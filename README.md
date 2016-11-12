@@ -4,21 +4,24 @@
 
 ## About
 
-This project uses [Feathers](http://feathersjs.com). An open source web framework for building modern real-time applications.
+This app will be the central notification service of the schulcloud project. 
+
+As API framework, we use [Feathers](http://feathersjs.com). 
 
 ## Getting Started
 
-Getting up and running is as easy as 1, 2, 3.
+1. Make sure you have [NodeJS](https://nodejs.org/) and [npm](https://www.npmjs.com/) and [mongodb](https://www.mongodb.com/) installed.
 
-1. Make sure you have [NodeJS](https://nodejs.org/) and [npm](https://www.npmjs.com/) installed.
 2. Install your dependencies
-    
+
     ```
     cd path/to/node-notification-service; npm install
     ```
 
-3. Start your app
-    
+3. If not already done, start mongodb (`mongod`)
+
+4. Start your app
+
     ```
     npm start
     ```
