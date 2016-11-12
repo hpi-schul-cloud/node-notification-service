@@ -1,4 +1,4 @@
-# node-notification-service
+# Schulcloud Notification-API
 
 > feathers app to provide the schulcloud notification api
 
