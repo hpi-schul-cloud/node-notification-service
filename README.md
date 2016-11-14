@@ -8,6 +8,10 @@ This app will be the central notification service of the schulcloud project.
 
 As API framework, we use [Feathers](http://feathersjs.com). 
 
+## Architecture
+
+<img src="http://i.imgur.com/1YJa3Fw.png" width="800">
+
 ## Getting Started
 
 1. Make sure you have [NodeJS](https://nodejs.org/) and [npm](https://www.npmjs.com/) and [mongodb](https://www.mongodb.com/) installed.
