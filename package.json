@@ -18,7 +18,7 @@
   "scripts": {
     "test": "npm run jshint && npm run mocha",
     "jshint": "jshint src/. test/. --config",
-    "start": "node src/",
+    "start": "nodemon --inspect src/",
     "mocha": "mocha test/ --recursive"
   },
   "dependencies": {
@@ -30,7 +30,7 @@
     "feathers-configuration": "^0.3.3",
     "feathers-errors": "^2.5.0",
     "feathers-hooks": "^1.6.1",
-    "feathers-mongoose": "^3.6.0",
+    "feathers-mongoose": "^3.6.1",
     "feathers-rest": "^1.5.2",
     "feathers-socketio": "^1.4.2",
     "mongoose": "^4.6.7",
