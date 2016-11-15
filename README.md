@@ -1,4 +1,4 @@
-# node-notification-service
+# Schulcloud Notification-API
 
 > feathers app to provide the schulcloud notification api
 
@@ -7,6 +7,10 @@
 This app will be the central notification service of the schulcloud project. 
 
 As API framework, we use [Feathers](http://feathersjs.com). 
+
+## Architecture
+
+<img src="http://i.imgur.com/1YJa3Fw.png" width="800">
 
 ## Getting Started
 
