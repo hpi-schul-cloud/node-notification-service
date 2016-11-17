@@ -38,7 +38,9 @@ As API framework, we use [Feathers](http://feathersjs.com).
 
 ## Testing
 
+To run the tests, make sure mocha and chai are installed.
 Simply run `npm test` and all your tests in the `test/` directory will be run.
+The test script executes jshint and mocha. If you just want to run either of them use: `mocha test/ --recursive` or `jshint src/. test/. --config`  
 
 ## Scaffolding
 
