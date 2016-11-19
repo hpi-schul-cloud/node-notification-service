@@ -33,3 +33,6 @@ data/
 # intellij
 .idea/
 *.iml
+
+# Visual Studio Code
+.vscode/
