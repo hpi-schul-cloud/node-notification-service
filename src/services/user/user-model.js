@@ -7,12 +7,15 @@
 
 // was created by feathers, we could use it for mocking schulcloud users
 
+// Add a table for devices
+
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
-  email: {type: String, required: true, unique: true},
-  password: { type: String, required: true },
+  int: {type: String, required: true, unique: true},
+
+  device: [],
 
   createdAt: { type: Date, 'default': Date.now },
   updatedAt: { type: Date, 'default': Date.now }
