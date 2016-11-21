@@ -1,12 +1,7 @@
 'use strict';
-const firebase = require('node-gcm');
-const firebaseConfig = require('./firebase.json');
+const firebase = require('./adapters/firebase.js');
 
 class SendInterface {
-
-  constructor() {
-    this.firebaseSender = new firebase.Sender(firebaseConfig.serverToken);
-  }
 
   sendToMobile(notification) {
 
@@ -24,28 +19,20 @@ class SendInterface {
 
   sendToWeb(notification) {
 
-     console.log('[INFO] sending notification to web');
+    console.log('[INFO] sending notification to web');
 
-      // TODO insert sending magic
-      let message = new firebase.Message({
-        notification: {
-          title: notification.title,
-          body: notification.text
-        }
-      });
-      let deviceToken = '';
-      this.firebaseSender.send(message, deviceToken, (error, response) => {
-        if (error) {
-          console.log('[INFO] Could not send message via Firebase.');
-        } else {
-          console.log('[INFO] Response from Firebase', response);
-        }
-      })
-      notification.changeState('sent to web');
-
-      console.log('[INFO] notification was sent to web');
-
-      return Promise.resolve( notification );
+    // TODO insert sending magic
+    return new Promise((resolve, reject) => {
+      firebase.send(notification, 'mops')
+        .then(result => {
+          console.log('[INFO] notification was sent to web');
+          notification.changeState('sent to web');
+          resolve(result);
+        })
+        .catch(error => {
+          reject(error);
+        });
+    });
   }
 
 }
