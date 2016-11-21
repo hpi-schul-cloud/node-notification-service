@@ -25,12 +25,12 @@ class FirebaseAdapter {
           console.log('[INFO] Response from Firebase', response);
           if (response.failure === 1) {
             reject(new errors.GeneralError(response.results[0].error));
+          } else {
+            resolve(notification/*{
+              messageId: response.results[0].message_id,
+              message: message
+            }*/);
           }
-
-          resolve(notification/*{
-            messageId: response.results[0].message_id,
-            message: message
-          }*/);
         }
       });
     });
