@@ -1,4 +1,5 @@
 'use strict';
+const message = require('./message');
 // const orchestration = require('./orchestration');
 const notification = require('./notification');
 const resolve = require('./resolve');
@@ -16,4 +17,5 @@ module.exports = function() {
   app.configure(resolve);
   // app.configure(orchestration);
   app.configure(notification);
+  app.configure(message);
 };
