@@ -23,17 +23,9 @@ const deviceSchema = new Schema({
   // TODO: necessary? plattform: { type: String, required: true }
 });
 
-const userNotificationSchema = new Schema({
-  _id: { type: ObjectId, required: true },
-  state: { type: String, enum: notificationStates, default: 'created' },
-  stateHistory: [],
-  message: { type: messageModel, required: true }
-});
-
 const userSchema = new Schema({
-  _id: { type: ObjectId, required: true },
+  name: { type: String, required: true },
   devices: { type: [deviceSchema], required: false },
-  notifications: { type: [userNotificationSchema], required: false },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });

@@ -9,14 +9,9 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const sourceSchema = new Schema({
-  serviceId: { type: ObjectId, required: true },
+  serviceId: { type: Schema.ObjectId, required: true },
   author: { type: String, required: true },
   authenticationToken: {type: String, required: true }
-});
-
-const userSchema = new Schema({
-  userId: { type: ObjectId, required:true },
-  clicked: { type: Boolean, 'default': false }
 });
 
 const messageSchema = new Schema({
@@ -25,10 +20,15 @@ const messageSchema = new Schema({
   body: { type: String, required: true },
   icon: { type: String, required: false },
   action: { type: String, required: false },
-  source: { type: sourceSchema, required: true },
-  scope: { type: [ObjectId], required: true },
-  users: { type: [userSchema], required: false },
+  source: {
+    serviceId: { type: Schema.ObjectId, required: true },
+    author: { type: String, required: true },
+    authenticationToken: {type: String, required: true }
+  },
+  scopeIds: { type: [String], required: false },
   validTo: { type: Date, required: false },
+
+  userIds: { type: [String], required: false },
   createdAt: { type: Date, 'default': Date.now },
   updatedAt: { type: Date, 'default': Date.now }
 });

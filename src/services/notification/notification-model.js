@@ -8,12 +8,13 @@
 const mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 const Schema = mongoose.Schema;
+const messageSchema = mongoose.model('message').schema;
 
 
 // TODO notification model for db
 const notificationSchema = new Schema({
-  title: { type: String, required: true },
-  text: { type: String, required: false },
+  message: { type: messageSchema, required: true },
+  user: { type: Schema.ObjectId, ref: 'user', required: true },
   state: { type: String, default: 'created' },
   stateHistory: [],
   createdAt: { type: Date, default: Date.now },
