@@ -1,5 +1,5 @@
 'use strict';
-// const orchestration = require('./orchestration');
+const callback = require('./callback');
 const notification = require('./notification');
 const resolve = require('./resolve');
 const authentication = require('./authentication');
@@ -14,6 +14,7 @@ module.exports = function() {
   app.configure(authentication);
   app.configure(user);
   app.configure(resolve);
-  // app.configure(orchestration);
   app.configure(notification);
+  app.configure(callback);
+  app.configure(callback);
 };
