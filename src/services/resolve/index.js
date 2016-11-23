@@ -20,7 +20,6 @@ class Service {
       return Promise.reject(new errors.BadRequest('Parameter Missing'));
 
     console.log('[INFO] New notification Request with title ' + data.title);
-    debugger;
 
     // create a new notification object
     const newNotification = new notification({
