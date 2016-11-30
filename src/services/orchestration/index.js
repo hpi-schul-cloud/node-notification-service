@@ -8,11 +8,13 @@ class Orchestration {
     // TODO insert escalation magic
   }
 
-  orchestrate(notification) {
+  orchestrate(notifications) {
 
     console.log('[INFO] orchestrating notification');
 
-    notification.changeState('orchestrated');
+    notifications.forEach((notification) => {
+      notification.changeState('orchestrated');
+    });
 
     return new Promise((resolve, reject) => {
         let devices = [{
@@ -20,7 +22,7 @@ class Orchestration {
         }];
 
         // TODO insert orchestration magic
-        sendInterface.send([notification], devices)
+        sendInterface.send(notifications, devices)
           .then( res => {
               console.log('[INFO] notification sent');
               resolve(res);
