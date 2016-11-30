@@ -1,11 +1,11 @@
 'use strict';
 
-const hooks = require('./hooks');
-const util = require('../util');
-const mongoose = require('mongoose');
+const hooks        = require('./hooks');
+const util         = require('../util');
+const constants    = require('../constants');
+const mongoose     = require('mongoose');
 const notification = require('../notification/notification-model');
-const callback = require('./callback-model');
-const errors = require('feathers-errors');
+const errors       = require('feathers-errors');
 
 class Service {
   constructor(options) {
@@ -13,34 +13,25 @@ class Service {
   }
 
   create(data, params) {
-    if (!util.isAllSet([data.notificationId]))
-      return Promise.reject(new errors.BadRequest('Parameter Missing'));
+    if (!util.isSet(data.notificationId))
+      return Promise.reject(new errors.BadRequest('Notification Id Missing'));
 
     return new Promise((resolve, reject) => {
-
-      var newCbId;
-
       notification.findOne({_id:data.notificationId})
         .then( notification => {
-            const newCb = new callback({_creator: notification._id});
-            return newCb.save();
-        })
-        .then ( newCb => {
-            newCbId = newCb._id;
-            return notification.findOne({_id:data.notificationId})
-        })
-        .then ( not => {
-            not.callbacks.push(newCbId);
-            return not.save();
+            notification.callbacks.push({type:data.type});
+
+            if (data.type === constants.CALLBACK_TYPES.CLICKED)
+              notifications.state = 'clicked'; // TODO use constant
+
+            return notification.save();
         })
         .then ( pushedNot => {
-            console.log(pushedNot);
-            resolve(notification.findOne({_id:data.notificationId}).populate('callbacks'));
+            resolve(pushedNot);
         })
         .catch( err => {
             return reject(new errors.BadRequest(err));
         })
-
     });
 
   }

@@ -21,7 +21,7 @@ const messageSchema = new Schema({
   icon: { type: String, required: false },
   action: { type: String, required: false },
   source: {
-    serviceId: { type: Schema.ObjectId, required: true },
+    serviceId: { type: String, required: true },
     author: { type: String, required: true },
     authenticationToken: {type: String, required: true }
   },

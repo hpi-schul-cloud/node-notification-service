@@ -7,19 +7,20 @@
 
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const messageSchema = mongoose.model('message').schema;
+
+const callbackSchema = new Schema({
+  type: { type: String, enum:['received','clicked'], required: true},  //
+  createdAt: { type: Date, 'default': Date.now }
+});
 
 
 // TODO notification model for db
 const notificationSchema = new Schema({
-  message: { type: messageSchema, required: true },
+  message: { type: Object, required: true },
   user: { type: Schema.ObjectId, ref: 'user', required: true },
   state: { type: String, default: 'created' },
   stateHistory: [],
-  callbacks: [{                                   // hier machen wir eine referenz zu dem callback model
-      type: Schema.ObjectId,
-      ref: 'callback'
-  }],
+  callbacks: [callbackSchema],
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });
