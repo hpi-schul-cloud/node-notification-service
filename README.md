@@ -28,7 +28,10 @@ As API framework, we use [Feathers](http://feathersjs.com).
     cd path/to/node-notification-service; npm install
     ```
 
-4. If not already done, start mongodb (`mongod`). Make sure you created the `/data/db` directory and have permissions to write to it.
+4. If not already done, start mongodb (`mongod`). Make sure you created the `/data/db` directory and have permissions to write to it.  
+    ```
+    mongod --config /usr/local/etc/mongod.conf
+    ```
 
 5. Start your app
 
