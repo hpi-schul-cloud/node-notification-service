@@ -20,7 +20,8 @@ const deviceSchema = new Schema({
   type: { type: String, enum: ['mobile', 'desktop', 'email'], required: true },
   service: { type: String, enum: ['firebase', 'apn', 'email'], required: true },
   OS: { type: String, required: true},
-  state: {type: String, enum: ['registered','failed','removed']},
+  name: { type: String, required: true},
+  state: {type: String, enum: ['registered','failed','removed'], required: true},
   active: { type: Boolean, default: false } // Active device at the moment
 });
 
@@ -32,5 +33,6 @@ const userSchema = new Schema({
 });
 
 const userModel = mongoose.model('user', userSchema);
+const deviceModel = mongoose.model('device', deviceSchema);
 
 module.exports = userModel;

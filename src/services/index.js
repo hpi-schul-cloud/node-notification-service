@@ -1,4 +1,5 @@
 'use strict';
+const device = require('./device');
 const callback = require('./callback');
 const message = require('./message');
 // const orchestration = require('./orchestration');
@@ -19,4 +20,5 @@ module.exports = function() {
   app.configure(notification);
   app.configure(callback);
   app.configure(message);
+  app.configure(device);
 };
