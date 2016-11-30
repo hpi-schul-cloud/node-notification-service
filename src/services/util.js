@@ -11,6 +11,13 @@ class Util {
     });
   }
 
+  getEnumValues(enumObject) {
+    var result = [];
+    for (var key in enumObject)
+      result.push(enumObject[key])
+    return result;
+  }
+
   isAnySet(array) {
     return array.some((elem,i)=>{
       if (typeof elem !== 'undefined') return true;
