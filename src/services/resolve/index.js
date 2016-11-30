@@ -27,8 +27,8 @@ class Resolve {
     }
 
     return new Promise( (resolve,reject) => {
-        if (mock[ssoToken])
-          resolve(mock[ssoToken])
+        if (mock[token])
+          resolve(mock[token])
         else
           reject(new errors.Forbidden('token not valid'))
     })
