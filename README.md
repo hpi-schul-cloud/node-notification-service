@@ -1,10 +1,10 @@
-# Schulcloud Notification-API
+# Schul-Cloud Notification-API
 
-> feathers app to provide the schulcloud notification api
+> feathers app to provide the Schul-Cloud notification api
 
 ## About
 
-This app will be the central notification service of the schulcloud project. 
+This app will be the central notification service of the Schul-Cloud project. 
 
 As API framework, we use [Feathers](http://feathersjs.com). 
 
@@ -28,7 +28,12 @@ As API framework, we use [Feathers](http://feathersjs.com).
     cd path/to/node-notification-service; npm install
     ```
 
-4. If not already done, start mongodb (`mongod`). Make sure you created the `/data/db` directory and have permissions to write to it.
+4. If not already done, start mongodb (`mongod`). Make sure you created the `/data/db` directory and have permissions to write to it.  
+   
+   You can also specify a local path:
+    ```
+    mongod --dbpath=data/db
+    ```
 
 5. Start your app
 

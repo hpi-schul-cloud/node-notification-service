@@ -49,7 +49,50 @@ class Service {
 
   }
 
+  // returns user ids
+  static resolveUser(ids) {
+
+    // Call Schul-Cloud Server
+    // contactSchulCloud(ids);
+
+    var userIDs = [];
+
+    // Mocking Data
+    userIDs.push(1);
+
+    return userIDs;
+  }
+
+  static verifyService(token) {
+
+    var serviceID;
+
+    // Call Schul-Cloud Service
+    // ...
+
+    // TODO end mocking
+    serviceID = 1;
+
+    return serviceID;
+  }
+
+  static verifyUser(userID) {
+
+  var userID;
+
+  // Call Schul-Cloud Service
+
+
+  // TODO write the real function
+  userID = 1;
+
+  return userID;
+
 }
+
+}
+
+
 
 module.exports = function(){
   const app = this;
