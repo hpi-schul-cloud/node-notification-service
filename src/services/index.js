@@ -1,12 +1,11 @@
 'use strict';
-const device = require('./device');
-const callback = require('./callback');
 const message = require('./message');
 // const orchestration = require('./orchestration');
 const notification = require('./notification');
 const resolve = require('./resolve');
 const authentication = require('./authentication');
 const user = require('./user');
+const device = require('./device');
 const callback = require('./callback');
 const mongoose = require('mongoose');
 module.exports = function() {
