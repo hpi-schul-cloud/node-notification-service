@@ -2,7 +2,6 @@
 const config = require('./config.json').firebase;
 const firebase = require('node-gcm');
 const errors = require('feathers-errors');
-const _ = require('lodash');
 
 class FirebaseAdapter {
   constructor() {
@@ -10,41 +9,78 @@ class FirebaseAdapter {
   }
 
   send(notifications, devices) {
-    return new Promise((resolve, reject) => {
-      let message = buildMessage(notifications[0]);
+    return new Promise((resolve) => {
+      let message = this._buildMessage(notifications[0]);
       let tokens = devices.reduce((accumulator, device) => {
-        return accumulator.push(device.token);
+        return accumulator.concat(device.token);
       }, [])
 
-      this.firebaseSender.sendNoRetry(message, { registrationTokens: tokens }, (error, response) => {
+      this.firebaseSender.sendNoRetry(message, { registrationTokens: tokens }, (error, firebaseResponse) => {
         if (error) {
           console.log('[INFO] Unable to send message via Firebase.');
-          reject(new errors.Unavailable('Unable to send message via Firebase.'))
+          let response = this._buildErrorResponse(notifications, devices);
+          resolve(response);
         } else {
-          console.log('[INFO] Response from Firebase', response);
-          if (response.failure == 0) {
-            reject(new errors.GeneralError('Could not deliver some messages.'));
-          } else {
-            resolve(notification);
-          }
+          console.log('[INFO] Response from Firebase', firebaseResponse);
+          let response = this._buildResponse(notifications, devices, firebaseResponse);
+          resolve(response);
         }
       });
     });
   }
 
-  buildMessage(notification) {
+  _buildMessage(notification) {
     let message = {};
 
     message.notification = {
-      title: notification.title,
-      body: notification.body
+      title: notification.message.title,
+      body: notification.message.body
       // TODO: icon
     };
     // TODO: message.action = notification.action;
     message.priority = notification.priority == 'high' ? 'high' : 'normal';
     message.timeToLive = notification.timeToLive; // TODO: parse correctly
 
-    return message;
+    return new firebase.Message(message);
+  }
+
+  _buildResponse(notifications, devices, firebaseResponse) {
+    let response = {};
+
+    response.success = firebaseResponse.success;
+    response.failure = firebaseResponse.failure;
+    response.results = firebaseResponse.results.reduce((accumulator, firebaseResult, index) => {
+      let result = {
+        notificationId: notifications[index]._id,
+        deviceId: devices[index]._id
+      };
+
+      if (firebaseResult.hasOwnProperty('error')) {
+        // TODO: define own general error messages
+        result.error = firebaseResult.error;
+      }
+
+      return accumulator.concat(result);
+    }, []);
+
+    return response;
+  }
+
+  _buildErrorResponse(notifications, devices) {
+    let response = {
+      success: 0,
+      failure: notifications.length,
+      results: []
+    };
+
+    response.results = devices.reduce((accumulator, device, index) => {
+      let result = {
+        notificationId: notifications[index]._id,
+        deviceId: devices[index]._id,
+        error: 'Service unavailable'
+      };
+      return accumulator.concat(result);
+    }, []);
   }
 }
 
