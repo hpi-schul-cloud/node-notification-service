@@ -15,11 +15,10 @@ const callbackSchema = new Schema({
   createdAt: { type: Date, 'default': Date.now }
 });
 
-
 // TODO notification model for db
 const notificationSchema = new Schema({
   message: { type: Object, required: true },
-  user: { type: Schema.ObjectId, ref: 'user', required: true },
+  user: { type: String, ref: 'user', required: true },
   state: { type: String, default: 'created', enum:  Util.getEnumValues(Constants.NOTIFICATION_STATES)},
   stateHistory: [],
   callbacks: [callbackSchema],
