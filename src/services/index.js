@@ -17,7 +17,6 @@ module.exports = function() {
   app.configure(message);
   app.configure(authentication);
   app.configure(user);
-  app.configure(resolve);
   app.configure(notification);
   app.configure(callback);
   app.configure(device);

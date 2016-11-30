@@ -7,6 +7,8 @@
 
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const Constants = require('../constants');
+const Util = require('../util');
 
 const callbackSchema = new Schema({
   type: { type: String, enum:['received','clicked'], required: true},  //
@@ -18,7 +20,7 @@ const callbackSchema = new Schema({
 const notificationSchema = new Schema({
   message: { type: Object, required: true },
   user: { type: Schema.ObjectId, ref: 'user', required: true },
-  state: { type: String, default: 'created' },
+  state: { type: String, default: 'created', enum:  Util.getEnumValues(Constants.NOTIFICATION_STATES)},
   stateHistory: [],
   callbacks: [callbackSchema],
   createdAt: { type: Date, default: Date.now },

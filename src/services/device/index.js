@@ -1,8 +1,9 @@
 'use strict';
 
-const hooks = require('./hooks');
-const device = require('../user/index');
-const resolve = require('../resolve/index');
+const hooks   = require('./hooks');
+const user    = require('../user/user-model');
+const Resolve = require('../resolve');
+const errors  = require('feathers-errors');
 
 class Service {
 
@@ -13,45 +14,50 @@ class Service {
   // Adds a device for a user to the database
   create(data, params) {
 
+    console.log(data);
+
     // Create device object
-    const newDevice = new device({
-      token: data.token,
+    const newDevice = {
+      token: data.service_token,
       type: data.type,
       service: data.service,
       name: data.name,
       OS: data.OS,
       state: 'registered'
-    });
+    };
 
-    // Resolve user only existing users can register in the Schul-Cloud app
-    var userId = resolve.Service.verifyUser(data.user);
-
-    // Create User
-    const newUser = new user({
-      name: userId,
-      devices: newDevice
+    var newUser = new user({
+      schulcloudId : null,
+      devices : [newDevice]
     });
 
     // Insert data into DB
     return new Promise((resolve, reject) => {
 
-      user.findOne({_id:userId})
+      // Resolve user only existing users can register in the Schul-Cloud app
+      Resolve.verifyUser(data.user_token)
+        .then( schulcloudId => {
+          newUser.schulcloudId = schulcloudId;
+          return user.findOne({schulcloudId:schulcloudId})
+        })
         .then( user => {
-          user.devices.push(newDevice);
+          if (!user) {
+            var user = newUser;
+          } else {
+            const deviceExists = user.devices.some( device => {
+              if (device.token === newDevice.token) return true;
+            });
+            if (!deviceExists) {
+              user.devices.push(newDevice);
+            }
+          }
           return user.save();
         })
         .then ( userWithNewDevice => {
           resolve(userWithNewDevice);
         })
         .catch( err => {
-          console.log(err);
-          return newUser.save();
-        })
-        .then( userNew => {
-          resolve(userNew);
-        })
-        .catch( err => {
-          reject(new errors.GeneralError('Internal Error'));
+          reject(err);
         })
 
     });
