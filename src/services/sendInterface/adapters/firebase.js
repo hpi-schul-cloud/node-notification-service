@@ -13,15 +13,13 @@ class FirebaseAdapter {
       let message = this._buildMessage(notifications[0]);
       let tokens = devices.reduce((accumulator, device) => {
         return accumulator.concat(device.token);
-      }, [])
+      }, []);
 
       this.firebaseSender.sendNoRetry(message, { registrationTokens: tokens }, (error, firebaseResponse) => {
         if (error) {
-          console.log('[INFO] Unable to send message via Firebase.');
           let response = this._buildErrorResponse(notifications, devices);
           resolve(response);
         } else {
-          console.log('[INFO] Response from Firebase', firebaseResponse);
           let response = this._buildResponse(notifications, devices, firebaseResponse);
           resolve(response);
         }
