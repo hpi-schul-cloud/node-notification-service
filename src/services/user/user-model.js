@@ -36,3 +36,4 @@ const userModel = mongoose.model('user', userSchema);
 const deviceModel = mongoose.model('device', deviceSchema);
 
 module.exports = userModel;
+module.exports = deviceModel;
