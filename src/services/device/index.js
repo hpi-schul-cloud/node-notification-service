@@ -14,8 +14,6 @@ class Service {
   // Adds a device for a user to the database
   create(data, params) {
 
-    console.log(data);
-
     // Create device object
     const newDevice = {
       token: data.service_token,
@@ -26,7 +24,7 @@ class Service {
       state: 'registered'
     };
 
-    var newUser = new user({
+    let newUser = new user({
       schulcloudId : null,
       devices : [newDevice]
     });
@@ -42,7 +40,7 @@ class Service {
         })
         .then( user => {
           if (!user) {
-            var user = newUser;
+            user = newUser;
           } else {
             const deviceExists = user.devices.some( device => {
               if (device.token === newDevice.token) return true;
@@ -59,7 +57,6 @@ class Service {
         .catch( err => {
           reject(err);
         })
-
     });
   }
 }
