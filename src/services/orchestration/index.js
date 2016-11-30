@@ -15,9 +15,12 @@ class Orchestration {
     notification.changeState('orchestrated');
 
     return new Promise((resolve, reject) => {
+        let devices = [{
+          token: 'ladida',
+        }];
 
         // TODO insert orchestration magic
-        sendInterface.sendToWeb(notification)
+        sendInterface.send([notification], devices)
           .then( res => {
               console.log('[INFO] notification sent');
               resolve(res);

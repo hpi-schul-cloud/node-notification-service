@@ -9,17 +9,12 @@ class FirebaseAdapter {
     this.firebaseSender = new firebase.Sender(config.serverToken);
   }
 
-  /**
-   * Send a message with the given payload and options via Firebase.
-   *
-   * @param {{title: string, body: string}} notification
-   * @param {Object} data
-   * @param {string[]} tokens
-   * @param {{timeToLive: number, priority: ('normal'|'high')}} options
-   */
-  send(notification, data, tokens, options) {
+  send(notifications, devices) {
     return new Promise((resolve, reject) => {
-      let message = buildMessage(notification, data, options);
+      let message = buildMessage(notifications[0]);
+      let tokens = devices.reduce((accumulator, device) => {
+        return accumulator.push(device.token);
+      }, [])
 
       this.firebaseSender.sendNoRetry(message, { registrationTokens: tokens }, (error, response) => {
         if (error) {
@@ -27,35 +22,27 @@ class FirebaseAdapter {
           reject(new errors.Unavailable('Unable to send message via Firebase.'))
         } else {
           console.log('[INFO] Response from Firebase', response);
-          if (response.failure === tokens.length) {
-            reject(new errors.GeneralError('Could not deliver any message.'));
-          } else if (response.failes > 0) {
-            resolve();
+          if (response.failure == 0) {
+            reject(new errors.GeneralError('Could not deliver some messages.'));
           } else {
-            resolve(notification/*{
-              messageId: response.results[0].message_id,
-              message: message
-            }*/);
+            resolve(notification);
           }
         }
       });
     });
   }
 
-  buildMessage(notification, data, options) {
+  buildMessage(notification) {
     let message = {};
 
-    if (_.isPlainObject(notification)) {
-      _.assign(message.notification, notification);
-    }
-
-    if (_.isPlainObject(data)) {
-      _.assign(message.data, data);
-    }
-
-    if (_.isPlainObject(options)) {
-      _.assign(message, options);
-    }
+    message.notification = {
+      title: notification.title,
+      body: notification.body
+      // TODO: icon
+    };
+    // TODO: message.action = notification.action;
+    message.priority = notification.priority == 'high' ? 'high' : 'normal';
+    message.timeToLive = notification.timeToLive; // TODO: parse correctly
 
     return message;
   }

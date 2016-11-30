@@ -1,46 +1,18 @@
 'use strict';
 const _ = require('lodash');
 const notificationServices = {
-  firebase: require('./adapters/firebase.js')
+  firebase: require('./adapters/firebase')
 };
 
 class SendInterface {
 
-  sendToMobile(notification, data, devices, options) {
-
-    console.log('[INFO] sending notification to mobile');
-
-    // TODO insert sending magic
-
-    notification.changeState('sent to mobile');
-
-    console.log('[INFO] notification was sent to mobile');
-
-    return Promise.resolve( notification );
-
-  }
-
-  sendToWeb(notification, data, devices, options) {
-
-    console.log('[INFO] sending notification to web');
-
-    let groupedDevices = _.groupBy(devices, device => device.service);
-
-    // TODO insert sending magic
-    return new Promise((resolve, reject) => {
-      firebase.send(notification, data, tokens, options)
-        .then(result => {
-          console.log('[INFO] notification was sent to web');
-          notification.changeState('sent to web');
-          resolve(result);
-        })
-        .catch(error => {
-          reject(error);
-        });
-    });
-  }
-
-  send(notification, data, devices, options) {
+  /**
+   * This method sends the given notifications to all devices via the appropriate service.
+   * If multiple notifications are given, only the message of the first is respected.
+   * The returned promise resolves, if at least one notification was sent.
+   * The returned promise rejects, if all notifications fail.
+   */
+  send(notifications, devices) {
 
     let results = {};
 
@@ -54,7 +26,7 @@ class SendInterface {
         continue;
       }
 
-      notificationServices[service].send(notification, data, devices, options);
+      notificationServices[service].send(notifications, devices);
     })
   }
 
