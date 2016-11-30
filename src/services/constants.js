@@ -25,6 +25,12 @@ class Constants {
       EMAIL: 'email'
     }
 
+    this.MESSAGE_PRIORITIES = {
+      HIGH: 'high',
+      MEDIUM: 'medium',
+      LOW: 'low'
+    }
+
   }
 
 
