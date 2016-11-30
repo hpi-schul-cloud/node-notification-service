@@ -16,11 +16,12 @@ const Schema = mongoose.Schema;
 const notificationStates = ['created', 'sent', 'seen', 'clicked', 'deleted', 'failed'];
 
 const deviceSchema = new Schema({
-  service: { type: String, enum: ['firebase', 'apn', 'email'], required: true },
-  type: { type: String, enum: ['web', 'mobile', 'email'], required: true },
   token: { type: String, required: true },
-  active: { type: Boolean, default: false }
-  // TODO: necessary? plattform: { type: String, required: true }
+  type: { type: String, enum: ['mobile', 'desktop', 'email'], required: true },
+  service: { type: String, enum: ['firebase', 'apn', 'email'], required: true },
+  OS: { type: String, required: true},
+  state: {type: String, enum: ['registered','failed','removed']},
+  active: { type: Boolean, default: false } // Active device at the moment
 });
 
 const userSchema = new Schema({
