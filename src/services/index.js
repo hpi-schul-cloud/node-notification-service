@@ -1,11 +1,11 @@
 'use strict';
-const callback = require('./callback');
 const message = require('./message');
 // const orchestration = require('./orchestration');
 const notification = require('./notification');
 const resolve = require('./resolve');
 const authentication = require('./authentication');
 const user = require('./user');
+const callback = require('./callback');
 const mongoose = require('mongoose');
 module.exports = function() {
   const app = this;
@@ -13,10 +13,10 @@ module.exports = function() {
   mongoose.connect(app.get('mongodb'));
   mongoose.Promise = global.Promise;
 
+  app.configure(message);
   app.configure(authentication);
   app.configure(user);
   app.configure(resolve);
   app.configure(notification);
   app.configure(callback);
-  app.configure(message);
 };
