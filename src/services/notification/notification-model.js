@@ -29,7 +29,7 @@ const notificationSchema = new Schema({
 notificationSchema.methods.changeState = function changeState(newState) {
   this.stateHistory.push({'state': this.state, 'timestamp': Date.now});
   this.state = newState;
-}
+};
 
 const notificationModel = mongoose.model('notification', notificationSchema);
 

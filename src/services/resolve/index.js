@@ -24,14 +24,14 @@ class Resolve {
       servicetoken1 : 'serviceidfürservicetoken1',
       servicetoken2 : 'serviceidfürservicetoken2',
       servicetoken3 : 'serviceidfürservicetoken3',
-    }
+    };
 
     return new Promise( (resolve,reject) => {
         if (mock[token])
-          resolve(mock[token])
+          resolve(mock[token]);
         else
-          reject(new errors.Forbidden('token not valid'))
-    })
+          reject(new errors.Forbidden('token not valid'));
+    });
   }
 
   // get User ID from schulcloud db by sso Token
@@ -41,14 +41,14 @@ class Resolve {
       usertoken1 : 'useridfürusertoken1',
       usertoken2 : 'useridfürusertoken2',
       usertoken3 : 'useridfürusertoken3',
-    }
+    };
 
     return new Promise( (resolve,reject) => {
         if (mock[ssoToken])
-          resolve(mock[ssoToken])
+          resolve(mock[ssoToken]);
         else
-          reject(new errors.Forbidden('token not valid'))
-    })
+          reject(new errors.Forbidden('token not valid'));
+    });
 
   }
 
