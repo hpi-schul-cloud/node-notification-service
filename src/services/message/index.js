@@ -31,10 +31,12 @@ class Service {
           return Resolve.resolveUser(message.scopeIds);
         })
         .then( userIds => {
+          // set resolved userIds
           message.userIds = userIds;
           return Promise.resolve(message);
         })
         .then( message => {
+          // create notification for each user
           let notifications = message.userIds.reduce((notifications, userId) => {
             let notification = new Notification({
               message: message,
