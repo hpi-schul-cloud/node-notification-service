@@ -17,6 +17,7 @@
   },
   "scripts": {
     "test": "npm run mocha",
+    "testing": "nodemon --inspect src/ --exec \"npm test  || true\"",
     "jshint": "jshint src/. test/. --config",
     "start": "nodemon --inspect src/",
     "mocha": "mocha test/ --recursive"

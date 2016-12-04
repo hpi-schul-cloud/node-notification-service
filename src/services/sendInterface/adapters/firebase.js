@@ -30,11 +30,16 @@ class FirebaseAdapter {
   _buildMessage(notification) {
     let message = {};
 
-    message.notification = {
-      title: notification.message.title,
-      body: notification.message.body
-      // TODO: icon
+    // https://github.com/firebase/quickstart-js/issues/71#issuecomment-258872970
+    message.content_available = true;
+    message.data = {
+      notificationId: notification._id,
+      notification: {
+        title: notification.message.title,
+        body: notification.message.body
+      }
     };
+
     // TODO: message.action = notification.action;
     message.priority = notification.priority == 'high' ? 'high' : 'normal';
     message.timeToLive = notification.timeToLive; // TODO: parse correctly

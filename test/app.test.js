@@ -4,9 +4,12 @@ const assert = require('assert');
 const request = require('request');
 const app = require('../src/app');
 
+const port = 3131;
+const host = 'http://localhost:' + port;
+
 describe('Feathers application tests', function() {
   before(function(done) {
-    this.server = app.listen(3030);
+    this.server = app.listen(port);
     this.server.once('listening', () => done());
   });
 
@@ -15,7 +18,7 @@ describe('Feathers application tests', function() {
   });
 
   it('starts and shows the index page', function(done) {
-    request('http://localhost:3030', function(err, res, body) {
+    request(host, function(err, res, body) {
       assert.ok(body.indexOf('<html>') !== -1);
       done(err);
     });
@@ -24,7 +27,7 @@ describe('Feathers application tests', function() {
   describe('404', function() {
     it('shows a 404 HTML page', function(done) {
       request({
-        url: 'http://localhost:3030/path/to/nowhere',
+        url: host + '/path/to/nowhere',
         headers: {
           'Accept': 'text/html'
         }
@@ -37,7 +40,7 @@ describe('Feathers application tests', function() {
 
     it('shows a 404 JSON error without stack trace', function(done) {
       request({
-        url: 'http://localhost:3030/path/to/nowhere',
+        url: host + '/path/to/nowhere',
         json: true
       }, function(err, res, body) {
         assert.equal(res.statusCode, 404);
