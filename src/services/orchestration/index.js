@@ -1,6 +1,7 @@
 'use strict';
 
 const sendInterface = require('../sendInterface');
+const User = require('../user/user-model');
 
 class Orchestration {
 
@@ -17,20 +18,26 @@ class Orchestration {
     });
 
     return new Promise((resolve, reject) => {
-        let devices = [{
-          token: 'ladida',
-        }];
-
-        // TODO insert orchestration magic
-        sendInterface.send(notifications, devices)
-          .then( res => {
+      return User
+        .findOne({
+          schulcloudId: notifications[0].user
+        })
+        .then( user => {
+          // send to all of users devices
+          let news = [];
+          for(var i = 0; i < user.devices.length; i++) {
+            news.push(notifications[0]);
+          }
+          sendInterface.send(news, user.devices)
+            .then( res => {
               console.log('[INFO] notification sent');
               resolve(res);
-          })
-          .catch( err => {
+            })
+            .catch( err => {
               console.log('[ERROR] send error');
               reject();
-          })
+            })
+          });
     });
 
   }

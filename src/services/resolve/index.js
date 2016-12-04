@@ -7,11 +7,13 @@ class Resolve {
   // return schulcloud user ids for given array of user or scope ids
   static resolveUser(ids) {
 
-    var userIDs = [];
-    // Mocking Data
-    userIDs.push('fsdk23eoce8jrw3oejed');
-
-    return Promise.resolve(userIDs);
+    return this.verifyUser(ids);
+    //
+    // var userIDs = [];
+    // // Mocking Data
+    // userIDs.push('fsdk23eoce8jrw3oejed');
+    //
+    // return Promise.resolve(userIDs);
 
     // TODO Call Schul-Cloud Server
     // contactSchulCloud(ids);
