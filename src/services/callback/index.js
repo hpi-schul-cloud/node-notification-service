@@ -18,13 +18,14 @@ class Service {
 
     return new Promise((resolve, reject) => {
       notification.findOne({_id:data.notificationId})
-        .then( notification => {
-            notification.callbacks.push({type:data.type});
+        .then( foundNotification => {
+
+            foundNotification.callbacks.push({type:data.type});
 
             if (data.type === constants.CALLBACK_TYPES.CLICKED)
               notifications.state = 'clicked'; // TODO use constant
 
-            return notification.save();
+            return foundNotification.save();
         })
         .then ( pushedNot => {
             resolve(pushedNot);
