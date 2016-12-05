@@ -23,7 +23,7 @@ class Service {
             foundNotification.callbacks.push({type:data.type});
 
             if (data.type === constants.CALLBACK_TYPES.CLICKED)
-              notifications.state = 'clicked'; // TODO use constant
+              foundNotification.state = constants.CALLBACK_TYPES.CLICKED;
 
             return foundNotification.save();
         })
