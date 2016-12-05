@@ -7,26 +7,19 @@
 
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-
-const sourceSchema = new Schema({
-  serviceId: { type: Schema.ObjectId, required: true },
-  author: { type: String, required: true },
-  authenticationToken: {type: String, required: true }
-});
+const Constants = require('../constants');
+const Util = require('../util');
 
 const messageSchema = new Schema({
-  // TODO: priority
   title: { type: String, required: true },
   body: { type: String, required: true },
-  icon: { type: String, required: false },
   action: { type: String, required: false },
-  source: {
-    serviceId: { type: String, required: true },
-    author: { type: String, required: true },
-    authenticationToken: {type: String, required: true }
-  },
-  scopeIds: { type: [String], required: false },
-  validTo: { type: Date, required: false },
+  priority: { type: String, default: Constants.MESSAGE_PRIORITIES.MEDIUM, enum: Util.getEnumValues(Constants.MESSAGE_PRIORITIES) },
+  timeToLive: { type: Date, required: false },
+
+  authToken: { type: String, required: true },
+  userId: { type: String, required: true },
+  scopeIds: { type: [String], required: true },
 
   userIds: { type: [String], required: false },
   createdAt: { type: Date, 'default': Date.now },

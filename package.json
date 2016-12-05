@@ -16,9 +16,11 @@
     "node": ">= 0.12.0"
   },
   "scripts": {
-    "test": "npm run mocha",
+    "test": "npm run coverage",
+    "testing": "nodemon --inspect src/ --exec \"npm test  || true\"",
     "jshint": "jshint src/. test/. --config",
     "start": "nodemon --inspect src/",
+    "coverage": "NODE_ENV=test istanbul cover node_modules/.bin/_mocha -- -- -u exports -R spec test/**/*.test.js",
     "mocha": "mocha test/ --recursive"
   },
   "dependencies": {
@@ -44,6 +46,7 @@
     "chai": "^3.5.0",
     "expect": "^1.20.2",
     "feathers-populate-hook": "0.0.4",
+    "istanbul": "^0.4.5",
     "jshint": "^2.9.4",
     "mocha": "^3.1.2",
     "nodemon": "^1.11.0",
