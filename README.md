@@ -1,4 +1,4 @@
-# Schul-Cloud Notification-API
+# Schul-Cloud Notification-API [![Travis Status](https://travis-ci.org/schulcloud/node-notification-service.svg?branch=master)](https://travis-ci.org/schulcloud/node-notification-service) [![Code Coverage](https://img.shields.io/codecov/c/github/schulcloud/node-notification-service/master.svg)](https://codecov.io/gh/schulcloud/node-notification-service)
 
 > feathers app to provide the Schul-Cloud notification api
 
@@ -30,12 +30,17 @@ As API framework, we use [Feathers](http://feathersjs.com).
 
 4. If not already done, start mongodb (`mongod`). Make sure you created the `/data/db` directory and have permissions to write to it.  
    
-   You can also specify a local path:
+    You can also specify a local path:
     ```
     mongod --dbpath=data/db
     ```
+5. Create private `config.json`
 
-5. Start your app
+    ```
+    cp src/services/sendInterface/adapters/config.sample.json src/services/sendInterface/adapters/config.json
+    ```
+
+6. Start your app
 
     ```
     npm start
