@@ -33,6 +33,7 @@
     "feathers-mongoose": "^3.6.1",
     "feathers-rest": "^1.5.2",
     "feathers-socketio": "^1.4.2",
+    "feathers-swagger": "^0.3.1",
     "mongoose": "^4.6.7",
     "node-gcm": "^0.14.4",
     "passport": "^0.3.2",
