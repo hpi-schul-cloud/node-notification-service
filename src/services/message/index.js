@@ -1,17 +1,86 @@
 'use strict';
 
-const service       = require('feathers-mongoose');
-const Message       = require('./message-model');
-const hooks         = require('./hooks');
-const errors        = require('feathers-errors');
-const Util          = require('../util');
-const Resolve       = require('../resolve');
+const service = require('feathers-mongoose');
+const Message = require('./message-model');
+const hooks = require('./hooks');
+const errors = require('feathers-errors');
+const Util = require('../util');
+const Resolve = require('../resolve');
 const Orchestration = require('../orchestration');
-const Notification  = require('../notification/notification-model');
+const Notification = require('../notification/notification-model');
 
 class Service {
+
   constructor(options) {
     this.options = options || {};
+
+    this.docs = {
+      description: 'A service to send messages',
+      definitions: {
+        messages: {
+          type: "object",
+          required: [
+            "title","body","authToken","UserId","scopeIds"
+          ],
+          properties: {
+            title: {
+              type: "string",
+              description: "Title of the Notification"
+            },
+            body: {
+              type: "string",
+              description: ""
+            },
+            action: {
+              type: "string",
+              description: ""
+            },
+            priority: {
+              type: "string",
+              description: ""
+            },
+            timeToLive: {
+              type: "date-time",
+              description: ""
+            },
+            authToken: {
+              type: "string",
+              description: ""
+            },
+            userId: {
+              type: "string",
+              rdescription: ""
+            },
+            scopeIds: {
+              type: "array",
+              items: {
+                type: "string"
+              },
+              description: ""
+            },
+            userIds: {
+              type: "array",
+              items: {
+                type: "string"
+              },
+              description: ""
+            }
+          },
+          responses: {
+            "201" : {
+              description: "New Message has been resolved"
+            }
+          },
+          example : {
+            title: "New Notification",
+            body: "You have a new Notification",
+            authToken: "blabla1234",
+            userId: "blabla1234",
+            scopeIds: ["blabla1234"]
+          }
+        }
+      }
+    }
   }
 
   create(data, params) {
@@ -22,21 +91,21 @@ class Service {
 
     return new Promise((resolve, reject) => {
       message.save()
-        .then( message => {
+        .then(message => {
           return Resolve.verifyService(message.authToken);
         })
-        .then( authToken => {
+        .then(authToken => {
           return Resolve.verifyUser(message.userId);
         })
-        .then( userId => {
+        .then(userId => {
           return Resolve.resolveUser(message.scopeIds);
         })
-        .then( userIds => {
+        .then(userIds => {
           // set resolved userIds
           message.userIds = userIds;
           return Promise.resolve(message);
         })
-        .then( message => {
+        .then(message => {
           // create notification for each user
           let notifications = message.userIds.reduce((notifications, userId) => {
             let notification = new Notification({
@@ -48,11 +117,11 @@ class Service {
 
           return Promise.all(notifications);
         })
-        .then( notifications => {
+        .then(notifications => {
           Orchestration.orchestrate(notifications);
           resolve(message);
         })
-        .catch( error => {
+        .catch(error => {
           reject(error);
         });
     });

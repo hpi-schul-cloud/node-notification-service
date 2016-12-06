@@ -13,6 +13,7 @@ const bodyParser = require('body-parser');
 const socketio = require('feathers-socketio');
 const middleware = require('./middleware');
 const services = require('./services');
+const swagger = require('feathers-swagger');
 
 const app = feathers();
 
@@ -28,6 +29,20 @@ app.use(compress())
   .configure(hooks())
   .configure(rest())
   .configure(socketio())
+  .configure(swagger({
+    docsPath: '/docs',
+    uiIndex: path.join(__dirname, 'docs.html'),
+    info: {
+      title: 'Schulcloud Notification API Docs',
+      description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam',
+      version: '0.0.1',
+      contact: {
+          "name": "Notification API Dev Team",
+          "url": "http://www.schul.tech",
+          "email": "dummy@schul.tech"
+      },
+    }
+  }))
   .configure(services)
   .configure(middleware);
 
