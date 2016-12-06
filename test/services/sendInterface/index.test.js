@@ -9,10 +9,10 @@ describe('sendInterface service', function() {
     assert.ok(sendInterface);
   });
 
-  it('send empty', (done) => {
+  it('send empty', () => {
     return sendInterface.send([], [])
       .then(function(res) {
-        done();
+        res.should.not.be.ok;
       })
       .catch(function(err) {
         let expected = {
@@ -21,7 +21,6 @@ describe('sendInterface service', function() {
           results: []
         };
         assert.deepEqual(err, expected);
-        done();
       });
   });
 
