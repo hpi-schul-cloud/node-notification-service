@@ -25,14 +25,14 @@ describe('device service', () => {
 
 
     it('call with valid data', () => {
-      app.service('devices').create(validPayload)
+      return app.service('devices').create(validPayload)
         .then(function(res) {
           assert.ok(res);
         });
     });
 
     it('call with unknown token', () => {
-      app.service('devices').create({
+      return app.service('devices').create({
         "service": "firebase",
         "type": "mobile",
         "name": "test2",
@@ -46,7 +46,7 @@ describe('device service', () => {
     });
 
     it('calls the service two times with the same device token', () => {
-      app.service('devices').create(validPayload)
+      return app.service('devices').create(validPayload)
       .then((res) =>{
         return app.service('devices').create(validPayload);
       })

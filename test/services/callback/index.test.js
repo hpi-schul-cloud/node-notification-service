@@ -14,6 +14,7 @@ describe('callback service', function() {
       app.service('callback').create({});
     })
 
+    // TODO implement this shit
     it('call with valid token', () => {
       app.service('callback').create({
 

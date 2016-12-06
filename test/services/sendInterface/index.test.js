@@ -10,7 +10,7 @@ describe('sendInterface service', function() {
   });
 
   it('send empty', (done) => {
-    sendInterface.send([], [])
+    return sendInterface.send([], [])
       .then(function(res) {
         done();
       })
