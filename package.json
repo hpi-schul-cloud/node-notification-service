@@ -20,7 +20,7 @@
     "testing": "nodemon --inspect src/ --exec \"npm test  || true\"",
     "jshint": "jshint src/. test/. --config",
     "start": "nodemon --inspect src/",
-    "coverage": "istanbul cover node_modules/.bin/_mocha test/**/*.test.js",
+    "coverage": "./node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha ./test/**/*.test.js",
     "mocha": "mocha test/ --recursive"
   },
   "dependencies": {
