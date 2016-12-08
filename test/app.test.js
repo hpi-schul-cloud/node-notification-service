@@ -50,5 +50,16 @@ describe('Feathers application tests', function() {
         done(err);
       });
     });
+
+    it('shows a 405 Wrong Method error without stack trace', function(done) {
+      request({
+        url: host + '/messages',
+        json: true
+      }, function(err, res, body) {
+        assert.equal(res.statusCode, 405);
+        assert.equal(body.code, 405);
+        done(err);
+      });
+    });
   });
 });
