@@ -20,7 +20,7 @@ class Service {
         messages: {
           type: "object",
           required: [
-            "title","body","serviceToken","UserId","scopeIds"
+            "title","body","token","scopeIds"
           ],
           properties: {
             title: {
