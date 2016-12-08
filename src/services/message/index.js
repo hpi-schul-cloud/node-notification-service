@@ -16,11 +16,11 @@ class Service {
 
     this.docs = {
       description: 'A service to send messages',
-      definitions: {
+      definitions: {  // Define the corresponding payload Model
         messages: {
           type: "object",
           required: [
-            "title","body","authToken","UserId","scopeIds"
+            "title","body","serviceToken","UserId","scopeIds"
           ],
           properties: {
             title: {
@@ -29,54 +29,52 @@ class Service {
             },
             body: {
               type: "string",
-              description: ""
+              description: "Body of the Notification"
             },
             action: {
               type: "string",
-              description: ""
+              description: "Action to be done when the user clicks the notification"
             },
             priority: {
               type: "string",
-              description: ""
+              description: "either low, medium or high"
             },
             timeToLive: {
               type: "date-time",
               description: ""
             },
-            authToken: {
+            token: {
               type: "string",
-              description: ""
-            },
-            userId: {
-              type: "string",
-              rdescription: ""
+              description: "Token of the initiating service or user"
             },
             scopeIds: {
               type: "array",
               items: {
                 type: "string"
               },
-              description: ""
-            },
-            userIds: {
-              type: "array",
-              items: {
-                type: "string"
-              },
-              description: ""
-            }
-          },
-          responses: {
-            "201" : {
-              description: "New Message has been resolved"
+              description: "One or more scope Ids that either represent a single user or a group of users"
             }
           },
           example : {
             title: "New Notification",
             body: "You have a new Notification",
-            authToken: "blabla1234",
-            userId: "blabla1234",
-            scopeIds: ["blabla1234"]
+            token: "servicetoken2",
+            scopeIds: ["userIdOrScopeId","testScopeId"]
+          }
+        }
+      },
+      create : {
+        summary : 'Send a Notification',
+        description: 'Post a Message to the Service that will be resolved to one or many notifications',
+        responses: {
+          201 : {
+            description: 'Message was created and will be delivered to the specified user/group of users'
+          },
+          400 : {
+            description: 'The Provided payload is either incomplete or one or more values are invalid'
+          },
+          500 : {
+            description: 'internal error try again later.'
           }
         }
       }
@@ -84,26 +82,22 @@ class Service {
   }
 
   create(data, params) {
-    if (!Util.isAllSet([data.title, data.body, data.authToken, data.userId, data.scopeIds]))
+    if (!Util.isAllSet([data.title, data.body, data.token, data.scopeIds]))
       return Promise.reject(new errors.BadRequest('Parameters missing.'));
 
     let message = new Message(data);
 
     return new Promise((resolve, reject) => {
-      message.save()
-        .then(message => {
-          return Resolve.verifyService(message.authToken);
-        })
-        .then(authToken => {
-          return Resolve.verifyUser(message.userId);
-        })
-        .then(userId => {
+      // check if the provided token belongs to a service or user with authorities to push notifications
+      Resolve.verifyService(data.token)
+        .then(serviceOrUserId => {
+          message.initiatorId = serviceOrUserId;
           return Resolve.resolveUser(message.scopeIds);
         })
         .then(userIds => {
           // set resolved userIds
           message.userIds = userIds;
-          return Promise.resolve(message);
+          return message.save()
         })
         .then(message => {
           // create notification for each user
