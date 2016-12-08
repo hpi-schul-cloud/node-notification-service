@@ -30,39 +30,38 @@ describe('message service', function() {
 
   it('rejects invalid authToken', () => {
     return app.service('messages').create({
-      'title': 'Cat ipsum notification',
-      'body': 'Brown cats with pink ears slap owners face at 5am until human fills food dish for cats secretly make all the worlds muffins.',
-      'action': 'click-here',
-      'priority': 'high',
-      'timeToLive': '2016-12-31T23:59:00',
-      'scopeIds': 'some-random-id',
-      'userId': 'usertoken1',
-      'authToken': 'not-a-valid-token'
-    })
-    .then( res => {
-      expect(res.code).to.equal(403);
-    })
-    .catch( err => {
-      expect(err.code).to.equal(403);
-    });
+        "title": "New Notification",
+        "body": "You have a new Notification",
+        "token": "invalidToken",
+        "scopeIds": [
+          "userIdOrScopeId",
+          "testScopeId"
+        ]
+      })
+      .then(res => {
+        expect(res.code).to.be.above(399);
+      })
+      .catch(err => {
+         expect(err.code).to.be.above(399);
+      });
   });
 
-  it('rejects invalid userId', () => {
+   it('sends a message', () => {
     return app.service('messages').create({
-      'title': 'Cat ipsum notification',
-      'body': 'Brown cats with pink ears slap owners face at 5am until human fills food dish for cats secretly make all the worlds muffins.',
-      'action': 'click-here',
-      'priority': 'high',
-      'timeToLive': '2016-12-31T23:59:00',
-      'scopeIds': 'some-random-id',
-      'userId': 'not-a-valid-token',
-      'authToken': 'servertoken1'
-    })
-    .then( res => {
-      expect(res.code).to.equal(403);
-    })
-    .catch( err => {
-      expect(err.code).to.equal(403);
-    });
+        "title": "New Notification",
+        "body": "You have a new Notification",
+        "token": "servicetoken2",
+        "scopeIds": [
+          "userIdOrScopeId",
+          "testScopeId"
+        ]
+      })
+      .then(res => {
+        expect(res.code).not.to.be.above(299);
+      })
+      .catch(err => {
+        expect(err.code).not.to.exist;
+      });
   });
+
 });
