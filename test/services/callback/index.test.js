@@ -21,7 +21,7 @@ describe('callback service', function() {
       });
     });
 
-    it('call with valid token', () => {
+    it('call with valid token and received', () => {
       new Notification({
         message: {},
         user: 1
@@ -29,7 +29,25 @@ describe('callback service', function() {
         .save()
         .then(function(notification) {
           app.service('callback').create({
-            notificationId: notification._id
+            notificationId: notification._id,
+            type: 'received'
+          });
+        });
+    });
+
+
+    it('call with valid token and clicked', () => {
+      new Notification({
+        message: {
+          some: 'data'
+        },
+        user: 1
+      })
+        .save()
+        .then(function(notification) {
+          app.service('callback').create({
+            notificationId: notification._id,
+            type: 'clicked'
           });
         });
     });

@@ -24,6 +24,37 @@ describe('sendInterface service', function() {
       });
   });
 
+  // it('send one', () => {
+  //   let notifications = [{
+  //     _id: 'mockNotificationId',
+  //     message: {
+  //       title: 'test',
+  //       body: 'test'
+  //     }
+  //   }];
+  //   let devices = [{
+  //     _id: 'mockDeviceId',
+  //     service: 'firebase',
+  //     token: ''
+  //   }];
+  //   return sendInterface.send(notifications, devices)
+  //     .then(function(res) {
+  //       res.should.not.be.ok;
+  //     })
+  //     .catch(function(err) {
+  //       let expected = {
+  //         success: 0,
+  //         failure: 1,
+  //         results: [{
+  //           deviceId: 'mockDeviceId',
+  //           error: 'MissingRegistration',
+  //           notificationId: 'mockNotificationId'
+  //         }]
+  //       };
+  //       assert.deepEqual(err, expected);
+  //     });
+  // });
+
   // it('send test', (done) => {
   //   let notifications = [{
   //     _id: 'mockNotificationId',
