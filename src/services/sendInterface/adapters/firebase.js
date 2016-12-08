@@ -30,11 +30,28 @@ class FirebaseAdapter {
   _buildMessage(notification) {
     let message = {};
 
+    // TODO: test this flag on iOS
     // https://github.com/firebase/quickstart-js/issues/71#issuecomment-258872970
-    message.content_available = true;
+    // message.content_available = true;
+
+    // TODO: evaluate integration in escalation
+    // If the phonegap app is killed we have to place the notification here to trigger it natively
+    // Could be used if no received callback was triggered after a few seconds.
+    // message.notification = {
+    //   title: notification.message.title,
+    //     body: notification.message.body
+    // };
+
     message.data = {
+
+      // handle message in the background on Android Phonegap
+      // https://github.com/phonegap/phonegap-plugin-push/blob/master/docs/PAYLOAD.md#use-of-content-available-true
+      'content-available': '1',
+
       notificationId: notification._id,
-      notification: {
+
+      // we can not call this attribute 'notification' - phonegap will fail
+      news: {
         title: notification.message.title,
         body: notification.message.body
       }
@@ -42,7 +59,10 @@ class FirebaseAdapter {
 
     // TODO: message.action = notification.action;
     message.priority = notification.priority == 'high' ? 'high' : 'normal';
-    message.timeToLive = notification.timeToLive; // TODO: parse correctly
+
+    // TODO: evaluate usage for escalation to avoid multiple notifications
+    // seconds the message is kept on the server if it was not possible to push it immediately
+    // message.timeToLive = notification.timeToLive; // TODO: parse correctly
 
     return new firebase.Message(message);
   }
