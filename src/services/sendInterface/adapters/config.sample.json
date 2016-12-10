@@ -1,4 +1,12 @@
 {
+  "apn": {
+    "token": {
+      "key": "path/to/key.p8",
+      "keyId": "T0K3NK3Y1D",
+      "teamId": "T34M1D"
+    },
+    "production": false
+  },
   "firebase": {
     "serverToken": "some-secret-token"
   }
