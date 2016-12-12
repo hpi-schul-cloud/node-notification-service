@@ -1,21 +1,43 @@
 <!DOCTYPE html>
-<html lang="en">
+<html ng-app="sendApp">
 <head>
     <meta charset="UTF-8">
     <title>Sent Interface</title>
 </head>
-<body>
-<form>
+<body ng-controller="sendCtrl">
+
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+<script src="javascript/send.js"> </script>
+
+<h1>send a message to clients</h1>
+<form id="send-request">
   <label for="sender">Sender:
-    <input id="sender" name="sender">
+    <input id="sender" name="sender" ng-model="sender">
   </label>
+  <br>
   <label for="target">Target:
     <input id="target" name="target">
   </label>
-  <textarea maxlength="160" rows="4" cols="50">
-  This is a generic sample message so we don't have to type one for every test.
+  <br>
+  <label for="title">Title:
+    <input id="title" name="title" ng-model="data.title">
+  </label>
+  <br> <br>
+  <textarea maxlength="160" rows="4" cols="50" ng-model="data.body">This is a generic sample message so we don't have to type one for every test.
   </textarea>
-  <button type="button" name="Submit">Send message</button>
+  <br>
+  <button type="button" name="Submit" ng-click="sendRequest()">Send message</button>
 </form>
+  {{error}} <br>
+
+
+<div ng-if="error">
+{{response}}</div>
+<div ng-else>
+  {{response.data}}
+</div>
+
+
+
 </body>
 </html>
