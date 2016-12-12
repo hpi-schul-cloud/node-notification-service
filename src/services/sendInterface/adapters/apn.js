@@ -23,10 +23,20 @@ class ApnAdapter {
   }
 
   _buildMessage(notification) {
-    var message = new apn.Notification();
+    let message = new apn.Notification();
 
-    message.alert = '';
-    message.payload = '';
+    message.title = notification.message.title;
+    message.body = notification.message.body;
+    message.expiry = notification.timeToLive; // TODO: should be UNIX timestamp
+    message.priority = notification.priority === 'high' ? 10 : 5;
+    message.contentAvailable = true;
+
+    if (message.priority === 10) {
+      // we must trigger this for messages with high priority
+      message.alert = notification.message.title;
+    }
+
+    return message;
   }
 
   _buildResponse(notifications, devices, apnResponse) {
@@ -35,31 +45,37 @@ class ApnAdapter {
     response.success = apnResponse.sent.length;
     response.failure = apnResponse.failed.length;
 
-    let successResults = apn.response.sent.reduce((accumulator, token) => {
-      let index = devices.findIndex(device => device.token === token);
-      let result = {
-        notificationId: notifications[index]._id,
-        deviceId: devices[index]._id
-      };
+    let successResults = [];
+    if (response.success > 0) {
+      successResults = apnResponse.sent.reduce((accumulator, token) => {
+        let index = devices.findIndex(device => device.token === token);
+        let result = {
+          notificationId: notifications[index]._id,
+          deviceId: devices[index]._id
+        };
 
-      return accumulator.concat(result);
-    });
+        return accumulator.concat(result);
+      }, []);
+    }
 
-    let failureResults = apnResponse.results.reduce((accumulator, failedResult) => {
-      let index = devices.findIndex(device => device.token === failedResult.device);
-      let result = {
-        notificationId: notifications[index]._id,
-        deviceId: devices[index]._id,
-      };
+    let failureResults = [];
+    if (response.failure > 0 ) {
+      failureResults = apnResponse.failed.reduce((accumulator, failedResult) => {
+        let index = devices.findIndex(device => device.token === failedResult.device);
+        let result = {
+          notificationId: notifications[index]._id,
+          deviceId: devices[index]._id,
+        };
 
-      if (failedResult.hasOwnProperty('error')) {
-        result.error = failedResult.error;
-      } else {
-        result.error = failedResult.response.reason;
-      }
+        if (failedResult.hasOwnProperty('error')) {
+          result.error = failedResult.error;
+        } else {
+          result.error = failedResult.response.reason;
+        }
 
-      return accumulator.concat(result);
-    }, []);
+        return accumulator.concat(result);
+      }, []);
+    }
 
     response.results = successResults.concat(failureResults);
 
