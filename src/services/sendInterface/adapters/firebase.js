@@ -30,16 +30,18 @@ class FirebaseAdapter {
   _buildMessage(notification) {
     let message = {};
 
-    // TODO: test this flag on iOS
+    // TODO: test this flag on iOS (both flags don't work, try to send them to APNs directly)
+    // May be problematic on Android
     // https://github.com/firebase/quickstart-js/issues/71#issuecomment-258872970
     // message.content_available = true;
+    // message["content-available"] = 1;
 
-    // TODO: evaluate integration in escalation
+    // TODO: evaluate integration in escalation (Android) and send on iOS immediately
     // If the phonegap app is killed we have to place the notification here to trigger it natively
     // Could be used if no received callback was triggered after a few seconds.
     // message.notification = {
     //   title: notification.message.title,
-    //     body: notification.message.body
+    //   body: notification.message.body,
     // };
 
     message.data = {
