@@ -39,3 +39,4 @@ data/
 
 # Dont track sepcific files
 src/services/sendInterface/adapters/config.json
+test.sh
