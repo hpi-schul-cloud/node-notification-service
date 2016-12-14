@@ -5,7 +5,7 @@
 angular.module('sendApp', [])
   .controller("sendCtrl", function ($scope, $http) {
     $scope.data = {
-      title: "dlasjd",
+      title: "Sample Message",
       body: "the long message",
       token: "servicetoken2",
       scopeIds: [

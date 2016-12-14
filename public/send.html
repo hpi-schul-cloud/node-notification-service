@@ -2,7 +2,7 @@
 <html ng-app="sendApp">
 <head>
     <meta charset="UTF-8">
-    <title>Sent Interface</title>
+    <title>Send Interface</title>
   <link rel="stylesheet" type="text/css" href="css/Style.css">
 </head>
 <body ng-controller="sendCtrl">
@@ -10,7 +10,7 @@
 <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
 <script src="javascript/send.js"> </script>
 
-<h1>send a message to clients</h1>
+<h1>Send a message to clients</h1>
 <form id="send-request">
   <label for="sender">Sender:
     <input id="sender" name="sender" ng-model="sender">
@@ -29,8 +29,6 @@
   <br>
   <button type="button" name="Submit" ng-click="sendRequest()">Send message</button>
 </form>
-  {{error}} <br>
-
 
 <div ng-if="error">
 {{response}}</div>
@@ -71,7 +69,8 @@
     <br>
     <button type="button" name="Submit" ng-click="researchID()">Research ID</button> <br>
 
-    {{idResponse}}
+    {{idResponse}} <br>
+    {{idResponse.status}}
   </div>
 </div>
 

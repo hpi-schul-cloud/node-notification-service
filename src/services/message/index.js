@@ -82,8 +82,27 @@ class Service {
   }
 
   get(id,params) {
+      debugger;
       console.log('[INFO] get message ' + id);
-      return Message.findOne({_id:id});
+      return Notification
+        .find({'message.messageId': id})
+        //.populate('user')
+        .then(notifications => {
+          let data = [];
+          notifications.forEach( notification => {
+            data.push({
+              user: notification.user,
+              status: notification.callbacks.length
+            });
+          });
+          return data;
+        })
+        .catch(err => {
+          console.log("Error ", err);
+          return "Error";
+        });
+      // return Message.findOne({_id:id});
+
   }
 
 
@@ -110,7 +129,13 @@ class Service {
           // create notification for each user
           let notifications = message.userIds.reduce((notifications, userId) => {
             let notification = new Notification({
-              message: message,
+              message: {
+                messageId: message._id,
+                title: message.title,
+                body: message.body,
+                action: message.action,
+                priority: message.priority
+              },
               user: userId
             }).save();
             return notifications.concat(notification);
