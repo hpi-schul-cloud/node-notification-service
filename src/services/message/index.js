@@ -81,6 +81,13 @@ class Service {
     }
   }
 
+  get(id,params) {
+      console.log('[INFO] get message ' + id);
+      return Message.findOne({_id:id});
+  }
+
+
+
   create(data, params) {
     if (!Util.isAllSet([data.title, data.body, data.token, data.scopeIds]))
       return Promise.reject(new errors.BadRequest('Parameters missing.'));
