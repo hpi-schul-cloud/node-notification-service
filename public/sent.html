@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Sent Interface</title>
+  <link rel="stylesheet" type="text/css" href="css/Style.css">
 </head>
 <body ng-controller="sendCtrl">
 
@@ -34,9 +35,45 @@
 <div ng-if="error">
 {{response}}</div>
 <div ng-else>
-  {{response.data}}
-</div>
+  <!-- {{response.data}} -->
 
+  <div ng-hide="hide">
+    <table>
+      <tr>
+        <th>Name</th>
+        <th>Value</th>
+      </tr>
+      <tr>
+        <td>Title</td>
+        <td>{{response.data.title}}</td>
+      </tr>
+      <tr>
+        <td>Body</td>
+        <td>{{response.data.body}}</td>
+      </tr>
+      <tr>
+        <td>id</td>
+        <td>{{response.data._id}}</td>
+      </tr>
+      <tr>
+        <td>Updated At</td>
+        <td>{{response.data.updatedAt}}</td>
+      </tr>
+      <tr>
+        <td>Created At</td>
+        <td>{{response.data.createdAt}}</td>
+      </tr>
+      <tr>
+        <td>user Ids</td>
+        <td>{{response.data.userIds}}</td>
+      </tr>
+    </table>
+    <br>
+    <button type="button" name="Submit" ng-click="researchID()">Research ID</button> <br>
+
+    {{idResponse}}
+  </div>
+</div>
 
 
 </body>
