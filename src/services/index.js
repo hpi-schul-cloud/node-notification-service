@@ -4,7 +4,6 @@ const message = require('./message');
 const notification = require('./notification');
 const resolve = require('./resolve');
 const authentication = require('./authentication');
-const user = require('./user');
 const device = require('./device');
 const callback = require('./callback');
 const mongoose = require('mongoose');
@@ -15,8 +14,7 @@ module.exports = function() {
   mongoose.Promise = global.Promise;
 
   app.configure(message);
-  app.configure(authentication);
-  app.configure(user);
+  //app.configure(authentication); disable authentication via feathers-authentication (Oauth) may be implemented later again
   app.configure(notification);
   app.configure(callback);
   app.configure(device);
