@@ -20,7 +20,7 @@ class Service {
         messages: {
           type: "object",
           required: [
-            "title","body","token","scopeIds"
+            "title", "body", "token", "scopeIds"
           ],
           properties: {
             title: {
@@ -55,25 +55,25 @@ class Service {
               description: "One or more scope Ids that either represent a single user or a group of users"
             }
           },
-          example : {
+          example: {
             title: "New Notification",
             body: "You have a new Notification",
             token: "servicetoken2",
-            scopeIds: ["userIdOrScopeId","testScopeId"]
+            scopeIds: ["userIdOrScopeId", "testScopeId"]
           }
         }
       },
-      create : {
-        summary : 'Send a Notification',
+      create: {
+        summary: 'Send a Notification',
         description: 'Post a Message to the Service that will be resolved to one or many notifications',
         responses: {
-          201 : {
+          201: {
             description: 'Message was created and will be delivered to the specified user/group of users'
           },
-          400 : {
+          400: {
             description: 'The Provided payload is either incomplete or one or more values are invalid'
           },
-          500 : {
+          500: {
             description: 'internal error try again later.'
           }
         }
@@ -81,29 +81,21 @@ class Service {
     }
   }
 
-  get(id,params) {
-      console.log('[INFO] get message ' + id);
-      return Notification
-        .find({'message.messageId': id})
-        //.populate('user')
-        .then(notifications => {
-          let data = [];
-          notifications.forEach( notification => {
-            data.push({
-              user: notification.user,
-              status: notification.callbacks.length
-            });
+  get(id, params) {
+    console.log('[INFO] get message ' + id);
+    return Notification
+      .find({'message.messageId': id})
+      .then(notifications => {
+        let data = [];
+        notifications.forEach(notification => {
+          data.push({
+            user: notification.user,
+            status: notification.callbacks.length
           });
-          return data;
-        })
-        .catch(err => {
-          console.log("Error ", err);
-          return "Error";
         });
-      // return Message.findOne({_id:id});
-
+        return data;
+      })
   }
-
 
 
   create(data, params) {
@@ -154,7 +146,7 @@ class Service {
   }
 }
 
-module.exports = function() {
+module.exports = function () {
   const app = this;
 
   // Initialize our service with any options it requires

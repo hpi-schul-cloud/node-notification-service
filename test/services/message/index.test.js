@@ -46,6 +46,18 @@ describe('message service', function () {
       });
   });
 
+  it('reject incomplete message', () => {
+    return app.service('messages').create({
+      foo: "bar"
+    })
+      .then(res => {
+        expect(res.code).to.be.above(399);
+      })
+      .catch(err => {
+        expect(err.code).to.be.above(399);
+      });
+  })
+
   it('sends a message', () => {
     return app.service('messages').create({
       "title": "New Notification",
@@ -87,4 +99,13 @@ describe('message service', function () {
       });
   });
 
+  it('retrieve nothing for invalid message', ()=> {
+    return app.service('messages').get('invalidMessageId')
+      .then(res => {
+        assert(res.length == 0, "no notifications found");
+      })
+      .catch(err => {
+        expect(err.code).not.to.exist;
+      });
+  })
 });
