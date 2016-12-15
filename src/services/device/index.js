@@ -5,56 +5,14 @@ const user = require('../user/user-model');
 const Resolve = require('../resolve');
 const errors = require('feathers-errors');
 
+const docs = require('./docs.json');
+
 class Service {
 
   constructor(options) {
     this.options = options || {};
 
-    this.docs = {
-      description: 'Device registration',
-      definitions: {
-        devices: {
-          type: "object",
-          required: [
-            "user_token", "service_token","type", "service", "OS", "name"
-          ],
-          properties: {
-            user_token: {
-              type: "string",
-              description: "Schul-Cloud SSO Token"
-            },
-            service_token: {
-              type: "string",
-              description: "Device Token"
-            },
-            type: {
-              type: "string",
-              description: "either 'mobile' or 'desktop'"
-            },
-            service: {
-              type: "string",
-              description: "either 'firebase' or 'apn'"
-            },
-            OS: {
-              type: "string",
-              description: "e.g. 'android7'"
-            },
-            name: {
-              type: "string",
-              description: "Device name"
-            }
-          },
-          example: {
-            service: "firebase",
-            type: "mobile",
-            name: "test2",
-            user_token: "usertoken1",
-            service_token: "anderestoken",
-            OS: "android7"
-          }
-        }
-      }
-    }
+    this.docs = docs;
   }
 
   // Adds a device for a user to the database

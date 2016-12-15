@@ -9,6 +9,8 @@ const Resolve = require('../resolve');
 const Orchestration = require('../orchestration');
 const Notification = require('../notification/notification-model');
 
+const docs = require('./docs.json')
+
 class Service {
 
   constructor(options) {
