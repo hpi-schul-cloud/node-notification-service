@@ -25,6 +25,7 @@ class ApnAdapter {
   _buildMessage(notification) {
     let message = new apn.Notification();
 
+    message.topic = 'org.schulcloud';
     message.title = notification.message.title;
     message.body = notification.message.body;
     message.expiry = notification.timeToLive; // TODO: should be UNIX timestamp
