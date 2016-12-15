@@ -1,37 +1,51 @@
 'use strict';
 
 const hooks = require('./hooks');
+const error = require('feathers-errors');
 const device = require('../device');
 const spawn = require('child_process').spawn;
 const fs = require('fs');
 const crypto = require('crypto');
 const zip = require('express-zip');
 
+// password for certificate
+const password = require('../../certificates/config.json').password;
+
+// website.json content
+const websiteName = 'Schul-Cloud';
+const websitePushID = 'web.org.schul-cloud';
+const urlFormatString = 'https://schul-cloud.org/';
+const webServiceURL = 'https://schul-cloud.org:3030/';
+const allowedDomains = [urlFormatString];
+
 class Service {
   constructor(options) {
     this.options = options || {};
   }
 
-  register(data, params) {
+  register(req, res) {
+    console.log(req.headers);
+  }
+
+  delete(req, res) {
 
   }
 
-  delete(id, data, params) {
-
-  }
-
-  requestPushPackage(data, params) {
-    //
-    return Promise.resolve();
+  requestPushPackage(req, res, next) {
+    if (req.params.websitePushID !== websitePushID) {
+      res.send(new error.NotFound('Invalid websitePushID.'));
+    } else {
+      next();
+    }
   }
 
   createPushPackage(req, res, next) {
     const tempPrefix = '/tmp/pushPackage-';
-    let token = 'teasasddasdst'; // TODO: should be our device id
+    let token = req.body.userId; // this must be in the user info dictionary
 
     fs.mkdtemp(tempPrefix, (err, tempDir) => {
       if (err) {
-        console.log(err);
+        res.send(new error.GeneralError('Unable to create pushPackage.'));
         return;
       }
 
@@ -46,15 +60,17 @@ class Service {
         })
         .then((tempDir) => {
           res.zip([
-            { path: '/pushPackage/icon.iconset/', name: '/icon.iconset' },
-            { path: tempDir + '/webiste.json', name: '/website.json' },
+            { path: '/pushPackage/icon.iconset', name: '/icon.iconset' },
+            { path: tempDir + '/website.json', name: '/website.json' },
             { path: tempDir + '/manifest.json', name: '/manifest.json' },
             { path: tempDir + '/signature', name: '/signature' }
           ]);
-          return tempDir;
+          next();
+          return Promise.resolve(tempDir);
         })
         .catch((error) => {
-          console.log(error);
+          res.data = new error.GeneralError('Unable to create pushPackage.');
+          next();
         });
     });
   }
@@ -62,12 +78,12 @@ class Service {
   _createWebsiteJSON(dir, token) {
     return new Promise((resolve, reject) => {
       fs.writeFile(dir + '/website.json', JSON.stringify({
-        websiteName: 'Schul-Cloud',
-        websitePushID: 'web.org.schul-cloud',
-        allowedDomains: ['http://schul-cloud.org/'],
-        urlFormatString: 'http://schul-cloud.org/',
+        websiteName: websiteName,
+        websitePushID: websitePushID,
+        allowedDomains: allowedDomains,
+        urlFormatString: urlFormatString,
         authenticationToken: token,
-        webServiceURL: 'http://schul-cloud.org:3030/'
+        webServiceURL: webServiceURL
       }), (err) => {
         if (err) reject(err);
         resolve(dir);
@@ -128,7 +144,7 @@ class Service {
         '-signer', cert,
         '-inkey', key,
         '-certfile', intermediate,
-        '-passin', 'pass:ices73?caper'
+        '-passin', 'pass:' + password
       ];
 
       let process = spawn('openssl', args);
@@ -154,26 +170,14 @@ module.exports = function(){
   const app = this;
   const service = new Service();
 
-  // Initialize our service with any options it requires
-  app.use('/:version/devices/:deviceToken/registrations/:websitePushID', {
-    create: service.register,
-    delete: service.delete
-  });
-  app.use('/:version/pushPackage/:websitePushID', {
-    create: service.requestPushPackage
-  }, service.createPushPackage, service.cleanTempDir);
+  app.post('/:version/devices/:deviceToken/registrations/:websitePushID', service.register);
+  app.delete('/:version/devices/:deviceToken/registrations/:websitePushID', service.delete);
 
-  // Get our initialize service to that we can bind hooks
-  const registrationService = app.service('/:version/devices/:deviceToken/registrations/:websitePushID');
-  const pushPackageService = app.service('/:version/pushPackage/:websitePushID');
-
-  // Set up our before hooks
-  registrationService.before(hooks.before);
-  pushPackageService.before(hooks.before);
-
-  // Set up our after hooks
-  registrationService.after(hooks.after);
-  pushPackageService.after(hooks.after);
+  app.post('/:version/pushPackage/:websitePushID',
+    service.requestPushPackage,
+    service.createPushPackage,
+    service.cleanTempDir
+  );
 };
 
 module.exports.Service = Service;
