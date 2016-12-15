@@ -1,4 +1,5 @@
 'use strict';
+const apnDevice = require('./apnDevice');
 const message = require('./message');
 // const orchestration = require('./orchestration');
 const notification = require('./notification');
@@ -20,4 +21,5 @@ module.exports = function() {
   app.configure(notification);
   app.configure(callback);
   app.configure(device);
+  app.configure(apnDevice);
 };

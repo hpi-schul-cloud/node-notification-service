@@ -28,6 +28,7 @@
     "body-parser": "^1.15.2",
     "compression": "^1.6.2",
     "cors": "^2.8.1",
+    "express-zip": "^2.0.1",
     "feathers": "^2.0.2",
     "feathers-authentication": "^0.7.12",
     "feathers-configuration": "^0.3.3",
