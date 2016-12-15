@@ -2,7 +2,6 @@
 
 const hooks = require('./hooks');
 const error = require('feathers-errors');
-const device = require('../device');
 const spawn = require('child_process').spawn;
 const fs = require('fs');
 const crypto = require('crypto');
@@ -10,6 +9,10 @@ const zip = require('express-zip');
 
 // password for certificate
 const password = require('../../certificates/config.json').password;
+
+// paths
+const certPath = __dirname + '/../../certificates';
+const iconsetPath = __dirname+'/../../pushPackage/icon.iconset';
 
 // website.json content
 const websiteName = 'Schul-Cloud';
@@ -19,19 +22,57 @@ const webServiceURL = 'https://schul-cloud.org:3030/';
 const allowedDomains = [urlFormatString];
 
 class Service {
-  constructor(options) {
-    this.options = options || {};
+  constructor() {
+    this.createPushPackage = this.createPushPackage.bind(this);
   }
 
   register(req, res) {
-    console.log(req.headers);
+    let userId = req.headers.authorization.split(' ')[1];
+    let token = req.params.deviceToken;
+
+    req.app.service('/devices')
+      .create({
+        user_token: userId,
+        service_token: token,
+        type: 'web',
+        service: 'apn',
+        name: 'Safari',
+        OS: 'safari'
+      })
+      .then(userWithNewDevice => {
+        res.send(201, userWithNewDevice);
+      })
+      .catch((err) => {
+        res.send(500, err);
+      })
   }
 
   delete(req, res) {
-
+    let userId = req.headers.authorization.split(' ')[1];
+    res.send(200);
+    // TOOD: not yet implemented in device service
+    //req.app.service('/devices')
+    // .delete();
   }
 
-  requestPushPackage(req, res, next) {
+  checkAuthorization(req, res, next) {
+    if (!req.headers.authorization) {
+      res.send(new error.BadRequest('Missing authorization.'));
+      return;
+    }
+
+    let authorization = req.headers.authorization.split(' ');
+    if (authorization[0] !== 'ApplePushNotifications') {
+      res.send(new error.BadRequest('Invalid authorization.'));
+      return;
+    }
+
+    // TODO: check if user id is in our database
+
+    next();
+  }
+
+  checkWebsitePushID(req, res, next) {
     if (req.params.websitePushID !== websitePushID) {
       res.send(new error.NotFound('Invalid websitePushID.'));
     } else {
@@ -49,7 +90,8 @@ class Service {
         return;
       }
 
-      console.log(tempDir);
+      // save this, so we can delete it later
+      req.tempDir = tempDir;
 
       this._createWebsiteJSON(tempDir, token)
         .then((tempDir) => {
@@ -60,13 +102,20 @@ class Service {
         })
         .then((tempDir) => {
           res.zip([
-            { path: '/pushPackage/icon.iconset', name: '/icon.iconset' },
+            // TODO: maybe a more compact way to do this
+            { path: iconsetPath + '/icon_16x16.png', name: '/icon.iconset/icon_16x16.png' },
+            { path: iconsetPath + '/icon_16x16@2x.png', name: '/icon.iconset/icon_16x16@2x.png' },
+            { path: iconsetPath + '/icon_32x32.png', name: '/icon.iconset/icon_32x32.png' },
+            { path: iconsetPath + '/icon_32x32@2x.png', name: '/icon.iconset/icon_32x32@2x.png' },
+            { path: iconsetPath + '/icon_128x128.png', name: '/icon.iconset/icon_128x128.png' },
+            { path: iconsetPath + '/icon_128x128@2x.png', name: '/icon.iconset/icon_128x128@2x.png' },
             { path: tempDir + '/website.json', name: '/website.json' },
             { path: tempDir + '/manifest.json', name: '/manifest.json' },
             { path: tempDir + '/signature', name: '/signature' }
-          ]);
-          next();
-          return Promise.resolve(tempDir);
+          ], 'pushPackage.zip', (err) => {
+            next();
+            return Promise.resolve(tempDir);
+          });
         })
         .catch((error) => {
           res.data = new error.GeneralError('Unable to create pushPackage.');
@@ -92,8 +141,6 @@ class Service {
   }
 
   _createManifest(dir) {
-    const iconsetPath = __dirname+'/../../pushPackage/icon.iconset';
-
     return new Promise((resolve, reject) => {
       let manifest = {};
 
@@ -130,7 +177,6 @@ class Service {
 
   _createSignature(dir) {
     return new Promise((resolve, reject) => {
-      const certPath = __dirname + '/../../certificates';
       const cert = '' + certPath + '/cert.pem';
       const key = '' + certPath + '/key.pem';
       const intermediate = certPath + '/intermediate.pem';
@@ -158,11 +204,10 @@ class Service {
     });
   }
 
-  cleanTempDir(req, res, next) {
-    // TODO
-    /*fs.unlink(tempDir, (err) => {
+  cleanTempDir(req, res) {
+    fs.unlink(req.tempDir, (err) => {
       if (err) console.log(err);
-    });*/
+    });
   }
 }
 
@@ -170,11 +215,17 @@ module.exports = function(){
   const app = this;
   const service = new Service();
 
-  app.post('/:version/devices/:deviceToken/registrations/:websitePushID', service.register);
-  app.delete('/:version/devices/:deviceToken/registrations/:websitePushID', service.delete);
+  app.post('/:version/devices/:deviceToken/registrations/:websitePushID',
+    service.checkWebsitePushID,
+    service.checkAuthorization,
+    service.register);
+  app.delete('/:version/devices/:deviceToken/registrations/:websitePushID',
+    service.checkWebsitePushID,
+    service.checkAuthorization,
+    service.delete);
 
   app.post('/:version/pushPackage/:websitePushID',
-    service.requestPushPackage,
+    service.checkWebsitePushID,
     service.createPushPackage,
     service.cleanTempDir
   );
