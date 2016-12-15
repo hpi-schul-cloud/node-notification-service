@@ -82,7 +82,6 @@ class Service {
   }
 
   get(id,params) {
-      debugger;
       console.log('[INFO] get message ' + id);
       return Notification
         .find({'message.messageId': id})
