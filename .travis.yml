@@ -11,8 +11,9 @@ after_success:
   - bash <(curl -s https://codecov.io/bash)
   - bash <(curl -X POST --data "apiKey=$apiKey&branch=$BRANCH" http://$url/update)
 notifications:
-  slack: hpi:7IF9xrvPUNnqerSelxnUfaIZ
+  slack:
+    rooms:
+      - hpi:7IF9xrvPUNnqerSelxnUfaIZ
     on_success: change
     on_failure: change
-    on_pull_requests: false
   email: false
