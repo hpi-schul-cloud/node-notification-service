@@ -12,6 +12,9 @@ describe('apn service adapter', function() {
   });
 
   it('runs with mocked success/error', () => {
+    // We use the apnMock to generate all Provider functions
+    apn.apnProvider = apnMock.Provider();
+    // Since we want to define the response we "mock" the send function again
     let stub = sinon.stub(apn.apnProvider, 'send', (notification, recipients) => {
       return Promise.resolve({
         sent: ['da89754c193fed3f4af59baaf956d82508508ab0dcd490ec2811b929ed8da8f2'],

@@ -4,11 +4,11 @@ const apn = require('apn');
 const errors = require('feathers-errors');
 
 class ApnAdapter {
-  constructor() {
-    this.apnProvider = new apn.Provider(config);
-  }
-
   send(notifications, devices) {
+    // We use a singleton here to setup apn the first time it is used
+    if (!this.apnProvider) {
+      this.apnProvider = new apn.Provider(config);
+    }
     return new Promise((resolve) => {
       let message = this._buildMessage(notifications[0]);
       let tokens = devices.reduce((accumulator, device) => {
