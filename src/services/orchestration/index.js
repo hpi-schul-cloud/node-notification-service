@@ -10,6 +10,28 @@ const Util = require('../util');
 
 class Orchestration {
 
+  constructor() {
+    setInterval(this.reescalate, 10000);
+  }
+
+  reescalate() {
+    console.log("[SCHEDULED ESCALATION]");
+
+    let escalations = Escalation
+      .find({nextEscalationDue: {$lte: new Date()}})
+      .populate('notification')
+      .then(escalations => {
+        if (escalations.length) {
+          console.log(" - escalate", escalations.length, "scheduled notifications...");
+          escalations.forEach((escalation)=> {
+            orchestration.escalate(escalation);
+          });
+        } else {
+          console.log(" - no escalations scheduled...");
+        }
+      });
+  }
+
   escalate(escalation) {
     debugger;
     return User
@@ -24,7 +46,8 @@ class Orchestration {
         });
         if (devices && devices.length) {
           console.log(devices.length, "devices found...");
-          for (var i = 0; i < devices; i++) {
+          debugger;
+          for (var i = 0; i < devices.length; i++) {
             news.push(escalation.notification);
           }
           sendInterface.send(news, devices)
@@ -35,7 +58,7 @@ class Orchestration {
             .catch(err => {
               console.log('[ERROR] send error');
             })
-        }else{
+        } else {
           console.log('no devices found...');
         }
       })
@@ -54,14 +77,16 @@ class Orchestration {
         break;
       case Constants.DEVICE_TYPES.EMAIL:
       default:
-        escalation.nextEscalationType = "NONE";
+        escalation.notification.state = Constants.NOTIFICATION_STATES.ESCAlATED;
+
+        return escalation.notification.save() // async
+          .then(()=> {
+            return escalation.delete();
+          });
     }
-    if (escalation.nextEscalationType === "NONE") {
-      return escalation.delete();
-    } else {
-      escalation.nextEscalationDue = Date.now;
-      return escalation.save();
-    }
+    escalation.nextEscalationDue = Date.now() + 5000; // add 10 seconds
+    return escalation.save();
+
   }
 
   orchestrate(notifications) {
@@ -91,5 +116,6 @@ class Orchestration {
 
 }
 
-module.exports = new Orchestration();
+let orchestration = new Orchestration();
+module.exports = orchestration;
 
