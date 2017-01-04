@@ -1,0 +1,71 @@
+ {
+   "description": "Notification Auditing Service",
+   "find": {
+     "summary": "Get all Notifications (with Pagination)",
+     "description": "Get all Notifications",
+     "parameters": [{
+       "name": "user",
+       "in": "query",
+       "type": "string",
+       "description": "Search for user id",
+       "required": false
+     },{
+       "name": "state",
+       "in": "query",
+       "type": "string",
+       "description": "Search for state",
+       "required": false
+     },{
+       "name": "$limit",
+       "in": "query",
+       "type" : "integer",
+       "description": "Maximum number of results",
+       "required": false
+     },{
+       "name": "$skip",
+       "in": "query",
+       "type": "integer",
+       "description": "Number skipped of results",
+       "required": false
+     },{
+       "name": "$sort",
+       "in": "query",
+       "type" : "string",
+       "description": "Sorting paradigm (key of Notification; default asc, prefixed by '-' if desc)",
+       "required": false
+     },{
+       "name": "$select",
+       "in": "query",
+       "type" : "array",
+       "items": "string",
+       "description": "Show only defined keys of objects",
+       "required": false
+     }],
+     "responses": {
+       "200": {
+         "description": "OK"
+       },
+       "404": {
+         "description": "No Notifications found"
+       },
+       "500": {
+         "description": "internal error try again later."
+       }
+     }
+   },
+   "get": {
+     "summary": "Find a Notification by ID",
+     "description": "Find Notification by ID",
+     "responses": {
+       "200": {
+         "description": "OK"
+       },
+       "404": {
+         "description": "Notifications with given ID does not exist"
+       },
+       "500": {
+         "description": "internal error try again later."
+       }
+     }
+   }
+ }
