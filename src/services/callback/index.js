@@ -7,12 +7,17 @@ const mongoose     = require('mongoose');
 const notification = require('../notification/notification-model');
 const errors       = require('feathers-errors');
 
+const docs         = require('./docs.json');
+
 class Service {
+
   constructor(options) {
     this.options = options || {};
+    this.docs = docs;
   }
 
   create(data, params) {
+
     if (!util.isSet(data.notificationId))
       return Promise.reject(new errors.BadRequest('Notification Id Missing'));
 
@@ -31,7 +36,7 @@ class Service {
             resolve(pushedNot);
         })
         .catch( err => {
-            return reject(new errors.BadRequest(err));
+            reject(new errors.BadRequest(err));
         })
     });
 
