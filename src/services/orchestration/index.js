@@ -33,13 +33,11 @@ class Orchestration {
   }
 
   escalate(escalation) {
-    debugger;
     return User
       .findOne({
         schulcloudId: escalation.notification.user
       })
       .then(user => {
-        //if (!user) reject("user not found");
         let news = [];
         let devices = user.devices.filter(function (device) {
           return device.type === escalation.nextEscalationType;
@@ -68,9 +66,14 @@ class Orchestration {
   }
 
   updateEscalation(escalation) {
+    if (escalation.notification.state !== Constants.NOTIFICATION_STATES.ESCALATING) {
+      // notification has been clicked... remove escalation
+      return escalation.delete();
+    }
     switch (escalation.nextEscalationType) {
       case Constants.DEVICE_TYPES.DESKTOP:
         escalation.nextEscalationType = Constants.DEVICE_TYPES.MOBILE;
+
         break;
       case Constants.DEVICE_TYPES.MOBILE:
         escalation.nextEscalationType = Constants.DEVICE_TYPES.EMAIL;
@@ -79,12 +82,12 @@ class Orchestration {
       default:
         escalation.notification.state = Constants.NOTIFICATION_STATES.ESCAlATED;
 
-        return escalation.notification.save() // async
+        return escalation.notification.save()
           .then(()=> {
             return escalation.delete();
           });
     }
-    escalation.nextEscalationDue = Date.now() + 5000; // add 10 seconds
+    escalation.nextEscalationDue = Date.now() + 30000; // add 30 seconds
     return escalation.save();
 
   }
