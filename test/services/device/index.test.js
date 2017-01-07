@@ -15,14 +15,13 @@ describe('device service', () => {
     });
 
     const validPayload = {
-        "service": "firebase",
-        "type": "mobile",
-        "name": "test2",
-        "user_token": "usertoken2",
-        "service_token": "testToken",
-        "OS": "android7"
-      }
-
+      'service': 'firebase',
+      'type': 'mobile',
+      'name': 'test2',
+      'user_token': 'usertoken2',
+      'service_token': 'testToken',
+      'OS': 'android7'
+    }
 
     it('call with valid data', () => {
       return app.service('devices').create(validPayload)
@@ -33,30 +32,30 @@ describe('device service', () => {
 
     it('call with unknown token', () => {
       return app.service('devices').create({
-        "service": "firebase",
-        "type": "mobile",
-        "name": "test2",
-        "user_token": "ungültig",
-        "service_token": "testToken",
-        "OS": "android7"
+        'service': 'firebase',
+        'type': 'mobile',
+        'name': 'test2',
+        'user_token': 'ungültig',
+        'service_token': 'testToken',
+        'OS': 'android7'
       })
-        .catch(function(res) {
-          res.code.should.equal(403);
-        });
+      .catch(function(res) {
+        res.code.should.equal(403);
+      });
     });
 
     it('calls the service two times with the same device token', () => {
       return app.service('devices').create(validPayload)
-      .then((res) =>{
-        return app.service('devices').create(validPayload);
-      })
-      .then((res) => {
-        var i = 0;
-        res.devices.forEach( (device) => {
-          if (device.token === validPayload.service_token) i++;
+        .then((res) => {
+          return app.service('devices').create(validPayload);
         })
-        i.should.equal(1);
-      });
+        .then((res) => {
+          var i = 0;
+          res.devices.forEach((device) => {
+            if (device.token === validPayload.service_token) i++;
+          })
+          i.should.equal(1);
+        });
     });
 
 

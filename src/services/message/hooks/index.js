@@ -4,11 +4,13 @@ const globalHooks = require('../../../hooks');
 const hooks = require('feathers-hooks');
 
 
+const Auth = require('../../authentication');
+
 exports.before = {
   all: [],
   find: [],
   get: [],
-  create: [],
+  create: [Auth.serviceAuthHook()],
   update: [],
   patch: [],
   remove: []
