@@ -79,6 +79,7 @@ class Service {
   }
 
   createPushPackage(req, res, next) {
+    console.log('[INFO] create pushPackage');
     const tempPrefix = '/tmp/pushPackage-';
     // as token the schul-cloud userid is used
     let token = req.body.userId;
@@ -100,6 +101,7 @@ class Service {
           return this._createSignature(tempDir);
         })
         .then((tempDir) => {
+          console.log('[INFO] return zipped package');
           res.zip([
             // TODO: maybe a more compact way to do this
             { path: iconsetPath + '/icon_16x16.png', name: '/icon.iconset/icon_16x16.png' },
@@ -124,6 +126,7 @@ class Service {
   }
 
   _createWebsiteJSON(dir, token) {
+    console.log('[INFO] create json');
     return new Promise((resolve, reject) => {
       fs.writeFile(dir + '/website.json', JSON.stringify({
         websiteName: websiteName,
@@ -140,6 +143,7 @@ class Service {
   }
 
   _createManifest(dir) {
+    console.log('[INFO] create manifest');
     return new Promise((resolve, reject) => {
       let manifest = {};
 
@@ -175,6 +179,7 @@ class Service {
   }
 
   _createSignature(dir) {
+    console.log('[INFO] create signature');
     return new Promise((resolve, reject) => {
       const cert = '' + certPath + '/cert.pem';
       const key = '' + certPath + '/key.pem';
