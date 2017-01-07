@@ -29,39 +29,28 @@ class Service {
 
     let message = new Message(data);
 
-    return new Promise((resolve, reject) => {
-      // check if the provided token belongs to a service or user with authorities to push notifications
-      Resolve.verifyService(data.token)
-        .then(serviceOrUserId => {
-          message.initiatorId = serviceOrUserId;
-          return Resolve.resolveUser(message.scopeIds);
-        })
-        .then(userIds => {
-          // set resolved userIds
-          message.userIds = userIds;
-          return message.save()
-        })
-        .then(message => {
-          // create notification for each user
-          let notifications = message.userIds.reduce((notifications, userId) => {
-            let notification = new Notification({
-              message: message,
-              user: userId
-            }).save();
-            return notifications.concat(notification);
-          }, []);
+    return Resolve
+      .resolveUser(message.scopeIds).then(userIds => {
+        // set resolved userIds
+        message.userIds = userIds;
+        return message.save()
+      })
+      .then(message => {
+        // create notification for each user
+        let notifications = message.userIds.reduce((notifications, userId) => {
+          let notification = new Notification({
+            message: message,
+            user: userId
+          }).save();
+          return notifications.concat(notification);
+        }, []);
 
-          return Promise.all(notifications);
-        })
-        .then(notifications => {
-          Orchestration.orchestrate(notifications);
-          resolve(message);
-        })
-        .catch(error => {
-          reject(error);
-        });
-    });
-
+        return Promise.all(notifications);
+      })
+      .then(notifications => {
+        return Orchestration.orchestrate(notifications);
+        // resolve(message);
+      })
   }
 }
 

@@ -3,14 +3,14 @@
 const globalHooks = require('../../../hooks');
 const hooks = require('feathers-hooks');
 
-const Resolve = require('../../resolve');
+const Auth = require('../../Authentication');
 
 
 exports.before = {
   all: [],
   find: [],
   get: [],
-  create: [Resolve.userAuthHook()],
+  create: [Auth.userAuthHook()],
   update: [],
   patch: [],
   remove: []

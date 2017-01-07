@@ -17,28 +17,26 @@ class Orchestration {
       notification.changeState('orchestrated');
     });
 
-    return new Promise((resolve, reject) => {
-      return User
-        .findOne({
-          schulcloudId: notifications[0].user
-        })
-        .then(user => {
-          // send to all of users devices
-          let news = [];
-          for (var i = 0; i < user.devices.length; i++) {
-            news.push(notifications[0]);
-          }
-          sendInterface.send(news, user.devices)
-            .then(res => {
-              console.log('[INFO] notification sent');
-              resolve(res);
-            })
-            .catch(err => {
-              console.log('[ERROR] send error');
-              reject();
-            })
-        });
-    });
+    return User
+      .findOne({
+        schulcloudId: notifications[0].user
+      })
+      .then(user => {
+        // send to all of users devices
+        let news = [];
+        for (var i = 0; i < user.devices.length; i++) {
+          news.push(notifications[0]);
+        }
+        return sendInterface.send(news, user.devices)
+          .then(res => {
+            console.log('[INFO] notification sent');
+            // resolve(res);
+          })
+          .catch(err => {
+            console.log('[ERROR] send error');
+            // reject();
+          })
+      });
 
   }
 
