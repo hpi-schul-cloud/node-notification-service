@@ -30,21 +30,21 @@ class Service {
     let userId = req.headers.authorization.split(' ')[1];
     let token = req.params.deviceToken;
 
-    req.app.service('/devices')
+    req.app.service('devices')
       .create({
         user_token: userId,
         service_token: token,
-        type: 'web',
+        type: 'desktop',
         service: 'apn',
         name: 'Safari',
         OS: 'safari'
       })
       .then(userWithNewDevice => {
-        res.send(201, userWithNewDevice);
+        res.status(201).send(userWithNewDevice);
       })
       .catch((err) => {
-        res.send(500, err);
-      })
+        res.status(500).send(err);
+      });
   }
 
   delete(req, res) {
@@ -55,7 +55,7 @@ class Service {
     // .delete();
   }
 
-  checkAuthorization(req, res, next) {
+  checkAuthorizationHeader(req, res, next) {
     if (!req.headers.authorization) {
       res.send(new error.BadRequest('Missing authorization.'));
       return;
@@ -66,8 +66,6 @@ class Service {
       res.send(new error.BadRequest('Invalid authorization.'));
       return;
     }
-
-    // TODO: check if user id is in our database
 
     next();
   }
@@ -82,7 +80,8 @@ class Service {
 
   createPushPackage(req, res, next) {
     const tempPrefix = '/tmp/pushPackage-';
-    let token = req.body.userId; // this must be in the user info dictionary
+    // as token the schul-cloud userid is used
+    let token = req.body.userId;
 
     fs.mkdtemp(tempPrefix, (err, tempDir) => {
       if (err) {
@@ -196,11 +195,11 @@ class Service {
       let process = spawn('openssl', args);
       process.on('close', (code) => {
         if (code !== 0) {
-          reject('Unable to create signature. Exited with code ' + code + '.')
+          reject('Unable to create signature. Exited with code ' + code + '.');
         } else {
           resolve(dir);
         }
-      })
+      });
     });
   }
 
@@ -217,11 +216,11 @@ module.exports = function(){
 
   app.post('/:version/devices/:deviceToken/registrations/:websitePushID',
     service.checkWebsitePushID,
-    service.checkAuthorization,
+    service.checkAuthorizationHeader,
     service.register);
   app.delete('/:version/devices/:deviceToken/registrations/:websitePushID',
     service.checkWebsitePushID,
-    service.checkAuthorization,
+    service.checkAuthorizationHeader,
     service.delete);
 
   app.post('/:version/pushPackage/:websitePushID',
@@ -231,4 +230,4 @@ module.exports = function(){
   );
 };
 
-module.exports.Service = Service;
+module.exports.Service = new Service();
