@@ -32,12 +32,12 @@ class Service {
 
     req.app.service('devices')
       .create({
-        user_token: userId,
-        service_token: token,
-        type: 'desktop',
-        service: 'apn',
-        name: 'Safari',
-        OS: 'safari'
+        'user_token': userId,
+        'service_token': token,
+        'type': 'desktop',
+        'service': 'apn',
+        'name': 'Safari',
+        'OS': 'safari'
       })
       .then(userWithNewDevice => {
         res.status(201).send(userWithNewDevice);
