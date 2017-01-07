@@ -22,22 +22,22 @@ class Orchestration {
         .findOne({
           schulcloudId: notifications[0].user
         })
-        .then( user => {
+        .then(user => {
           // send to all of users devices
           let news = [];
-          for(var i = 0; i < user.devices.length; i++) {
+          for (var i = 0; i < user.devices.length; i++) {
             news.push(notifications[0]);
           }
           sendInterface.send(news, user.devices)
-            .then( res => {
+            .then(res => {
               console.log('[INFO] notification sent');
               resolve(res);
             })
-            .catch( err => {
+            .catch(err => {
               console.log('[ERROR] send error');
               reject();
             })
-          });
+        });
     });
 
   }
@@ -45,4 +45,3 @@ class Orchestration {
 }
 
 module.exports = new Orchestration();
-

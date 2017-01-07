@@ -60,7 +60,7 @@ class FirebaseAdapter {
     };
 
     // TODO: message.action = notification.action;
-    message.priority = notification.priority == 'high' ? 'high' : 'normal';
+    message.priority = notification.priority === 'high' ? 'high' : 'normal';
 
     // TODO: evaluate usage for escalation to avoid multiple notifications
     // seconds the message is kept on the server if it was not possible to push it immediately

@@ -1,13 +1,13 @@
 'use strict';
 
-const hooks        = require('./hooks');
-const util         = require('../util');
-const constants    = require('../constants');
-const mongoose     = require('mongoose');
+const hooks = require('./hooks');
+const util = require('../util');
+const constants = require('../constants');
+const mongoose = require('mongoose');
 const notification = require('../notification/notification-model');
-const errors       = require('feathers-errors');
+const errors = require('feathers-errors');
 
-const docs         = require('./docs.json');
+const docs = require('./docs.json');
 
 class Service {
 
@@ -22,21 +22,21 @@ class Service {
       return Promise.reject(new errors.BadRequest('Notification Id Missing'));
 
     return new Promise((resolve, reject) => {
-      notification.findOne({_id:data.notificationId})
-        .then( foundNotification => {
+      notification.findOne({ _id: data.notificationId })
+        .then(foundNotification => {
 
-            foundNotification.callbacks.push({type:data.type});
+          foundNotification.callbacks.push({ type: data.type });
 
-            if (data.type === constants.CALLBACK_TYPES.CLICKED)
-              foundNotification.state = constants.CALLBACK_TYPES.CLICKED;
+          if (data.type === constants.CALLBACK_TYPES.CLICKED)
+            foundNotification.state = constants.CALLBACK_TYPES.CLICKED;
 
-            return foundNotification.save();
+          return foundNotification.save();
         })
-        .then ( pushedNot => {
-            resolve(pushedNot);
+        .then(pushedNot => {
+          resolve(pushedNot);
         })
-        .catch( err => {
-            reject(new errors.BadRequest(err));
+        .catch(err => {
+          reject(new errors.BadRequest(err));
         })
     });
 
@@ -44,7 +44,7 @@ class Service {
 
 }
 
-module.exports = function(){
+module.exports = function() {
   const app = this;
 
   // Initialize our service with any options it requires
