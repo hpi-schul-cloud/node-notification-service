@@ -6,6 +6,8 @@ services:
 script:
   - cp src/services/sendInterface/adapters/config.sample.json src/services/sendInterface/adapters/config.json
   - cp src/certificates/config.sample.json src/certificates/config.json
+  - cp src/certificates/cert.sample.pem src/certificates/cert.pem
+  - cp src/certificates/key.sample.pem src/certificates/key.pem
   - npm test
   - export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
 after_success:
