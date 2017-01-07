@@ -18,13 +18,19 @@ describe('apn service adapter', function() {
     let stub = sinon.stub(apn.apnProvider, 'send', (notification, recipients) => {
       return Promise.resolve({
         sent: ['da89754c193fed3f4af59baaf956d82508508ab0dcd490ec2811b929ed8da8f2'],
-        failed: [{
-          device: '98508ab0dcd490ec2811bbaaf956d8250da89754c193fed3f4af5929ed8da8f2',
-          status: '400',
-          response: {
-            reason: 'BadDeviceToken'
+        failed: [
+          {
+            device: '98508ab0dcd490ec2811bbaaf956d8250da89754c193fed3f4af5929ed8da8f2',
+            status: '400',
+            response: {
+              reason: 'BadDeviceToken'
+            }
+          }, {
+            device: '18508ab0dcd40da89754c193fed3f4af5929ed8da8f290ec2811bbaaf956d825',
+            status: '500',
+            error: 'Some error message from Apple'
           }
-        }]
+        ]
       });
     });
 
@@ -34,14 +40,24 @@ describe('apn service adapter', function() {
         message: {
           title: 'test',
           body: 'test'
-        }
+        },
+        priority: 'high'
       },
       {
         _id: 'mockNotificationId2',
         message: {
           title: 'test',
           body: 'test'
-        }
+        },
+        priority: 'high'
+      },
+      {
+        _id: 'mockNotificationId3',
+        message: {
+          title: 'test',
+          body: 'test'
+        },
+        priority: 'high'
       }
     ];
     let devices = [
@@ -54,18 +70,29 @@ describe('apn service adapter', function() {
         _id: 'mockDeviceId2',
         service: 'apn',
         token: 'da89754c193fed3f4af59baaf956d82508508ab0dcd490ec2811b929ed8da8f2'
+      },
+      {
+        _id: 'mockDeviceId3',
+        service: 'apn',
+        token: '18508ab0dcd40da89754c193fed3f4af5929ed8da8f290ec2811bbaaf956d825'
       }
     ];
     let expected = {
       success: 1,
-      failure: 1,
-      results: [{
-        notificationId: 'mockNotificationId2',
-        deviceId: 'mockDeviceId2'
-      },{
-        notificationId: 'mockNotificationId',
-        deviceId: 'mockDeviceId',
-        error: 'BadDeviceToken' }
+      failure: 2,
+      results: [
+        {
+          notificationId: 'mockNotificationId2',
+          deviceId: 'mockDeviceId2'
+        }, {
+          notificationId: 'mockNotificationId',
+          deviceId: 'mockDeviceId',
+          error: 'BadDeviceToken'
+        }, {
+          notificationId: 'mockNotificationId3',
+          deviceId: 'mockDeviceId3',
+          error: 'Some error message from Apple'
+        }
       ]
     };
 

@@ -49,7 +49,7 @@ class Service {
 
   delete(req, res) {
     let userId = req.headers.authorization.split(' ')[1];
-    res.send(200);
+    res.sendStatus(200);
     // TOOD: not yet implemented in device service
     //req.app.service('/devices')
     // .delete();
@@ -85,7 +85,7 @@ class Service {
 
     fs.mkdtemp(tempPrefix, (err, tempDir) => {
       if (err) {
-        res.send(new error.GeneralError('Unable to create pushPackage.'));
+        res.status(500).send(new error.GeneralError('Unable to create pushPackage.'));
         return;
       }
 
@@ -116,8 +116,8 @@ class Service {
             return Promise.resolve(tempDir);
           });
         })
-        .catch((error) => {
-          res.data = new error.GeneralError('Unable to create pushPackage.');
+        .catch((err) => {
+          res.errorMessage = new error.GeneralError('Unable to create pushPackage.');
           next();
         });
     });
@@ -133,8 +133,11 @@ class Service {
         authenticationToken: token,
         webServiceURL: webServiceURL
       }), (err) => {
-        if (err) reject(err);
-        resolve(dir);
+        if (err) {
+          reject(err);
+        } else {
+          resolve(dir);
+        }
       });
     });
   }
@@ -147,29 +150,32 @@ class Service {
       fs.readdir(iconsetPath, (err, files) => {
         if (err) {
           reject(err);
-        }
-
-        // create hash for website.json
-        let hash = crypto.createHash('SHA1');
-        hash.setEncoding('hex');
-        hash.write(fs.readFileSync(dir + '/' + 'website.json'));
-        hash.end();
-        manifest['webiste.json'] = hash.read();
-
-        // create hashes for iconset
-        files.forEach((file) => {
+        } else {
+          // create hash for website.json
           let hash = crypto.createHash('SHA1');
           hash.setEncoding('hex');
-          hash.write(fs.readFileSync(iconsetPath + '/' + file));
+          hash.write(fs.readFileSync(dir + '/' + 'website.json'));
           hash.end();
-          manifest['icon.iconset/' + file] = hash.read();
-        });
+          manifest['webiste.json'] = hash.read();
 
-        // write manifest to file
-        fs.writeFile(dir + '/manifest.json', manifest, (err) => {
-          if (err) reject(err);
-          resolve(dir);
-        });
+          // create hashes for iconset
+          files.forEach((file) => {
+            let hash = crypto.createHash('SHA1');
+            hash.setEncoding('hex');
+            hash.write(fs.readFileSync(iconsetPath + '/' + file));
+            hash.end();
+            manifest['icon.iconset/' + file] = hash.read();
+          });
+
+          // write manifest to file
+          fs.writeFile(dir + '/manifest.json', manifest, (err) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(dir);
+            }
+          });
+        }
       });
     });
   }
@@ -208,6 +214,10 @@ class Service {
     fs.unlink(req.tempDir, (err) => {
       if (err) console.log(err);
     });
+
+    if (res.errorMessage) {
+      res.status(500).send(res.errorMessage);
+    }
   }
 }
 
