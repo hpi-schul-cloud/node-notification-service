@@ -28,7 +28,8 @@ describe('apn service adapter', function() {
       });
     });
 
-    let notifications = [{
+    let notifications = [
+      {
         _id: 'mockNotificationId',
         message: {
           title: 'test',
@@ -41,8 +42,10 @@ describe('apn service adapter', function() {
           title: 'test',
           body: 'test'
         }
-      }];
-    let devices = [{
+      }
+    ];
+    let devices = [
+      {
         _id: 'mockDeviceId',
         service: 'apn',
         token: '98508ab0dcd490ec2811bbaaf956d8250da89754c193fed3f4af5929ed8da8f2'
@@ -51,7 +54,8 @@ describe('apn service adapter', function() {
         _id: 'mockDeviceId2',
         service: 'apn',
         token: 'da89754c193fed3f4af59baaf956d82508508ab0dcd490ec2811b929ed8da8f2'
-      }];
+      }
+    ];
     let expected = {
       success: 1,
       failure: 1,
