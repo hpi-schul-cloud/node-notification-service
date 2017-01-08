@@ -1,6 +1,7 @@
 'use strict';
 const notificationServices = {
-  firebase: require('./adapters/firebase')
+  firebase: require('./adapters/firebase'),
+  email: require('./adapters/email')
 };
 
 class SendInterface {
