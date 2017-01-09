@@ -22,6 +22,11 @@ class Orchestration {
    */
   reescalate() {
     console.log("[SCHEDULED ESCALATION] starts...");
+    if (this.reescalation_running == true){
+      console.log("- await last reescalate finished...")
+      return Promise.resolve();
+    }
+      this.reescalation_running = true;
     return Escalation
       .find({nextEscalationDue: {$lte: new Date()}})
       .populate('notification')
@@ -47,7 +52,7 @@ class Orchestration {
   }
 
   escalate(escalation) {
-    console.log("escalate", escalation._id);
+    console.log("[INFO] escalating ", escalation._id);
     return User
       .findOne({
         schulcloudId: escalation.notification.user
