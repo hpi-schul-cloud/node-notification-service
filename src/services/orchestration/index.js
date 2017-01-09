@@ -11,28 +11,43 @@ const Util = require('../util');
 class Orchestration {
 
   constructor() {
+    // timer checks all 10 seconds for remaining escalations to be send
     setInterval(this.reescalate, 10000);
   }
 
+  /**
+   * restarts escalation for stored objects.
+   * take care to do not run multiple instances by the same time.
+   * timer above schedules for 10 seconds only!
+   */
   reescalate() {
-    console.log("[SCHEDULED ESCALATION]");
-
-    let escalations = Escalation
+    console.log("[SCHEDULED ESCALATION] starts...");
+    return Escalation
       .find({nextEscalationDue: {$lte: new Date()}})
       .populate('notification')
       .then(escalations => {
         if (escalations.length) {
           console.log(" - escalate", escalations.length, "scheduled notifications...");
-          escalations.forEach((escalation)=> {
-            orchestration.escalate(escalation);
-          });
+          return Promise.all(escalations.map(escalation=> {
+            return orchestration.escalate(escalation);
+          }));
         } else {
           console.log(" - no escalations scheduled...");
+          return Promise.resolve();
         }
+      })
+      .then(()=> {
+        this.reescalation_running = false;
+        console.log("[SCHEDULED ESCALATION] end...");
+      })
+      .catch(err=> {
+        this.reescalation_running = false;
+        console.log("[SCHEDULED ESCALATION] end after error...", err);
       });
   }
 
   escalate(escalation) {
+    console.log("escalate", escalation._id);
     return User
       .findOne({
         schulcloudId: escalation.notification.user
@@ -44,7 +59,6 @@ class Orchestration {
         });
         if (devices && devices.length) {
           console.log(devices.length, "devices found...");
-          debugger;
           for (var i = 0; i < devices.length; i++) {
             news.push(escalation.notification);
           }
