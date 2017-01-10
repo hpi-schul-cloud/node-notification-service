@@ -12,6 +12,7 @@ class Constants {
     this.NOTIFICATION_STATES = {
       CREATED: 'created',
       ESCALATING: 'escalating',
+      NOT_ESCALATED: 'not_escalated',
       ESCAlATED: 'escalated',
       SEEN: 'seen',
       CLICKED: 'clicked',

@@ -11,9 +11,15 @@ const Util = require('../util');
 class Orchestration {
 
   constructor() {
+
+    // next escalation wait time in ms
+    this.reescalation_time = 30000;
+
     // timer checks all 10 seconds for remaining escalations to be send
     setInterval(this.reescalate, 10000);
+
   }
+
 
   /**
    * restarts escalation for stored objects.
@@ -22,11 +28,11 @@ class Orchestration {
    */
   reescalate() {
     console.log("[SCHEDULED ESCALATION] starts...");
-    if (this.reescalation_running == true){
+    if (this.reescalation_running == true) {
       console.log("- await last reescalate finished...")
       return Promise.resolve();
     }
-      this.reescalation_running = true;
+    this.reescalation_running = true;
     return Escalation
       .find({nextEscalationDue: {$lte: new Date()}})
       .populate('notification')
@@ -59,9 +65,31 @@ class Orchestration {
       })
       .then(user => {
         let news = [];
-        let devices = user.devices.filter(function (device) {
-          return device.type === escalation.nextEscalationType;
-        });
+        let devices = [];
+
+        while(devices.length == 0) {
+          devices = user.devices.filter(function (device) {
+            return device.type === escalation.nextEscalationType;
+          });
+          if(devices.length == 0){
+            switch (escalation.nextEscalationType) {
+              case Constants.DEVICE_TYPES.DESKTOP:
+                escalation.nextEscalationType = Constants.DEVICE_TYPES.MOBILE;
+                break;
+              case Constants.DEVICE_TYPES.MOBILE:
+                escalation.nextEscalationType = Constants.DEVICE_TYPES.EMAIL;
+                break;
+              default:
+                escalation.notification.changeState(Constants.NOTIFICATION_STATES.NOT_ESCALATED);
+                console.log("[INFO] no devices found for escalation", escalation.id)
+                return escalation.notification.save()
+                  .then(()=>{
+                    return orchestration.updateEscalation(escalation);
+                  });
+            }
+          }
+        }
+
         if (devices && devices.length) {
           console.log(devices.length, "devices found...");
           for (var i = 0; i < devices.length; i++) {
@@ -87,28 +115,25 @@ class Orchestration {
   updateEscalation(escalation) {
     if (escalation.notification.state !== Constants.NOTIFICATION_STATES.ESCALATING) {
       // notification has been clicked... remove escalation
-      return escalation.delete();
+      console.log("[INFO] cancel escalation due already clicked...", escalation.id);
+      return escalation.remove();
     }
     switch (escalation.nextEscalationType) {
       case Constants.DEVICE_TYPES.DESKTOP:
         escalation.nextEscalationType = Constants.DEVICE_TYPES.MOBILE;
-
         break;
       case Constants.DEVICE_TYPES.MOBILE:
         escalation.nextEscalationType = Constants.DEVICE_TYPES.EMAIL;
         break;
-      case Constants.DEVICE_TYPES.EMAIL:
-      default:
+      default: // Constants.DEVICE_TYPES.EMAIL
         escalation.notification.state = Constants.NOTIFICATION_STATES.ESCAlATED;
-
         return escalation.notification.save()
           .then(()=> {
-            return escalation.delete();
+            return escalation.remove();
           });
     }
-    escalation.nextEscalationDue = Date.now() + 30000; // add 30 seconds
+    escalation.nextEscalationDue = Date.now() + orchestration.reescalation_time;
     return escalation.save();
-
   }
 
   orchestrate(notifications) {
@@ -138,6 +163,8 @@ class Orchestration {
 
 }
 
-let orchestration = new Orchestration();
-module.exports = orchestration;
+let
+  orchestration = new Orchestration();
+module
+  .exports = orchestration;
 
