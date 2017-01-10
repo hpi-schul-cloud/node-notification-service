@@ -67,23 +67,26 @@ class Orchestration {
         let news = [];
         let devices = [];
 
-        while(devices.length == 0) {
+        while (devices.length == 0) {
           devices = user.devices.filter(function (device) {
+            if (escalation.nextEscalationType == Constants.DEVICE_TYPES.DESKTOP_MOBILE)
+              return device.type === Constants.DEVICE_TYPES.DESKTOP || device.type === Constants.DEVICE_TYPES.MOBILE;
             return device.type === escalation.nextEscalationType;
           });
-          if(devices.length == 0){
+          if (devices.length == 0) {
             switch (escalation.nextEscalationType) {
               case Constants.DEVICE_TYPES.DESKTOP:
                 escalation.nextEscalationType = Constants.DEVICE_TYPES.MOBILE;
                 break;
               case Constants.DEVICE_TYPES.MOBILE:
+              case Constants.DEVICE_TYPES.DESKTOP_MOBILE:
                 escalation.nextEscalationType = Constants.DEVICE_TYPES.EMAIL;
                 break;
               default:
                 escalation.notification.changeState(Constants.NOTIFICATION_STATES.NOT_ESCALATED);
                 console.log("[INFO] no devices found for escalation", escalation.id)
                 return escalation.notification.save()
-                  .then(()=>{
+                  .then(()=> {
                     return orchestration.updateEscalation(escalation);
                   });
             }
@@ -122,6 +125,7 @@ class Orchestration {
       case Constants.DEVICE_TYPES.DESKTOP:
         escalation.nextEscalationType = Constants.DEVICE_TYPES.MOBILE;
         break;
+      case Constants.DEVICE_TYPES.DESKTOP_MOBILE:
       case Constants.DEVICE_TYPES.MOBILE:
         escalation.nextEscalationType = Constants.DEVICE_TYPES.EMAIL;
         break;
@@ -144,27 +148,19 @@ class Orchestration {
       notification.save();
     });
 
-    let notification = notifications[0];
-
-    //return new Promise((resolve, reject) => {
-
-    let escalation = Escalation({
-      notification: notification,
-      priority: notification.priority,
-      nextEscalationType: Constants.DEVICE_TYPES.DESKTOP,
-      nextEscalationDue: Date.now
-    });
-    // escalate
-    return this.escalate(escalation);
-
-    //});
-
+    return Promise.all(notifications.map(notification=> {
+      let escalation = Escalation({
+        notification: notification,
+        priority: notification.priority,
+        nextEscalationType: notification.priority === Constants.MESSAGE_PRIORITIES.HIGH ? Constants.DEVICE_TYPES.DESKTOP_MOBILE : Constants.DEVICE_TYPES.DESKTOP,
+        nextEscalationDue: Date.now
+      });
+      return this.escalate(escalation);
+    }));
   }
 
 }
 
-let
-  orchestration = new Orchestration();
-module
-  .exports = orchestration;
+let orchestration = new Orchestration();
+module.exports = orchestration;
 

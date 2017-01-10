@@ -21,6 +21,7 @@ class Constants {
 
     this.DEVICE_TYPES = {
       //ACTIVE: 'active',
+      DESKTOP_MOBILE: 'desktop_mobile',
       DESKTOP: 'desktop',
       MOBILE: 'mobile',
       EMAIL: 'email'
