@@ -185,16 +185,17 @@ class Service {
 
   _createSignature(dir) {
     return new Promise((resolve, reject) => {
-      const cert = '' + certPath + '/cert.pem';
-      const key = '' + certPath + '/key.pem';
+      const cert = certPath + '/cert.pem';
+      const key = certPath + '/key.pem';
       const intermediate = certPath + '/intermediate.pem';
-      const manifest = '' + dir + '/manifest.json';
-      const signature = '' + dir + '/signature';
+      const manifest = dir + '/manifest.json';
+      const signature = dir + '/signature';
 
       const args = [
         'smime', '-sign', '-binary',
         '-in', manifest,
         '-out', signature,
+        '-outform', 'DER',
         '-signer', cert,
         '-inkey', key,
         '-certfile', intermediate,
