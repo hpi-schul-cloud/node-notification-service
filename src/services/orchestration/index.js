@@ -2,11 +2,9 @@
 
 const sendInterface = require('../sendInterface');
 const User = require('../user/user-model');
-const Notification = require('../notification/notification-model');
 const Escalation = require('./escalation-model');
 
 const Constants = require('../constants');
-const Util = require('../util');
 
 class Orchestration {
 
@@ -15,6 +13,9 @@ class Orchestration {
     // next escalation wait time in ms
     this.reescalation_time = 30000;
 
+    // next escalation wait time in ms for low priority emails
+    this.low_reescalation_time = 360000;
+
     // timer checks all 10 seconds for remaining escalations to be send
     setInterval(this.reescalate, 10000);
 
@@ -22,9 +23,8 @@ class Orchestration {
 
 
   /**
-   * restarts escalation for stored objects.
+   * checks if there are escalations not finished and resend notifications to next device level.
    * take care to do not run multiple instances by the same time.
-   * timer above schedules for 10 seconds only!
    */
   reescalate() {
     console.log("[SCHEDULED ESCALATION] starts...");
@@ -59,17 +59,31 @@ class Orchestration {
 
   escalate(escalation) {
     console.log("[INFO] escalating ", escalation._id);
+
+    // notification has been received and clicked... leave escalation
+    if (escalation.notification.state !== Constants.NOTIFICATION_STATES.ESCALATING) {
+      console.log("[INFO] cancel escalation due state change...", escalation.id);
+      return escalation.remove();
+    }
+
     return User
       .findOne({
         schulcloudId: escalation.notification.user
       })
       .then(user => {
+
+        if (user == null) {
+          return Promise.reject("[ERROR] could not resolve user using scope " +  escalation.notification.user + " in escalation " + escalation.id);
+        }
+
         let news = [];
         let devices = [];
 
-        while (devices.length == 0) {
+        // finds first escalation type where the user already has devices registered
+        // if there are no devices registered, escalation will be removed
+        while (devices.length == 0 && escalation.notification.state === Constants.NOTIFICATION_STATES.ESCALATING) {
           devices = user.devices.filter(function (device) {
-            if (escalation.nextEscalationType == Constants.DEVICE_TYPES.DESKTOP_MOBILE)
+            if (escalation.nextEscalationType === Constants.DEVICE_TYPES.DESKTOP_MOBILE)
               return device.type === Constants.DEVICE_TYPES.DESKTOP || device.type === Constants.DEVICE_TYPES.MOBILE;
             return device.type === escalation.nextEscalationType;
           });
@@ -84,30 +98,30 @@ class Orchestration {
                 break;
               default:
                 escalation.notification.changeState(Constants.NOTIFICATION_STATES.NOT_ESCALATED);
-                console.log("[INFO] no devices found for escalation", escalation.id)
                 return escalation.notification.save()
                   .then(()=> {
-                    return orchestration.updateEscalation(escalation);
+                    console.log("[INFO] no devices found for escalation", escalation.id)
+                    return escalation.remove();
                   });
             }
           }
         }
 
-        if (devices && devices.length) {
+        // devices have been found... send
+        if (devices.length != 0) {
           console.log(devices.length, "devices found...");
+          // prepare notifications by multiplication for devices
           for (var i = 0; i < devices.length; i++) {
             news.push(escalation.notification);
           }
           sendInterface.send(news, devices)
             .then(res => {
-              console.log('[INFO] notification sent');
+              console.log('[INFO] notifications sent to', devices.length, "devices");
               return this.updateEscalation(escalation);
             })
             .catch(err => {
-              console.log('[ERROR] send error');
+              console.log('[ERROR] send error', err);
             })
-        } else {
-          console.log('no devices found...');
         }
       })
       .catch(err => {
@@ -115,19 +129,26 @@ class Orchestration {
       });
   }
 
+  /**
+   * updates escalation to next escalation step and raises due time.
+   * if already in state email, the escalation will be removed.
+   * @param escalation
+   * @returns {*}
+   */
   updateEscalation(escalation) {
-    if (escalation.notification.state !== Constants.NOTIFICATION_STATES.ESCALATING) {
-      // notification has been clicked... remove escalation
-      console.log("[INFO] cancel escalation due already clicked...", escalation.id);
-      return escalation.remove();
-    }
     switch (escalation.nextEscalationType) {
       case Constants.DEVICE_TYPES.DESKTOP:
         escalation.nextEscalationType = Constants.DEVICE_TYPES.MOBILE;
+        escalation.nextEscalationDue = Date.now() + orchestration.reescalation_time;
         break;
       case Constants.DEVICE_TYPES.DESKTOP_MOBILE:
       case Constants.DEVICE_TYPES.MOBILE:
         escalation.nextEscalationType = Constants.DEVICE_TYPES.EMAIL;
+        if (escalation.priority === Constants.MESSAGE_PRIORITIES.HIGH) {
+          escalation.nextEscalationDue = Date.now() + orchestration.reescalation_time;
+        } else {
+          escalation.nextEscalationDue = Date.now() + orchestration.low_reescalation_time;
+        }
         break;
       default: // Constants.DEVICE_TYPES.EMAIL
         escalation.notification.state = Constants.NOTIFICATION_STATES.ESCAlATED;
@@ -136,27 +157,42 @@ class Orchestration {
             return escalation.remove();
           });
     }
-    escalation.nextEscalationDue = Date.now() + orchestration.reescalation_time;
     return escalation.save();
   }
 
+  /**
+   * starts first escalation of new notifications.
+   * for notifications with high priority all devices will be notified immediately,
+   * otherwise the escalation will start with desktop devices only.
+   * @param notifications
+   * @returns {Promise.<TResult>|Promise}
+   */
   orchestrate(notifications) {
-
     console.log('[INFO] orchestrating notification');
-    notifications.forEach((notification) => {
-      notification.changeState(Constants.NOTIFICATION_STATES.ESCALATING);
-      notification.save();
-    });
-
     return Promise.all(notifications.map(notification=> {
-      let escalation = Escalation({
-        notification: notification,
-        priority: notification.priority,
-        nextEscalationType: notification.priority === Constants.MESSAGE_PRIORITIES.HIGH ? Constants.DEVICE_TYPES.DESKTOP_MOBILE : Constants.DEVICE_TYPES.DESKTOP,
-        nextEscalationDue: Date.now
+      notification.changeState(Constants.NOTIFICATION_STATES.ESCALATING);
+      return notification.save();
+    }))
+      .then(succ=> {
+        return Promise.all(notifications.map(notification=> {
+          // on high priority send notification to all devices,
+          // otherwise to desktop first.
+          let firstEscalationType =
+            notification.priority === Constants.MESSAGE_PRIORITIES.HIGH
+              ? Constants.DEVICE_TYPES.DESKTOP_MOBILE
+              : Constants.DEVICE_TYPES.DESKTOP;
+          let escalation = Escalation({
+            notification: notification,
+            priority: notification.priority,
+            nextEscalationType: firstEscalationType,
+            nextEscalationDue: Date.now
+          });
+          return this.escalate(escalation);
+        }))
+      })
+      .catch(err=> {
+        console.log("[ERROR] in orchestrate", err);
       });
-      return this.escalate(escalation);
-    }));
   }
 
 }
