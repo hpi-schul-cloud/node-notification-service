@@ -8,8 +8,8 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const Util = require("../util.js");
-const Constants = require("../constants.js");
+const Util = require('../util.js');
+const Constants = require('../constants.js');
 
 const escalationSchema = new Schema({
   notification: {type: String, ref: 'notification', required: true},
