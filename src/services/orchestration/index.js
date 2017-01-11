@@ -84,13 +84,13 @@ class Orchestration {
 
         // finds first escalation type where the user already has devices registered
         // if there are no devices registered, escalation will be removed
-        while (devices.length == 0 && escalation.notification.state === Constants.NOTIFICATION_STATES.ESCALATING) {
+        while (devices.length === 0 && escalation.notification.state === Constants.NOTIFICATION_STATES.ESCALATING) {
           devices = user.devices.filter(function (device) {
             if (escalation.nextEscalationType === Constants.DEVICE_TYPES.DESKTOP_MOBILE)
               return device.type === Constants.DEVICE_TYPES.DESKTOP || device.type === Constants.DEVICE_TYPES.MOBILE;
             return device.type === escalation.nextEscalationType;
           });
-          if (devices.length == 0) {
+          if (devices.length === 0) {
             switch (escalation.nextEscalationType) {
               case Constants.DEVICE_TYPES.DESKTOP:
                 escalation.nextEscalationType = Constants.DEVICE_TYPES.MOBILE;
@@ -115,7 +115,7 @@ class Orchestration {
         }
 
         // devices have been found... send
-        if (devices.length != 0) {
+        if (devices.length !== 0) {
           console.log(devices.length, 'devices found...');
           // prepare notifications by multiplication for devices
           for (var i = 0; i < devices.length; i++) {
@@ -146,15 +146,15 @@ class Orchestration {
     switch (escalation.nextEscalationType) {
       case Constants.DEVICE_TYPES.DESKTOP:
         escalation.nextEscalationType = Constants.DEVICE_TYPES.MOBILE;
-        escalation.nextEscalationDue = Date.now() + orchestration.reescalationTime;
+        escalation.nextEscalationDue = Date.now() + this.reescalationTime;
         break;
       case Constants.DEVICE_TYPES.DESKTOP_MOBILE:
       case Constants.DEVICE_TYPES.MOBILE:
         escalation.nextEscalationType = Constants.DEVICE_TYPES.EMAIL;
         if (escalation.priority === Constants.MESSAGE_PRIORITIES.HIGH) {
-          escalation.nextEscalationDue = Date.now() + orchestration.reescalationTime;
+          escalation.nextEscalationDue = Date.now() + this.reescalationTime;
         } else {
-          escalation.nextEscalationDue = Date.now() + orchestration.lowReescalationTime;
+          escalation.nextEscalationDue = Date.now() + this.lowReescalationTime;
         }
         break;
       default: // Constants.DEVICE_TYPES.EMAIL
