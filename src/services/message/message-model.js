@@ -24,6 +24,7 @@ const messageSchema = new Schema({
   userIds: { type: [String], required: false },
   createdAt: { type: Date, 'default': Date.now },
   updatedAt: { type: Date, 'default': Date.now }
+
 });
 
 const messageModel = mongoose.model('message', messageSchema);

@@ -16,17 +16,20 @@
     "node": ">= 0.12.0"
   },
   "scripts": {
-    "test": "npm run coverage",
+    "test": "npm run coverage && npm run eslint",
     "testing": "nodemon --inspect src/ --exec \"npm test  || true\"",
     "jshint": "jshint src/. test/. --config",
+    "eslint": "eslint src/. test/. ",
     "start": "nodemon --inspect src/",
     "coverage": "./node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha ./test/**/*.test.js",
     "mocha": "mocha test/ --recursive"
   },
   "dependencies": {
+    "apn": "^2.1.2",
     "body-parser": "^1.15.2",
     "compression": "^1.6.2",
     "cors": "^2.8.1",
+    "express-zip": "^2.0.1",
     "feathers": "^2.0.2",
     "feathers-authentication": "^0.7.12",
     "feathers-configuration": "^0.3.3",
@@ -48,10 +51,12 @@
     "feathers-populate-hook": "0.0.4",
     "istanbul": "^0.4.5",
     "jshint": "^2.9.4",
+    "eslint": "^2.13.0",
     "mocha": "^3.1.2",
     "nodemon": "^1.11.0",
     "request": "^2.78.0",
     "request-promise": "^4.1.1",
-    "sinon": "^1.17.6"
+    "sinon": "^1.17.6",
+    "supertest": "^2.0.1"
   }
 }

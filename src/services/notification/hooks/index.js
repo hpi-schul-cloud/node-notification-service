@@ -9,9 +9,9 @@ exports.before = {
   all: [],
   find: [],
   get: [],
-  create: [],
-  update: [],
-  patch: [],
+  create: hooks.disable(),
+  update: hooks.disable(),
+  patch: hooks.disable(),
   remove: []
 };
 
