@@ -49,6 +49,7 @@ class Authentication {
       usertoken1: 'useridfürusertoken1',
       usertoken2: 'useridfürusertoken2',
       usertoken3: 'useridfürusertoken3',
+      usertokenwithmin16chars: 'useridfürusertoken4',
     };
 
     return new Promise((resolve, reject) => {
