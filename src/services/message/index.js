@@ -54,13 +54,14 @@ class Service {
           }).save();
           return notifications.concat(notification);
         }, []);
-
         return Promise.all(notifications);
       })
       .then(notifications => {
         return Orchestration.orchestrate(notifications);
-        // resolve(message);
       })
+      .then(()=> {
+        return message; // TODO remove unnecessary data from model
+      });
   }
 }
 

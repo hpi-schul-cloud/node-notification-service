@@ -10,7 +10,7 @@ angular.module('sendApp', [])
       body: "the long message",
       token: "servicetoken2",
       scopeIds: [
-        "userIdOrScopeId", "testScopeId"
+        "useridfürusertoken1"
       ]
     };
 
