@@ -38,5 +38,9 @@ data/
 .vscode/
 
 # Dont track sepcific files
-src/services/sendInterface/adapters/config.json
+cert.pem
+key.pem
+cert.p12
+*.p8
+secure/config.json
 test.sh

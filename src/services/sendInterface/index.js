@@ -1,6 +1,8 @@
 'use strict';
 const notificationServices = {
-  firebase: require('./adapters/firebase')
+  apn: require('./adapters/apn'),
+  firebase: require('./adapters/firebase'),
+  email: require('./adapters/email')
 };
 
 class SendInterface {
@@ -43,7 +45,7 @@ class SendInterface {
           this._addResponse(accumulatedResponses, response);
         });
 
-        if (accumulatedResponses.failure == notifications.length) {
+        if (accumulatedResponses.failure === notifications.length) {
           reject(accumulatedResponses);
         } else {
           resolve(accumulatedResponses);

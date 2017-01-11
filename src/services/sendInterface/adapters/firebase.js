@@ -1,5 +1,5 @@
 'use strict';
-const config = require('./config.json').firebase;
+const config = require('../../../../secure/config.json').sendServices.firebase;
 const firebase = require('node-gcm');
 const errors = require('feathers-errors');
 
@@ -15,7 +15,7 @@ class FirebaseAdapter {
         return accumulator.concat(device.token);
       }, []);
 
-      this.firebaseSender.sendNoRetry(message, { registrationTokens: tokens }, (error, firebaseResponse) => {
+      this.firebaseSender.send(message, { registrationTokens: tokens }, (error, firebaseResponse) => {
         if (error) {
           let response = this._buildErrorResponse(notifications, devices);
           resolve(response);
@@ -60,7 +60,7 @@ class FirebaseAdapter {
     };
 
     // TODO: message.action = notification.action;
-    message.priority = notification.message.priority == 'high' ? 'high' : 'normal';
+    message.priority = notification.priority === 'high' ? 'high' : 'normal';
 
     // TODO: evaluate usage for escalation to avoid multiple notifications
     // seconds the message is kept on the server if it was not possible to push it immediately

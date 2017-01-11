@@ -21,12 +21,12 @@ describe('Swagger documentation', function() {
   });
 
   it('displays Swagger UI', () => {
-    return rp(host+ "/docs")
-      .then( (htmlString) => {
-          htmlString.should.include('swagger');
+    return rp(host + '/docs')
+      .then((htmlString) => {
+        htmlString.should.include('swagger');
       })
-      .catch( (err) => {
-          err.should.not.be.ok;
+      .catch((err) => {
+        err.should.not.be.ok;
       });
   });
 

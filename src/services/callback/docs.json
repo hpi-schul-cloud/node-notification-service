@@ -1,0 +1,43 @@
+ {
+   "description": "Callback Service",
+   "definitions": {
+     "callback": {
+       "type": "object",
+       "required": [
+         "notificationId"
+       ],
+       "properties": {
+         "notificationId": {
+           "type": "string",
+           "description": "Id of Notification (provided with push)"
+         },
+         "type": {
+          "type": "string",
+          "description" : "Callback Type. Either 'received' or 'clicked'"
+         }
+       },
+       "example": {
+         "notificationId": "58515b6032a6110620478402",
+         "type" : "clicked"
+       }
+     }
+   },
+   "create": {
+     "summary": "Callback to Service",
+     "description": "Post a callback to the notification service after receiving a push. When the service receives a callback for a notification, it wont be escalated anymore.",
+     "responses": {
+       "200": {
+         "description": "OK"
+       },
+       "400": {
+         "description": "Callback type does not exist."
+       },
+       "404": {
+         "description": "Notification does not exist found"
+       },
+       "500": {
+         "description": "internal error try again later."
+       }
+     }
+   }
+ }
