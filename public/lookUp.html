@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html ng-app="searchApp">
+<head>
+    <meta charset="UTF-8">
+    <title>Research Message</title>
+  <link rel="stylesheet" type="text/css" href="css/Style.css">
+</head>
+<body ng-controller="lookCtrl">
+
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+<script src="javascript/research.js"> </script>
+
+<h1>Send a message to clients</h1>
+<form id="send-request">
+  <label for="messageId">Message Id: 5876034c3066d633009839ee <br>
+    <input id="messageId" name="messageId" type="text" ng-model="messageId" value="5876034c3066d633009839ee">
+  </label>
+  <button type="button" name="Submit" ng-click="researchID()">Research Id</button>
+</form>
+
+<div ng-if="idResponse.status == 200">
+  Message was successfully transmitted.
+</div>
+<div ng-show="idResponse" ng-if="idResponse.status != 200">
+  Message Error.
+</div>
+
+<div data-ng-repeat="i in range">
+  <tr>
+    <td>{{idResponse.data[i].user}}</td>
+    <td>{{idResponse.data[i].status}}</td>
+  </tr>
+
+</div>
+
+</body>
+</html>
