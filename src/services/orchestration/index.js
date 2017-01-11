@@ -95,6 +95,10 @@ class Orchestration {
               case Constants.DEVICE_TYPES.MOBILE:
               case Constants.DEVICE_TYPES.DESKTOP_MOBILE:
                 escalation.nextEscalationType = Constants.DEVICE_TYPES.EMAIL;
+                devices = [{
+                  service: Constants.DEVICE_TYPES.EMAIL,
+                  token: escalation.notification.user
+                }];
                 break;
               default:
                 escalation.notification.changeState(Constants.NOTIFICATION_STATES.NOT_ESCALATED);
