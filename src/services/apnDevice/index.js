@@ -8,6 +8,7 @@ const crypto = require('crypto');
 const zip = require('express-zip');
 
 // paths
+const publicPath = __dirname + '/../../../public';
 const securePath = __dirname + '/../../../secure';
 const certPath = securePath + '/certificates';
 const iconsetPath = __dirname+'/pushPackage/icon.iconset';
@@ -56,6 +57,16 @@ class Service {
     // TOOD: not yet implemented in device service
     //req.app.service('/devices')
     // .delete();
+  }
+
+  log(req, res) {
+    fs.appendFile(publicPath + '/apn.log', JSON.stringify(req.body), (err) => {
+      if (err) {
+        res.sendStatus(500);
+      } else {
+        res.sendStatus(200);
+      }
+    });
   }
 
   checkAuthorizationHeader(req, res, next) {
@@ -203,6 +214,13 @@ class Service {
       ];
 
       let process = spawn('openssl', args);
+      process.on('exit', (code) => {
+        if (code !== 0) {
+          reject('Unable to create signature. Exited with code ' + code + '.');
+        } else {
+          resolve(dir);
+        }
+      });
       process.on('close', (code) => {
         if (code !== 0) {
           reject('Unable to create signature. Exited with code ' + code + '.');
@@ -254,6 +272,8 @@ module.exports = function(){
     service.createPushPackage,
     service.cleanTempDir
   );
+
+  app.post('/:version/log', service.log);
 };
 
 module.exports.Service = new Service();
