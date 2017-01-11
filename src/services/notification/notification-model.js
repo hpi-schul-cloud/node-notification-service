@@ -15,17 +15,9 @@ const callbackSchema = new Schema({
   createdAt: { type: Date, 'default': Date.now }
 });
 
-const messageSchema = new Schema({
-  messageId: { type: String, ref: "message", required: true},
-  title: { type: String, required: true },
-  body: { type: String, required: true },
-  action: { type: String, required: false },
-  priority: { type: String, default: Constants.MESSAGE_PRIORITIES.MEDIUM, enum: Util.getEnumValues(Constants.MESSAGE_PRIORITIES) }
-});
-
 // TODO notification model for db
 const notificationSchema = new Schema({
-  message: { type: messageSchema, required: true },
+  message: { type: Object, required: true },
   user: { type: String, ref: 'user', required: true },
   state: { type: String, default: 'created', enum:  Util.getEnumValues(Constants.NOTIFICATION_STATES)},
   stateHistory: [],
