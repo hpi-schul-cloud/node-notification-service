@@ -25,9 +25,11 @@
     "mocha": "mocha test/ --recursive"
   },
   "dependencies": {
+    "apn": "^2.1.2",
     "body-parser": "^1.15.2",
     "compression": "^1.6.2",
     "cors": "^2.8.1",
+    "express-zip": "^2.0.1",
     "feathers": "^2.0.2",
     "feathers-authentication": "^0.7.12",
     "feathers-configuration": "^0.3.3",
@@ -54,6 +56,7 @@
     "nodemon": "^1.11.0",
     "request": "^2.78.0",
     "request-promise": "^4.1.1",
-    "sinon": "^1.17.6"
+    "sinon": "^1.17.6",
+    "supertest": "^2.0.1"
   }
 }

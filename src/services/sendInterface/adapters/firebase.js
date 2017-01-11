@@ -1,5 +1,5 @@
 'use strict';
-const config = require('./config.json').firebase;
+const config = require('../../../../secure/config.json').sendServices.firebase;
 const firebase = require('node-gcm');
 const errors = require('feathers-errors');
 
@@ -15,7 +15,7 @@ class FirebaseAdapter {
         return accumulator.concat(device.token);
       }, []);
 
-      this.firebaseSender.sendNoRetry(message, { registrationTokens: tokens }, (error, firebaseResponse) => {
+      this.firebaseSender.send(message, { registrationTokens: tokens }, (error, firebaseResponse) => {
         if (error) {
           let response = this._buildErrorResponse(notifications, devices);
           resolve(response);
