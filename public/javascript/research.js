@@ -1,15 +1,7 @@
 
 angular.module('searchApp', [])
   .controller("lookCtrl", function ($scope, $http) {
-    $scope.data = {
-      title: "Sample Message",
-      body: "the long message",
-      token: "servicetoken2",
-      test: "testMessage",
-      scopeIds: [
-        "userIdOrScopeId", "testScopeId"
-      ]
-    };
+
 
     $scope.id;
     $scope.hide = true;

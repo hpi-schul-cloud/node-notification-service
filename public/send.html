@@ -67,11 +67,28 @@
       </tr>
     </table>
     <br>
-    <button type="button" name="Submit" ng-click="researchID()">Research ID</button> <br>
+    <form id="search-request">
+      <label for="messageId">Message Id: <br>
+        <input id="messageId" name="messageId" type="text" ng-model="receivedId">
+      </label>
+      <button type="button" name="Submit" ng-click="researchID()">Research Id</button>
+    </form>
 
-    {{idResponse}} <br>
-    {{idResponse.status}} <br>
-    {{idResponse.data.user}}
+    <div ng-if="idResponse.status == 200">
+      Message was successfully transmitted.
+    </div>
+    <div ng-show="idResponse" ng-if="idResponse.status != 200">
+      Message Error.
+    </div>
+    Messea: {{test}}
+
+    <div data-ng-repeat="i in range">
+      <tr>
+        <td>{{idResponse.data[i].user}}</td>
+        <td>{{idResponse.data[i].status}}</td>
+      </tr>
+
+    </div>
   </div>
 </div>
 

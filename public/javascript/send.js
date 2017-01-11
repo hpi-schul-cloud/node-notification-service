@@ -4,6 +4,7 @@
 
 angular.module('sendApp', [])
   .controller("sendCtrl", function ($scope, $http) {
+
     $scope.data = {
       title: "Sample Message",
       body: "the long message",
@@ -12,7 +13,8 @@ angular.module('sendApp', [])
         "userIdOrScopeId", "testScopeId"
       ]
     };
-    $scope.id;
+
+
     $scope.hide = true;
 
     $scope.sendRequest = function () {
@@ -24,6 +26,7 @@ angular.module('sendApp', [])
       }).then(function success(response) {
         $scope.response = response;
         $scope.id = response.data._id;
+        $scope.receivedId = response.data._id;
         $scope.error = false;
         $scope.hide = false;
 
@@ -34,14 +37,23 @@ angular.module('sendApp', [])
 
     };
 
+
     $scope.researchID = function () {
+      var messageId = $scope.receivedId;
 
       return $http({
 
         method: "GET",
-        url: "//localhost:3030/messages/" + $scope.id
+        url: "//localhost:3030/messages/" + messageId
       }).then(function success(response) {
         $scope.idResponse = response;
+        $scope.user = response.data.length;
+        var range = [];
+        for(var i=0;i<$scope.user;i++) {
+          range.push(i);
+        }
+        $scope.range = range;
+        $scope.test = messageId;
 
       }, function error(response) {
         $scope.idResponse = response;
