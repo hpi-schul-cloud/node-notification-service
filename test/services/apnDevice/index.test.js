@@ -107,4 +107,11 @@ describe('apnDevice service', function() {
         done(err);
       });
   });
+
+  it('creates a log file', () => {
+    return request(app)
+      .post('/v1/log')
+      .send(['logInfo'])
+      .expect(200);
+  });
 });
