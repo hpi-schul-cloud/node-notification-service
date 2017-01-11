@@ -30,12 +30,12 @@ class Service {
   }
 
   register(req, res) {
-    let userId = req.headers.authorization.split(' ')[1];
+    let userToken = req.headers.authorization.split(' ')[1];
     let token = req.params.deviceToken;
 
     req.app.service('devices')
       .create({
-        'user_token': userId,
+        'user_token': userToken,
         'service_token': token,
         'type': 'desktop',
         'service': 'apn',
@@ -83,8 +83,8 @@ class Service {
 
   createPushPackage(req, res, next) {
     const tempPrefix = '/tmp/pushPackage-';
-    // as token the schul-cloud userid is used
-    let token = req.body.userId;
+    // as token the Schul-Cloud Token is used
+    let token = req.body.userToken;
 
     fs.mkdtemp(tempPrefix, (err, tempDir) => {
       if (err) {
