@@ -44,3 +44,4 @@ cert.p12
 *.p8
 secure/config.json
 test.sh
+**config.json
