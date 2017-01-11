@@ -72,7 +72,7 @@ class Orchestration {
       })
       .then(user => {
 
-        if (user == null) {
+        if (user == null) { // TODO this should not happen...
           return Promise.reject("[ERROR] could not resolve user using scope " +  escalation.notification.user + " in escalation " + escalation.id);
         }
 
