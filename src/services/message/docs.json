@@ -29,7 +29,7 @@
          },
          "token": {
            "type": "string",
-           "description": "Token of the initiating service or user"
+           "description": "SSO Token of the initiating service or user"
          },
          "scopeIds": {
            "type": "array",

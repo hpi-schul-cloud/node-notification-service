@@ -20,7 +20,7 @@ class Service {
 
     // Create device object
     const newDevice = {
-      token: data.service_token,
+      token: data.device_token,
       type: data.type,
       service: data.service,
       name: data.name,

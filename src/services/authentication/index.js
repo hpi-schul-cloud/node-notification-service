@@ -2,83 +2,47 @@
 
 const errors = require('feathers-errors');
 const Util = require('../util');
-
+const Resolve = require('../resolve');
 
 class Authentication {
-  // see if service token is registered with schulcloud db
-  static verifyService(token) {
 
-    const mock = {
-      servicetoken1: 'serviceidfürservicetoken1',
-      servicetoken2: 'serviceidfürservicetoken2',
-      servicetoken3: 'serviceidfürservicetoken3',
-    };
-
-    return new Promise((resolve, reject) => {
-      if (mock[token])
-        resolve(mock[token]);
-      else
-        reject(new errors.BadRequest('service token not valid'));
-    });
-  }
-
-  static serviceAuthHook() {
+  static auth() {
 
     return function(hook) {
 
       if (hook.data.token) {
 
-        return Authentication.verifyService(hook.data.token).then(serviceOrUserId => {
-          hook.data.initiatorId = serviceOrUserId;
+        return Resolve.verifyToken(hook.data.token).then(response => {
+
+          if (Array.isArray(response.data))
+            response.data = response.data[0];
+
+          console.log('[AUTHENTICATION] token is valid');
+
+          var authorities = [];
+
+          if (response.data.attributes.canWrite)
+            authorities.push('canWrite');
+
+          if (response.data.attributes.canRead)
+            authorities.push('canRead');
+
+          console.log('[AUTHENTICATION] assigned ' + response.data.id + ' to request');
+
+          hook.data.schulcloudId = response.data.id;
+          // hook.data.authorities = response.data.authorities;    in the future, when authorities are directly provided
+          hook.data.authorities = authorities;
+
         });
 
       } else {
-
-        return Promise.reject(new errors.BadRequest('user token missing'));
-
+        return Promise.reject(new errors.BadRequest('auth token missing'));
       }
     }
-
-
-  }
-
-  // get User ID from schulcloud db by sso Token
-  static verifyUser(ssoToken) {
-
-    const mock = {
-      usertoken1: 'useridfürusertoken1',
-      usertoken2: 'useridfürusertoken2',
-      usertoken3: 'useridfürusertoken3',
-      usertokenwithmin16chars: 'useridfürusertoken4',
-    };
-
-    return new Promise((resolve, reject) => {
-      if (mock[ssoToken])
-        resolve(mock[ssoToken]);
-      else
-        reject(new errors.Forbidden('user token not valid'));
-    });
-
-  }
-
-  static userAuthHook() {
-
-    return function(hook) {
-
-      if (hook.data.user_token) {
-
-        return Authentication.verifyUser(hook.data.user_token).then(schulcloudId => {
-          hook.data.schulcloudId = schulcloudId;
-        });
-
-      } else {
-
-        return Promise.reject(new errors.BadRequest('user token missing'));
-
-      }
-    }
-
   }
 }
+
+
+
 
 module.exports = Authentication;
