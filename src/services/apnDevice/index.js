@@ -18,7 +18,7 @@ const password = require(securePath + '/config.json').certificates.password;
 // website.json content
 const websiteName = 'Schul-Cloud';
 const websitePushID = 'web.org.schul-cloud';
-const urlFormatString = 'https://schul-cloud.org/';
+const urlFormatString = 'https://schul-cloud.org';
 const webServiceURL = 'https://schul-cloud.org:3030/';
 const allowedDomains = [urlFormatString];
 
@@ -159,7 +159,7 @@ class Service {
           hash.setEncoding('hex');
           hash.write(fs.readFileSync(dir + '/' + 'website.json'));
           hash.end();
-          manifest['webiste.json'] = hash.read();
+          manifest['website.json'] = hash.read();
 
           // create hashes for iconset
           files.forEach((file) => {
@@ -171,7 +171,7 @@ class Service {
           });
 
           // write manifest to file
-          fs.writeFile(dir + '/manifest.json', manifest, (err) => {
+          fs.writeFile(dir + '/manifest.json', JSON.stringify(manifest), (err) => {
             if (err) {
               reject(err);
             } else {
@@ -185,16 +185,17 @@ class Service {
 
   _createSignature(dir) {
     return new Promise((resolve, reject) => {
-      const cert = '' + certPath + '/cert.pem';
-      const key = '' + certPath + '/key.pem';
+      const cert = certPath + '/cert.pem';
+      const key = certPath + '/key.pem';
       const intermediate = certPath + '/intermediate.pem';
-      const manifest = '' + dir + '/manifest.json';
-      const signature = '' + dir + '/signature';
+      const manifest = dir + '/manifest.json';
+      const signature = dir + '/signature';
 
       const args = [
         'smime', '-sign', '-binary',
         '-in', manifest,
         '-out', signature,
+        '-outform', 'DER',
         '-signer', cert,
         '-inkey', key,
         '-certfile', intermediate,
