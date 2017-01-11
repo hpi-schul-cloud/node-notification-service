@@ -7,12 +7,13 @@ const fs = require('fs');
 const crypto = require('crypto');
 const zip = require('express-zip');
 
-// password for certificate
-const password = require('../../certificates/config.json').password;
-
 // paths
-const certPath = __dirname + '/../../certificates';
-const iconsetPath = __dirname+'/../../pushPackage/icon.iconset';
+const securePath = __dirname + '/../../../secure';
+const certPath = securePath + '/certificates';
+const iconsetPath = __dirname+'/pushPackage/icon.iconset';
+
+// password for certificate
+const password = require(securePath + '/config.json').certificates.password;
 
 // website.json content
 const websiteName = 'Schul-Cloud';

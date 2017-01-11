@@ -1,5 +1,5 @@
 'use strict';
-const config = require('./config.json').apn;
+const config = require('../../../../secure/config.json').sendServices.apn;
 const apn = require('apn');
 const errors = require('feathers-errors');
 

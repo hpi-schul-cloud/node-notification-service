@@ -1,5 +1,5 @@
 'use strict';
-const config = require('./config.json').firebase;
+const config = require('../../../../secure/config.json').sendServices.firebase;
 const firebase = require('node-gcm');
 const errors = require('feathers-errors');
 
