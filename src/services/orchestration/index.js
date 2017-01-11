@@ -10,14 +10,17 @@ class Orchestration {
 
   constructor() {
 
+    this.reescalate = this.reescalate.bind(this);
+
     // next escalation wait time in ms
-    this.reescalation_time = 30000;
+    this.reescalationTime = 30000;
 
     // next escalation wait time in ms for low priority emails
-    this.low_reescalation_time = 360000;
+    this.lowReescalationTime = 360000;
 
     // timer checks all 10 seconds for remaining escalations to be send
     setInterval(this.reescalate, 10000);
+
 
   }
 
@@ -27,42 +30,42 @@ class Orchestration {
    * take care to do not run multiple instances by the same time.
    */
   reescalate() {
-    console.log("[SCHEDULED ESCALATION] starts...");
-    if (this.reescalation_running == true) {
-      console.log("- await last reescalate finished...")
+    console.log('[SCHEDULED ESCALATION] starts...');
+    if (this.reescalationRunning === true) {
+      console.log('- await last reescalate finished...')
       return Promise.resolve();
     }
-    this.reescalation_running = true;
+    this.reescalationRunning = true;
     return Escalation
       .find({nextEscalationDue: {$lte: new Date()}})
       .populate('notification')
       .then(escalations => {
         if (escalations.length) {
-          console.log(" - escalate", escalations.length, "scheduled notifications...");
+          console.log(' - escalate', escalations.length, 'scheduled notifications...');
           return Promise.all(escalations.map(escalation=> {
-            return orchestration.escalate(escalation);
+            return this.escalate(escalation);
           }));
         } else {
-          console.log(" - no escalations scheduled...");
+          console.log(' - no escalations scheduled...');
           return Promise.resolve();
         }
       })
       .then(()=> {
-        this.reescalation_running = false;
-        console.log("[SCHEDULED ESCALATION] end...");
+        this.reescalationRunning = false;
+        console.log('[SCHEDULED ESCALATION] end...');
       })
       .catch(err=> {
-        this.reescalation_running = false;
-        console.log("[SCHEDULED ESCALATION] end after error...", err);
+        this.reescalationRunning = false;
+        console.log('[SCHEDULED ESCALATION] end after error...', err);
       });
   }
 
   escalate(escalation) {
-    console.log("[INFO] escalating ", escalation._id);
+    console.log('[INFO] escalating ', escalation._id);
 
     // notification has been received and clicked... leave escalation
     if (escalation.notification.state !== Constants.NOTIFICATION_STATES.ESCALATING) {
-      console.log("[INFO] cancel escalation due state change...", escalation.id);
+      console.log('[INFO] cancel escalation due state change...', escalation.id);
       return escalation.remove();
     }
 
@@ -72,8 +75,8 @@ class Orchestration {
       })
       .then(user => {
 
-        if (user == null) { // TODO this should not happen...
-          return Promise.reject("[ERROR] could not resolve user using scope " +  escalation.notification.user + " in escalation " + escalation.id);
+        if (user === null) { // TODO this should not happen...
+          return Promise.reject('[ERROR] could not resolve user using scope ' +  escalation.notification.user + ' in escalation ' + escalation.id);
         }
 
         let news = [];
@@ -104,7 +107,7 @@ class Orchestration {
                 escalation.notification.changeState(Constants.NOTIFICATION_STATES.NOT_ESCALATED);
                 return escalation.notification.save()
                   .then(()=> {
-                    console.log("[INFO] no devices found for escalation", escalation.id)
+                    console.log('[INFO] no devices found for escalation', escalation.id)
                     return escalation.remove();
                   });
             }
@@ -113,14 +116,14 @@ class Orchestration {
 
         // devices have been found... send
         if (devices.length != 0) {
-          console.log(devices.length, "devices found...");
+          console.log(devices.length, 'devices found...');
           // prepare notifications by multiplication for devices
           for (var i = 0; i < devices.length; i++) {
             news.push(escalation.notification);
           }
           sendInterface.send(news, devices)
             .then(res => {
-              console.log('[INFO] notifications sent to', devices.length, "devices");
+              console.log('[INFO] notifications sent to', devices.length, 'devices');
               return this.updateEscalation(escalation);
             })
             .catch(err => {
@@ -143,15 +146,15 @@ class Orchestration {
     switch (escalation.nextEscalationType) {
       case Constants.DEVICE_TYPES.DESKTOP:
         escalation.nextEscalationType = Constants.DEVICE_TYPES.MOBILE;
-        escalation.nextEscalationDue = Date.now() + orchestration.reescalation_time;
+        escalation.nextEscalationDue = Date.now() + orchestration.reescalationTime;
         break;
       case Constants.DEVICE_TYPES.DESKTOP_MOBILE:
       case Constants.DEVICE_TYPES.MOBILE:
         escalation.nextEscalationType = Constants.DEVICE_TYPES.EMAIL;
         if (escalation.priority === Constants.MESSAGE_PRIORITIES.HIGH) {
-          escalation.nextEscalationDue = Date.now() + orchestration.reescalation_time;
+          escalation.nextEscalationDue = Date.now() + orchestration.reescalationTime;
         } else {
-          escalation.nextEscalationDue = Date.now() + orchestration.low_reescalation_time;
+          escalation.nextEscalationDue = Date.now() + orchestration.lowReescalationTime;
         }
         break;
       default: // Constants.DEVICE_TYPES.EMAIL
@@ -195,12 +198,11 @@ class Orchestration {
         }))
       })
       .catch(err=> {
-        console.log("[ERROR] in orchestrate", err);
+        console.log('[ERROR] in orchestrate', err);
       });
   }
 
 }
 
-let orchestration = new Orchestration();
-module.exports = orchestration;
+module.exports = new Orchestration();
 
