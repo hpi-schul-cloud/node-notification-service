@@ -159,7 +159,7 @@ class Service {
           hash.setEncoding('hex');
           hash.write(fs.readFileSync(dir + '/' + 'website.json'));
           hash.end();
-          manifest['webiste.json'] = hash.read();
+          manifest['website.json'] = hash.read();
 
           // create hashes for iconset
           files.forEach((file) => {
@@ -171,7 +171,7 @@ class Service {
           });
 
           // write manifest to file
-          fs.writeFile(dir + '/manifest.json', manifest, (err) => {
+          fs.writeFile(dir + '/manifest.json', JSON.stringify(manifest), (err) => {
             if (err) {
               reject(err);
             } else {
