@@ -25,6 +25,8 @@ const allowedDomains = [urlFormatString];
 class Service {
   constructor() {
     this.createPushPackage = this.createPushPackage.bind(this);
+    this.cleanTempDir = this.cleanTempDir.bind(this);
+    this._deleteFolderRecursive = this._deleteFolderRecursive.bind(this);
   }
 
   register(req, res) {
@@ -211,13 +213,24 @@ class Service {
   }
 
   cleanTempDir(req, res) {
-    // TODO delete temp directory
-    fs.unlink(req.tempDir, (err) => {
-      if (err) console.log(err);
-    });
+    this._deleteFolderRecursive(req.tempDir);
 
     if (res.errorMessage) {
       res.status(500).send(res.errorMessage);
+    }
+  }
+
+  _deleteFolderRecursive(path) {
+    if (fs.existsSync(path)) {
+      fs.readdirSync(path).forEach(function(file) {
+        let curPath = path + '/' + file;
+        if (fs.statSync(curPath).isDirectory()) {
+          this._deleteFolderRecursive(curPath);
+        } else {
+          fs.unlinkSync(curPath);
+        }
+      });
+      fs.rmdirSync(path);
     }
   }
 }

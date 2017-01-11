@@ -101,7 +101,6 @@ describe('apnDevice service', function() {
         userId: 'usertoken2'
       })
       .end((err, res) => {
-        console.log('here!');
         expect(stub.called).to.be.true;
         expect(res.status).to.equal(500);
         fs.readdir.restore();
