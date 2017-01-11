@@ -12,7 +12,7 @@ describe('firebase service adapter', function() {
 
   it('run with mocked error', (done) => {
     // replace the send function of firebase
-    let stub = sinon.stub(firebase.firebaseSender, 'sendNoRetry', function(msg, opt, callback) {
+    let stub = sinon.stub(firebase.firebaseSender, 'send', function(msg, opt, callback) {
       return callback({}, {});
     });
 
@@ -33,7 +33,7 @@ describe('firebase service adapter', function() {
 
     // check and reset the mock
     assert(stub.called);
-    firebase.firebaseSender.sendNoRetry.restore();
+    firebase.firebaseSender.send.restore();
 
     // TODO: check result and then call done()
     done();
@@ -41,7 +41,7 @@ describe('firebase service adapter', function() {
 
   it('run with mocked success', (done) => {
     // replace the send function of firebase
-    let stub = sinon.stub(firebase.firebaseSender, 'sendNoRetry', function(msg, opt, callback) {
+    let stub = sinon.stub(firebase.firebaseSender, 'send', function(msg, opt, callback) {
       return callback(false, {
         success: 0,
         failure: 0,
@@ -68,7 +68,7 @@ describe('firebase service adapter', function() {
 
     // check and reset the mock
     assert(stub.called);
-    firebase.firebaseSender.sendNoRetry.restore();
+    firebase.firebaseSender.send.restore();
 
     // TODO: check result and then call done()
     done();

@@ -4,7 +4,9 @@ node_js:
 services:
   - mongodb
 script:
-  - cp src/services/sendInterface/adapters/config.sample.json src/services/sendInterface/adapters/config.json
+  - mv secure/config.sample.json secure/config.json
+  - mv secure/certificates/cert.sample.pem secure/certificates/cert.pem
+  - mv secure/certificates/key.sample.pem secure/certificates/key.pem
   - npm test
   - export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
 after_success:
