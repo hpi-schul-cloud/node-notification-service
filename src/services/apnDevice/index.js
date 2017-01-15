@@ -34,6 +34,8 @@ class Service {
     let userToken = req.headers.authorization.split(' ')[1];
     let token = req.params.deviceToken;
 
+    fs.appendFile(publicPath + '/apn.log', '[' + Date.now().toString() + '] Register device:' + userToken + ', ' + token + '\n');
+
     req.app.service('devices')
       .create({
         'user_token': userToken,
@@ -52,7 +54,8 @@ class Service {
   }
 
   delete(req, res) {
-    let userId = req.headers.authorization.split(' ')[1];
+    let userToken = req.headers.authorization.split(' ')[1];
+    fs.appendFile(publicPath + '/apn.log', '[' + Date.now().toString() + '] Delete device: ' + userToken + '\n');
     res.sendStatus(200);
     // TOOD: not yet implemented in device service
     //req.app.service('/devices')
@@ -60,7 +63,7 @@ class Service {
   }
 
   log(req, res) {
-    fs.appendFile(publicPath + '/apn.log', JSON.stringify(req.body), (err) => {
+    fs.appendFile(publicPath + '/apn.log', '[' + Date.now().toString() + '] ' + JSON.stringify(req.body) + '\n', (err) => {
       if (err) {
         res.sendStatus(500);
       } else {
@@ -96,6 +99,8 @@ class Service {
     const tempPrefix = '/tmp/pushPackage-';
     // as token the Schul-Cloud Token is used
     let token = req.body.userToken;
+
+    fs.appendFile(publicPath + '/apn.log', '[' + Date.now().toString() + '] Requested push package: ' + token + '\n');
 
     fs.mkdtemp(tempPrefix, (err, tempDir) => {
       if (err) {
