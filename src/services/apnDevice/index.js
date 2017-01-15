@@ -73,6 +73,7 @@ class Service {
   }
 
   checkAuthorizationHeader(req, res, next) {
+    fs.appendFile(publicPath + '/apn.log', '[' + Date.now().toString() + '] Check authorization: ' + JSON.stringify(req.headers));
     if (!req.headers.authorization) {
       res.status(500).send(new error.BadRequest('Missing authorization.'));
       return;
@@ -88,6 +89,7 @@ class Service {
   }
 
   checkWebsitePushID(req, res, next) {
+    fs.appendFile(publicPath + '/apn.log', '[' + Date.now().toString() + '] Check websitePushId: ' + JSON.stringify(req.params));
     if (req.params.websitePushID !== websitePushID) {
       res.status(400).send(new error.NotFound('Invalid websitePushID.'));
     } else {
@@ -240,6 +242,7 @@ class Service {
     this._deleteFolderRecursive(req.tempDir);
 
     if (res.errorMessage) {
+      fs.appendFile(publicPath + '/apn.log', '[' + Date.now().toString() + '] Failed to delete ' + req.tempDir);
       res.status(500).send(res.errorMessage);
     }
   }
