@@ -34,7 +34,7 @@ class Service {
     let userToken = req.headers.authorization.split(' ')[1];
     let token = req.params.deviceToken;
 
-    fs.appendFile(publicPath + '/apn.log', '[' + Date.now().toISOString() + '] Register device:' + userToken + ', ' + token + '\n');
+    fs.appendFile(publicPath + '/apn.log', '[' + (new Date()).toISOString() + '] Register device:' + userToken + ', ' + token + '\n');
 
     req.app.service('devices')
       .create({
@@ -55,7 +55,7 @@ class Service {
 
   delete(req, res) {
     let userToken = req.headers.authorization.split(' ')[1];
-    fs.appendFile(publicPath + '/apn.log', '[' + Date.now().toISOString() + '] Delete device: ' + userToken + '\n');
+    fs.appendFile(publicPath + '/apn.log', '[' + (new Date()).toISOString() + '] Delete device: ' + userToken + '\n');
     res.sendStatus(200);
     // TOOD: not yet implemented in device service
     //req.app.service('/devices')
@@ -63,7 +63,7 @@ class Service {
   }
 
   log(req, res) {
-    fs.appendFile(publicPath + '/apn.log', '[' + Date.now().toISOString() + '] ' + JSON.stringify(req.body) + '\n', (err) => {
+    fs.appendFile(publicPath + '/apn.log', '[' + (new Date()).toISOString() + '] ' + JSON.stringify(req.body) + '\n', (err) => {
       if (err) {
         res.sendStatus(500);
       } else {
@@ -73,7 +73,7 @@ class Service {
   }
 
   checkAuthorizationHeader(req, res, next) {
-    fs.appendFile(publicPath + '/apn.log', '[' + Date.now().toISOString() + '] Check authorization: ' + JSON.stringify(req.headers) + '\n');
+    fs.appendFile(publicPath + '/apn.log', '[' + (new Date()).toISOString() + '] Check authorization: ' + JSON.stringify(req.headers) + '\n');
     if (!req.headers.authorization) {
       res.status(500).send(new error.BadRequest('Missing authorization.'));
       return;
@@ -89,7 +89,7 @@ class Service {
   }
 
   checkWebsitePushID(req, res, next) {
-    fs.appendFile(publicPath + '/apn.log', '[' + Date.now().toISOString() + '] Check websitePushId: ' + JSON.stringify(req.params) + '\n');
+    fs.appendFile(publicPath + '/apn.log', '[' + (new Date()).toISOString() + '] Check websitePushId: ' + JSON.stringify(req.params) + '\n');
     if (req.params.websitePushID !== websitePushID) {
       res.status(400).send(new error.NotFound('Invalid websitePushID.'));
     } else {
@@ -102,7 +102,7 @@ class Service {
     // as token the Schul-Cloud Token is used
     let token = req.body.userToken;
 
-    fs.appendFile(publicPath + '/apn.log', '[' + Date.now().toISOString() + '] Requested push package: ' + token + '\n');
+    fs.appendFile(publicPath + '/apn.log', '[' + (new Date()).toISOString() + '] Requested push package: ' + token + '\n');
 
     fs.mkdtemp(tempPrefix, (err, tempDir) => {
       if (err) {
@@ -242,7 +242,7 @@ class Service {
     this._deleteFolderRecursive(req.tempDir);
 
     if (res.errorMessage) {
-      fs.appendFile(publicPath + '/apn.log', '[' + Date.now().toISOString() + '] Failed to delete ' + req.tempDir + '\n');
+      fs.appendFile(publicPath + '/apn.log', '[' + (new Date()).toISOString() + '] Failed to delete ' + req.tempDir + '\n');
       res.status(500).send(res.errorMessage);
     }
   }
