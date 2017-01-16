@@ -19,7 +19,7 @@ const password = require(securePath + '/config.json').certificates.password;
 // website.json content
 const websiteName = 'Schul-Cloud';
 const websitePushID = 'web.org.schul-cloud';
-const urlFormatString = 'https://schul-cloud.org';
+const urlFormatString = 'https://schul-cloud.org/%@';
 const webServiceURL = 'https://schul-cloud.org:3030';
 const allowedDomains = [urlFormatString, webServiceURL];
 
@@ -99,7 +99,6 @@ class Service {
 
   createPushPackage(req, res, next) {
     const tempPrefix = '/tmp/pushPackage-';
-    const pushPackageRoot = '/Schul-Cloud.pushpackage';
     // as token the Schul-Cloud Token is used
     let token = req.body.userToken;
 
@@ -124,15 +123,15 @@ class Service {
         .then((tempDir) => {
           res.zip([
             // TODO: maybe a more compact way to do this
-            { path: iconsetPath + '/icon_16x16.png', name: pushPackageRoot + '/icon.iconset/icon_16x16.png' },
-            { path: iconsetPath + '/icon_16x16@2x.png', name: pushPackageRoot + '/icon.iconset/icon_16x16@2x.png' },
-            { path: iconsetPath + '/icon_32x32.png', name: pushPackageRoot + '/icon.iconset/icon_32x32.png' },
-            { path: iconsetPath + '/icon_32x32@2x.png', name: pushPackageRoot + '/icon.iconset/icon_32x32@2x.png' },
-            { path: iconsetPath + '/icon_128x128.png', name: pushPackageRoot + '/icon.iconset/icon_128x128.png' },
-            { path: iconsetPath + '/icon_128x128@2x.png', name: pushPackageRoot + '/icon.iconset/icon_128x128@2x.png' },
-            { path: tempDir + '/website.json', name: pushPackageRoot + '/website.json' },
-            { path: tempDir + '/manifest.json', name: pushPackageRoot + '/manifest.json' },
-            { path: tempDir + '/signature', name: pushPackageRoot + '/signature' }
+            { path: iconsetPath + '/icon_16x16.png', name: '/icon.iconset/icon_16x16.png' },
+            { path: iconsetPath + '/icon_16x16@2x.png', name: '/icon.iconset/icon_16x16@2x.png' },
+            { path: iconsetPath + '/icon_32x32.png', name: '/icon.iconset/icon_32x32.png' },
+            { path: iconsetPath + '/icon_32x32@2x.png', name: '/icon.iconset/icon_32x32@2x.png' },
+            { path: iconsetPath + '/icon_128x128.png', name: '/icon.iconset/icon_128x128.png' },
+            { path: iconsetPath + '/icon_128x128@2x.png', name: '/icon.iconset/icon_128x128@2x.png' },
+            { path: tempDir + '/website.json', name: '/website.json' },
+            { path: tempDir + '/manifest.json', name: '/manifest.json' },
+            { path: tempDir + '/signature', name: '/signature' }
           ], 'pushPackage.zip', (err) => {
             next();
             return Promise.resolve(tempDir);
@@ -213,8 +212,8 @@ class Service {
       const args = [
         'smime', '-sign', '-binary',
         '-in', manifest,
-        '-out', signature,
-        '-outform', 'DER',
+        '-out', signature + '.pem',
+        //'-outform', 'DER',
         '-signer', cert,
         '-inkey', key,
         '-certfile', intermediate,
@@ -231,9 +230,21 @@ class Service {
       });
       process.on('close', (code) => {
         if (code !== 0) {
-          reject('Unable to create signature. Exited with code ' + code + '.');
+          reject('Unable to create signature. Closed with code ' + code + '.');
         } else {
-          resolve(dir);
+          let data = fs.readFileSync(signature + '.pem').toString();
+          let base64 = data.match(/Content-Disposition:[^\n]+\s*?([A-Za-z0-9+=\/\r\n]+)\s*?-----/);
+          if (base64) {
+            base64 = base64[1].replace(/[\s]/g, '');
+            base64 = new Buffer(base64, 'base64');
+            fs.writeFile(signature, base64.toString(), (err) => {
+              if (err) {
+                reject();
+              } else {
+                resolve(dir);
+              }
+            });
+          }
         }
       });
     });
