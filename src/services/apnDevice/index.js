@@ -275,7 +275,7 @@ module.exports = function(){
     service.checkAuthorizationHeader,
     service.delete);
 
-  app.post('/:version/pushPackage/:websitePushID',
+  app.post('/:version/pushPackages/:websitePushID',
     service.checkWebsitePushID,
     service.createPushPackage,
     service.cleanTempDir
