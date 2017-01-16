@@ -19,8 +19,8 @@ const password = require(securePath + '/config.json').certificates.password;
 // website.json content
 const websiteName = 'Schul-Cloud';
 const websitePushID = 'web.org.schul-cloud';
-const urlFormatString = 'https://schul-cloud.org/';
-const webServiceURL = 'https://schul-cloud.org:3030/';
+const urlFormatString = 'https://schul-cloud.org';
+const webServiceURL = 'https://schul-cloud.org:3030';
 const allowedDomains = [urlFormatString, webServiceURL];
 
 class Service {
