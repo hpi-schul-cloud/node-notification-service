@@ -99,6 +99,7 @@ class Service {
 
   createPushPackage(req, res, next) {
     const tempPrefix = '/tmp/pushPackage-';
+    const pushPackageRoot = '/Schul-Cloud.pushpackage';
     // as token the Schul-Cloud Token is used
     let token = req.body.userToken;
 
@@ -123,15 +124,15 @@ class Service {
         .then((tempDir) => {
           res.zip([
             // TODO: maybe a more compact way to do this
-            { path: iconsetPath + '/icon_16x16.png', name: '/icon.iconset/icon_16x16.png' },
-            { path: iconsetPath + '/icon_16x16@2x.png', name: '/icon.iconset/icon_16x16@2x.png' },
-            { path: iconsetPath + '/icon_32x32.png', name: '/icon.iconset/icon_32x32.png' },
-            { path: iconsetPath + '/icon_32x32@2x.png', name: '/icon.iconset/icon_32x32@2x.png' },
-            { path: iconsetPath + '/icon_128x128.png', name: '/icon.iconset/icon_128x128.png' },
-            { path: iconsetPath + '/icon_128x128@2x.png', name: '/icon.iconset/icon_128x128@2x.png' },
-            { path: tempDir + '/website.json', name: '/website.json' },
-            { path: tempDir + '/manifest.json', name: '/manifest.json' },
-            { path: tempDir + '/signature', name: '/signature' }
+            { path: iconsetPath + '/icon_16x16.png', name: pushPackageRoot + '/icon.iconset/icon_16x16.png' },
+            { path: iconsetPath + '/icon_16x16@2x.png', name: pushPackageRoot + '/icon.iconset/icon_16x16@2x.png' },
+            { path: iconsetPath + '/icon_32x32.png', name: pushPackageRoot + '/icon.iconset/icon_32x32.png' },
+            { path: iconsetPath + '/icon_32x32@2x.png', name: pushPackageRoot + '/icon.iconset/icon_32x32@2x.png' },
+            { path: iconsetPath + '/icon_128x128.png', name: pushPackageRoot + '/icon.iconset/icon_128x128.png' },
+            { path: iconsetPath + '/icon_128x128@2x.png', name: pushPackageRoot + '/icon.iconset/icon_128x128@2x.png' },
+            { path: tempDir + '/website.json', name: pushPackageRoot + '/website.json' },
+            { path: tempDir + '/manifest.json', name: pushPackageRoot + '/manifest.json' },
+            { path: tempDir + '/signature', name: pushPackageRoot + '/signature' }
           ], 'pushPackage.zip', (err) => {
             next();
             return Promise.resolve(tempDir);
