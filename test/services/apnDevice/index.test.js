@@ -41,7 +41,7 @@ describe('apnDevice service', function() {
 
   it('creates the pushPackage', () => {
     return request(app)
-      .post('/v1/pushPackage/web.org.schul-cloud')
+      .post('/v1/pushPackages/web.org.schul-cloud')
       .send({
         userId: 'usertoken2'
       })
@@ -78,7 +78,7 @@ describe('apnDevice service', function() {
     });
 
     request(app)
-      .post('/v1/pushPackage/web.org.schul-cloud')
+      .post('/v1/pushPackages/web.org.schul-cloud')
       .send({
         userId: 'usertoken2'
       })
@@ -96,7 +96,7 @@ describe('apnDevice service', function() {
     });
 
     request(app)
-      .post('/v1/pushPackage/web.org.schul-cloud')
+      .post('/v1/pushPackages/web.org.schul-cloud')
       .send({
         userId: 'usertoken2'
       })
