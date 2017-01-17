@@ -212,8 +212,8 @@ class Service {
       const args = [
         'smime', '-sign', '-binary',
         '-in', manifest,
-        '-out', signature + '.pem',
-        //'-outform', 'DER',
+        '-out', signature,
+        '-outform', 'DER',
         '-signer', cert,
         '-inkey', key,
         '-certfile', intermediate,
@@ -232,19 +232,7 @@ class Service {
         if (code !== 0) {
           reject('Unable to create signature. Closed with code ' + code + '.');
         } else {
-          let data = fs.readFileSync(signature + '.pem').toString();
-          let base64 = data.match(/Content-Disposition:[^\n]+\s*?([A-Za-z0-9+=\/\r\n]+)\s*?-----/);
-          if (base64) {
-            base64 = base64[1].replace(/[\s]/g, '');
-            base64 = new Buffer(base64, 'base64');
-            fs.writeFile(signature, base64.toString(), (err) => {
-              if (err) {
-                reject();
-              } else {
-                resolve(dir);
-              }
-            });
-          }
+          resolve(dir);
         }
       });
     });
