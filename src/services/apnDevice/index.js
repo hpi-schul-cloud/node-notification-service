@@ -3,7 +3,7 @@
 const hooks = require('./hooks');
 const error = require('feathers-errors');
 const spawn = require('child_process').spawn;
-const fs = require('fs');
+const fs = require('fs-extra');
 const crypto = require('crypto');
 const zip = require('express-zip');
 
@@ -21,13 +21,11 @@ const websiteName = 'Schul-Cloud';
 const websitePushID = 'web.org.schul-cloud';
 const urlFormatString = 'https://schul-cloud.org/%@';
 const webServiceURL = 'https://schul-cloud.org:3030';
-const allowedDomains = [urlFormatString, webServiceURL];
+const allowedDomains = ['https://schul-cloud.org', webServiceURL];
 
 class Service {
   constructor() {
     this.createPushPackage = this.createPushPackage.bind(this);
-    this.cleanTempDir = this.cleanTempDir.bind(this);
-    this._deleteFolderRecursive = this._deleteFolderRecursive.bind(this);
   }
 
   register(req, res) {
@@ -108,14 +106,6 @@ class Service {
       return;
     }
 
-    if (token === 'usertokenwithmin16chars') {
-      res.writeHead(200, {
-        'Content-Type': 'application/zip',
-        'Content-Disposition' : 'attachment; filename=pushPackage.zip'});
-      fs.createReadStream(__dirname + '/pushPackage.zip').pipe(res);
-      return;
-    }
-
     fs.mkdtemp(tempPrefix, (err, tempDir) => {
       if (err) {
         res.status(500).send(new error.GeneralError('Unable to create pushPackage.'));
@@ -127,32 +117,39 @@ class Service {
 
       this._createWebsiteJSON(tempDir, token)
         .then((tempDir) => {
-          return this._createManifest(tempDir);
+          return this._createPackage(tempDir);
         })
-        .then((tempDir) => {
-          return this._createSignature(tempDir);
-        })
-        .then((tempDir) => {
-          res.zip([
-            // TODO: maybe a more compact way to do this
-            { path: iconsetPath + '/icon_16x16.png', name: '/icon.iconset/icon_16x16.png' },
-            { path: iconsetPath + '/icon_16x16@2x.png', name: '/icon.iconset/icon_16x16@2x.png' },
-            { path: iconsetPath + '/icon_32x32.png', name: '/icon.iconset/icon_32x32.png' },
-            { path: iconsetPath + '/icon_32x32@2x.png', name: '/icon.iconset/icon_32x32@2x.png' },
-            { path: iconsetPath + '/icon_128x128.png', name: '/icon.iconset/icon_128x128.png' },
-            { path: iconsetPath + '/icon_128x128@2x.png', name: '/icon.iconset/icon_128x128@2x.png' },
-            { path: tempDir + '/website.json', name: '/website.json' },
-            { path: tempDir + '/manifest.json', name: '/manifest.json' },
-            { path: tempDir + '/signature', name: '/signature' }
-          ], 'pushPackage.zip', (err) => {
+        .then((path) => {
+          res.sendFile(path, {
+            headers: {
+              'Content-Disposition' : 'attachment; filename=pushPackage.zip'
+            }
+          }, (err) => {
             next();
-            return Promise.resolve(tempDir);
           });
         })
         .catch((err) => {
           res.errorMessage = new error.GeneralError('Unable to create pushPackage.');
           next();
         });
+    });
+  }
+
+  _createPackage(dir) {
+    return new Promise((resolve, reject) => {
+
+      // copy iconset to temp dir
+      fs.copySync(iconsetPath, dir + '/icon.iconset');
+
+      const args = [__dirname + '/createPushPackage.php', dir, securePath];
+      let process = spawn('php', args);
+      process.on('close', (code) => {
+        if (code !== 0) {
+          reject('Unable to create package. Closed with code ' + code + '.');
+        } else {
+          resolve(dir + '.zip');
+        }
+      });
     });
   }
 
@@ -177,101 +174,12 @@ class Service {
     });
   }
 
-  _createManifest(dir) {
-    return new Promise((resolve, reject) => {
-      let manifest = {};
-
-      // read iconset directory
-      fs.readdir(iconsetPath, (err, files) => {
-        if (err) {
-          reject(err);
-        } else {
-          // create hash for website.json
-          let hash = crypto.createHash('SHA1');
-          hash.setEncoding('hex');
-          hash.write(fs.readFileSync(dir + '/' + 'website.json'));
-          hash.end();
-          manifest['website.json'] = hash.read();
-
-          // create hashes for iconset
-          files.forEach((file) => {
-            let hash = crypto.createHash('SHA1');
-            hash.setEncoding('hex');
-            hash.write(fs.readFileSync(iconsetPath + '/' + file));
-            hash.end();
-            manifest['icon.iconset/' + file] = hash.read();
-          });
-
-          // write manifest to file
-          fs.writeFile(dir + '/manifest.json', JSON.stringify(manifest), (err) => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve(dir);
-            }
-          });
-        }
-      });
-    });
-  }
-
-  _createSignature(dir) {
-    return new Promise((resolve, reject) => {
-      const cert = certPath + '/cert.pem';
-      const key = certPath + '/key.pem';
-      const intermediate = certPath + '/intermediate.pem';
-      const manifest = dir + '/manifest.json';
-      const signature = dir + '/signature';
-
-      const args = [
-        'smime', '-sign', '-binary',
-        '-in', manifest,
-        '-out', signature,
-        '-outform', 'DER',
-        '-signer', cert,
-        '-inkey', key,
-        '-certfile', intermediate,
-        '-passin', 'pass:' + password
-      ];
-
-      let process = spawn('openssl', args);
-      process.on('exit', (code) => {
-        if (code !== 0) {
-          reject('Unable to create signature. Exited with code ' + code + '.');
-        } else {
-          resolve(dir);
-        }
-      });
-      process.on('close', (code) => {
-        if (code !== 0) {
-          reject('Unable to create signature. Closed with code ' + code + '.');
-        } else {
-          resolve(dir);
-        }
-      });
-    });
-  }
-
   cleanTempDir(req, res) {
-    this._deleteFolderRecursive(req.tempDir);
-
+    fs.removeSync(req.tempDir);
+    fs.removeSync(req.tempDir + '.zip');
     if (res.errorMessage) {
       fs.appendFile(publicPath + '/apn.log', '[' + (new Date()).toISOString() + '] Failed to delete ' + req.tempDir + '\n');
       res.status(500).send(res.errorMessage);
-    }
-  }
-
-  _deleteFolderRecursive(path) {
-    if (fs.existsSync(path)) {
-      fs.readdirSync(path).forEach(function(file) {
-        let curPath = path + '/' + file;
-        if (fs.statSync(curPath).isDirectory()) {
-          this._deleteFolderRecursive(curPath);
-        } else {
-          fs.unlinkSync(curPath);
-        }
-      });
-      fs.rmdirSync(path);
     }
   }
 }

@@ -3,7 +3,7 @@
 const expect = require('chai').expect;
 const request = require('supertest');
 const sinon = require('sinon');
-const fs = require('fs');
+const fs = require('fs-extra');
 const app = require('../../../src/app');
 const apnDevice = require('../../../src/services/apnDevice/index');
 const service = apnDevice.Service;
@@ -86,24 +86,6 @@ describe('apnDevice service', function() {
         expect(stub.called).to.be.true;
         expect(res.status).to.equal(500);
         fs.mkdtemp.restore();
-        done(err);
-      });
-  });
-
-  it('fails if unable to read temp dir', (done) => {
-    let stub = sinon.stub(fs, 'readdir', (path, callback) => {
-      callback(true, '');
-    });
-
-    request(app)
-      .post('/v1/pushPackages/web.org.schul-cloud')
-      .send({
-        userToken: 'usertoken2'
-      })
-      .end((err, res) => {
-        expect(stub.called).to.be.true;
-        expect(res.status).to.equal(500);
-        fs.readdir.restore();
         done(err);
       });
   });
