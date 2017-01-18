@@ -21,7 +21,6 @@ class Orchestration {
     // timer checks all 10 seconds for remaining escalations to be send
     setInterval(this.reescalate, 10000);
 
-
   }
 
 
@@ -32,7 +31,7 @@ class Orchestration {
   reescalate() {
     console.log('[SCHEDULED ESCALATION] starts...');
     if (this.reescalationRunning === true) {
-      console.log('- await last reescalate finished...')
+      console.log('- await last reescalate finished...');
       return Promise.resolve();
     }
     this.reescalationRunning = true;
@@ -65,7 +64,7 @@ class Orchestration {
 
     // notification has been received and clicked... leave escalation
     if (escalation.notification.state !== Constants.NOTIFICATION_STATES.ESCALATING) {
-      console.log('[INFO] cancel escalation due state change...', escalation.id);
+      console.log('[INFO] cancel escalation due state change...', escalation._id);
       return escalation.remove();
     }
 
@@ -151,7 +150,7 @@ class Orchestration {
       case Constants.DEVICE_TYPES.DESKTOP_MOBILE:
       case Constants.DEVICE_TYPES.MOBILE:
         escalation.nextEscalationType = Constants.DEVICE_TYPES.EMAIL;
-        if (escalation.priority === Constants.MESSAGE_PRIORITIES.HIGH) {
+        if (escalation.notification.priority === Constants.MESSAGE_PRIORITIES.HIGH) {
           escalation.nextEscalationDue = Date.now() + this.reescalationTime;
         } else {
           escalation.nextEscalationDue = Date.now() + this.lowReescalationTime;
@@ -159,9 +158,13 @@ class Orchestration {
         break;
       default: // Constants.DEVICE_TYPES.EMAIL
         escalation.notification.state = Constants.NOTIFICATION_STATES.ESCAlATED;
-        return escalation.notification.save()
-          .then(()=> {
+        return escalation.notification
+          .save()
+          .then(() => {
             return escalation.remove();
+          })
+          .then(() => {
+            return true;
           });
     }
     return escalation.save();
@@ -180,7 +183,7 @@ class Orchestration {
       notification.changeState(Constants.NOTIFICATION_STATES.ESCALATING);
       return notification.save();
     }))
-      .then(succ=> {
+      .then(() => {
         return Promise.all(notifications.map(notification=> {
           // on high priority send notification to all devices,
           // otherwise to desktop first.
@@ -188,13 +191,17 @@ class Orchestration {
             notification.priority === Constants.MESSAGE_PRIORITIES.HIGH
               ? Constants.DEVICE_TYPES.DESKTOP_MOBILE
               : Constants.DEVICE_TYPES.DESKTOP;
+
           let escalation = Escalation({
             notification: notification,
-            priority: notification.priority,
-            nextEscalationType: firstEscalationType,
-            nextEscalationDue: Date.now
+            nextEscalationType: firstEscalationType
           });
-          return this.escalate(escalation);
+
+          return escalation
+            .save()
+            .then(escalation => {
+              return this.escalate(escalation);
+            });
         }))
       })
       .catch(err=> {
