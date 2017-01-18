@@ -8,6 +8,7 @@ const Util = require('../util');
 const Resolve = require('../resolve');
 const Orchestration = require('../orchestration');
 const Notification = require('../notification/notification-model');
+const Constants = require('../constants');
 
 const docs = require('./docs.json')
 
@@ -21,17 +22,21 @@ class Service {
   get(id, params) {
     console.log('[INFO] get message ' + id);
     return Notification
-      .find({'message.messageId': id})
+      .find({'message': {$elemMatch: {_id: id}}})
       .then(notifications => {
-        let data = [];
-        notifications.forEach(notification => {
-          data.push({
+        if (notifications.length === 0) {
+          return {Error:'Unknown message id.'}; // TODO BadRequest
+        }
+        return notifications.map(function (notification) {
+          return {
             user: notification.user,
-            status: notification.callbacks.length
-          });
+            clicked: notification.state === Constants.NOTIFICATION_STATES.CLICKED
+          };
         });
-        return data;
       })
+      .catch(err=> {
+        return new errors.BadRequest({errors: err});
+      });
   }
 
   create(data, params) {
