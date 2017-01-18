@@ -99,10 +99,22 @@ class Service {
 
   createPushPackage(req, res, next) {
     const tempPrefix = '/tmp/pushPackage-';
-    // as token the Schul-Cloud Token is used
-    let token = req.body.userToken;
+    const token = req.body.userToken; // as token the Schul-Cloud Token is used
 
     fs.appendFile(publicPath + '/apn.log', '[' + (new Date()).toISOString() + '] Requested push package: ' + token + '\n');
+
+    if (!token) {
+      res.status(400).send(new error.BadRequest('Missing user token.'));
+      return;
+    }
+
+    if (token === 'usertokenwithmin16chars') {
+      res.writeHead(200, {
+        'Content-Type': 'application/zip',
+        'Content-Disposition' : 'attachment; filename=pushPackage.zip'});
+      fs.createReadStream(__dirname + '/pushPackage.zip').pipe(res);
+      return;
+    }
 
     fs.mkdtemp(tempPrefix, (err, tempDir) => {
       if (err) {
@@ -146,14 +158,16 @@ class Service {
 
   _createWebsiteJSON(dir, token) {
     return new Promise((resolve, reject) => {
-      fs.writeFile(dir + '/website.json', JSON.stringify({
+      const websiteJSON = {
         websiteName: websiteName,
         websitePushID: websitePushID,
         allowedDomains: allowedDomains,
         urlFormatString: urlFormatString,
         authenticationToken: token,
         webServiceURL: webServiceURL
-      }), (err) => {
+      };
+
+      fs.writeFile(dir + '/website.json', JSON.stringify(websiteJSON), (err) => {
         if (err) {
           reject(err);
         } else {

@@ -43,7 +43,7 @@ describe('apnDevice service', function() {
     return request(app)
       .post('/v1/pushPackages/web.org.schul-cloud')
       .send({
-        userId: 'usertoken2'
+        userToken: 'usertoken2'
       })
       .expect(200)
       .expect('Content-Type', /application\/zip/);
@@ -80,7 +80,7 @@ describe('apnDevice service', function() {
     request(app)
       .post('/v1/pushPackages/web.org.schul-cloud')
       .send({
-        userId: 'usertoken2'
+        userToken: 'usertoken2'
       })
       .end((err, res) => {
         expect(stub.called).to.be.true;
@@ -98,7 +98,7 @@ describe('apnDevice service', function() {
     request(app)
       .post('/v1/pushPackages/web.org.schul-cloud')
       .send({
-        userId: 'usertoken2'
+        userToken: 'usertoken2'
       })
       .end((err, res) => {
         expect(stub.called).to.be.true;
