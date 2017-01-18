@@ -39,7 +39,7 @@ describe('apnDevice service', function() {
       .expect(200);
   });
 
-  it('creates the pushPackage', () => {
+  it.skip('creates the pushPackage', () => {
     return request(app)
       .post('/v1/pushPackages/web.org.schul-cloud')
       .send({
