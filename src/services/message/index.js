@@ -1,5 +1,6 @@
 'use strict';
 
+const Mongoose = require('mongoose');
 const service = require('feathers-mongoose');
 const Message = require('./message-model');
 const hooks = require('./hooks');
@@ -22,20 +23,22 @@ class Service {
   get(id, params) {
     console.log('[INFO] get message ' + id);
     return Notification
-      .find({'message': {$elemMatch: {_id: id}}})
-      .then(notifications => {
-        if (notifications.length === 0) {
-          return {Error:'Unknown message id.'}; // TODO BadRequest
+      .find({'message._id': new Mongoose.Types.ObjectId(id)})
+      .then(notifications =>{
+        console.log(notifications);
+        if(notifications.length === 0){
+          return new errors.NotFound('Unknown id.');
         }
-        return notifications.map(function (notification) {
+        let result = notifications.map(function (notification) {
           return {
             user: notification.user,
             clicked: notification.state === Constants.NOTIFICATION_STATES.CLICKED
           };
         });
+        return result;
       })
-      .catch(err=> {
-        return new errors.BadRequest({errors: err});
+      .catch(err => {
+        return new errors.GeneralError(err);
       });
   }
 
