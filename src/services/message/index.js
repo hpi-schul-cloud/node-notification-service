@@ -24,13 +24,13 @@ class Service {
     console.log('[INFO] get message ' + id);
     return Notification
       .find({'message._id': new Mongoose.Types.ObjectId(id)})
-      .then(notifications =>{
-        console.log(notifications);
-        if(notifications.length === 0){
+      .then(notifications => {
+        console.log(' - ' + notifications.length + ' Notifications found...');
+        if (notifications.length === 0) {
           return new errors.NotFound('Unknown id.');
         }
         let result = notifications.map(function (notification) {
-          return {
+          return { // create some stats about which user has notifications clicked
             user: notification.user,
             clicked: notification.state === Constants.NOTIFICATION_STATES.CLICKED
           };
@@ -38,6 +38,7 @@ class Service {
         return result;
       })
       .catch(err => {
+        // will be thrown on wrong id format
         return new errors.GeneralError(err);
       });
   }
@@ -57,7 +58,13 @@ class Service {
         // create notification for each user
         let notifications = message.userIds.reduce((notifications, userId) => {
           let notification = new Notification({
-            message: message,
+            message: { // copy required content only
+              _id: message._id,
+              title: message.title,
+              body: message.body,
+              action: message.action,
+              priority: message.priority
+            },
             user: userId
           }).save();
           return notifications.concat(notification);
