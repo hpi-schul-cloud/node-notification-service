@@ -25,6 +25,7 @@ function createEscalation() {
 }
 
 describe('orchestration service', function() {
+
   it('did not register the orchestration service', () => {
     assert.ok(!app.service('orchestration'));
   });
@@ -64,13 +65,29 @@ describe('orchestration service', function() {
 
 
   describe('escalate(): ', () => {
-    it('perform .', () => {
-      // orchestration.escalate(createEscalation());
-      // TODO: check rejected because of none existing user
+
+    it('stop clicked notifications.', (done) => {
+      createEscalation()
+        .then(escalation => {
+          escalation.notification.state = Constants.NOTIFICATION_STATES.CLICKED;
+          orchestration
+            .escalate(escalation)
+            .then(data => {
+              assert.ok(data);
+
+              // check escalation deletion
+              Escalation.findOne(escalation._id).then(result => {
+                assert.equal(result, null);
+                done();
+              });
+            });
+        });
     });
+
 
     // TODO: more tests
   });
+
 
   describe('updateEscalation(): ', () => {
 
@@ -121,7 +138,7 @@ describe('orchestration service', function() {
       createEscalation()
         .then(escalation => {
           escalation.nextEscalationType = Constants.DEVICE_TYPES.DESKTOP_MOBILE;
-          escalation.notification.priority = Constants.MESSAGE_PRIORITIES.HIGH;
+          escalation.notification.message.priority = Constants.MESSAGE_PRIORITIES.HIGH;
           orchestration
             .updateEscalation(escalation)
             .then(function(saved) {
@@ -147,6 +164,64 @@ describe('orchestration service', function() {
                 done();
               });
             });
+        });
+    });
+
+  });
+
+
+  describe('orchestrate(): ', () => {
+
+    it('perform without notifications.', (done) => {
+      let notifications = [];
+      orchestration
+        .orchestrate(notifications)
+        .then(data => {
+          assert.equal(data.length, notifications.length);
+          done();
+        });
+    });
+
+    it('perform one "high" notification.', (done) => {
+      let user = 'someId';
+      let message = Message({
+        priority: Constants.MESSAGE_PRIORITIES.HIGH
+      });
+      let notification = Notification({
+        message: message,
+        user: user
+      });
+
+      let notifications = [
+        notification
+      ];
+      orchestration
+        .orchestrate(notifications)
+        .then(data => {
+          assert.equal(data.length, notifications.length);
+          assert.equal(data[0].nextEscalationType, Constants.DEVICE_TYPES.DESKTOP_MOBILE);
+          done();
+        });
+    });
+
+    it('perform three notification.', (done) => {
+      let user = 'someId';
+      let message = Message({});
+      let notification = Notification({
+        message: message,
+        user: user
+      });
+
+      let notifications = [
+        notification,
+        notification,
+        notification
+      ];
+      orchestration
+        .orchestrate(notifications)
+        .then(data => {
+          assert.equal(data.length, notifications.length);
+          done();
         });
     });
 

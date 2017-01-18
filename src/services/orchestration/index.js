@@ -78,17 +78,26 @@ class Orchestration {
           return Promise.reject('[ERROR] could not resolve user using scope ' +  escalation.notification.user + ' in escalation ' + escalation.id);
         }
 
-        let news = [];
+
         let devices = [];
 
         // finds first escalation type where the user already has devices registered
         // if there are no devices registered, escalation will be removed
+        // FIXME(max): reescalte instead of while loop
         while (devices.length === 0 && escalation.notification.state === Constants.NOTIFICATION_STATES.ESCALATING) {
+
+          // find devices that match the current escalation type
           devices = user.devices.filter(function (device) {
-            if (escalation.nextEscalationType === Constants.DEVICE_TYPES.DESKTOP_MOBILE)
+            if (escalation.nextEscalationType === Constants.DEVICE_TYPES.DESKTOP_MOBILE) {
               return device.type === Constants.DEVICE_TYPES.DESKTOP || device.type === Constants.DEVICE_TYPES.MOBILE;
-            return device.type === escalation.nextEscalationType;
+            } else {
+              return device.type === escalation.nextEscalationType;
+            }
           });
+
+
+          // FIXME(max): if there is no device we can go to the next step using updateEscalation()
+          // FIXME(max): NOT_ESCALATED can be set wrong
           if (devices.length === 0) {
             switch (escalation.nextEscalationType) {
               case Constants.DEVICE_TYPES.DESKTOP:
@@ -116,18 +125,18 @@ class Orchestration {
         // devices have been found... send
         if (devices.length !== 0) {
           console.log(devices.length, 'devices found...');
+
           // prepare notifications by multiplication for devices
-          for (var i = 0; i < devices.length; i++) {
+          let news = [];
+          for (let i = 0; i < devices.length; i++) {
             news.push(escalation.notification);
           }
-          sendInterface.send(news, devices)
-            .then(res => {
+
+          return sendInterface.send(news, devices)
+            .then(() => {
               console.log('[INFO] notifications sent to', devices.length, 'devices');
               return this.updateEscalation(escalation);
-            })
-            .catch(err => {
-              console.log('[ERROR] send error', err);
-            })
+            });
         }
       })
       .catch(err => {
@@ -150,7 +159,7 @@ class Orchestration {
       case Constants.DEVICE_TYPES.DESKTOP_MOBILE:
       case Constants.DEVICE_TYPES.MOBILE:
         escalation.nextEscalationType = Constants.DEVICE_TYPES.EMAIL;
-        if (escalation.notification.priority === Constants.MESSAGE_PRIORITIES.HIGH) {
+        if (escalation.notification.message.priority === Constants.MESSAGE_PRIORITIES.HIGH) {
           escalation.nextEscalationDue = Date.now() + this.reescalationTime;
         } else {
           escalation.nextEscalationDue = Date.now() + this.lowReescalationTime;
@@ -179,16 +188,17 @@ class Orchestration {
    */
   orchestrate(notifications) {
     console.log('[INFO] orchestrating notification');
-    return Promise.all(notifications.map(notification=> {
-      notification.changeState(Constants.NOTIFICATION_STATES.ESCALATING);
-      return notification.save();
-    }))
+    return Promise
+      .all(notifications.map(notification => {
+        notification.changeState(Constants.NOTIFICATION_STATES.ESCALATING);
+        return notification.save();
+      }))
       .then(() => {
-        return Promise.all(notifications.map(notification=> {
+        return Promise.all(notifications.map(notification => {
           // on high priority send notification to all devices,
           // otherwise to desktop first.
           let firstEscalationType =
-            notification.priority === Constants.MESSAGE_PRIORITIES.HIGH
+            notification.message.priority === Constants.MESSAGE_PRIORITIES.HIGH
               ? Constants.DEVICE_TYPES.DESKTOP_MOBILE
               : Constants.DEVICE_TYPES.DESKTOP;
 
@@ -197,15 +207,12 @@ class Orchestration {
             nextEscalationType: firstEscalationType
           });
 
-          return escalation
-            .save()
-            .then(escalation => {
-              return this.escalate(escalation);
-            });
-        }))
+          return escalation.save();
+        }));
       })
-      .catch(err=> {
-        console.log('[ERROR] in orchestrate', err);
+      .then(escalations => {
+        this.reescalate();
+        return escalations;
       });
   }
 
