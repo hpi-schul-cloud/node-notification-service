@@ -53,7 +53,6 @@ angular.module('sendApp', [])
           range.push(i);
         }
         $scope.range = range;
-        $scope.test = messageId;
 
       }, function error(response) {
         $scope.idResponse = response;

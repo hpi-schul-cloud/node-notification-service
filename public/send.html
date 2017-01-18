@@ -33,7 +33,7 @@
 <div ng-if="error">
 {{response}}</div>
 <div ng-else>
-  <!-- {{response.data}} -->
+  {{response}}
 
   <div ng-hide="hide">
     <table>
@@ -76,6 +76,7 @@
 
     <div ng-if="idResponse.status == 200">
       Message was successfully transmitted.
+      {{idResponse}}
     </div>
     <div ng-show="idResponse" ng-if="idResponse.status != 200">
       Message Error.
