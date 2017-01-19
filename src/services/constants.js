@@ -2,12 +2,12 @@
 
 class Constants {
 
-  constructor(options) {
+  constructor() {
 
     this.CALLBACK_TYPES = {
       RECEIVED : 'received',
       CLICKED : 'clicked'
-    }
+    };
 
     this.NOTIFICATION_STATES = {
       CREATED: 'created',
@@ -17,7 +17,7 @@ class Constants {
       SEEN: 'seen',
       CLICKED: 'clicked',
       REMOVED: 'removed'
-    }
+    };
 
     this.DEVICE_TYPES = {
       //ACTIVE: 'active',
@@ -25,16 +25,15 @@ class Constants {
       DESKTOP: 'desktop',
       MOBILE: 'mobile',
       EMAIL: 'email'
-    }
+    };
 
     this.MESSAGE_PRIORITIES = {
       HIGH: 'high',
       MEDIUM: 'medium',
       LOW: 'low'
-    }
+    };
 
   }
-
 
 }
 
