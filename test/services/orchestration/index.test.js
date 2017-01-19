@@ -1,13 +1,17 @@
 'use strict';
 
 const assert = require('assert');
+const sinon = require('sinon');
+
 const app = require('../../../src/app');
 const orchestration = require('../../../src/services/orchestration/index');
+const sendInterface = require('../../../src/services/sendInterface/index');
 
-const Escalation = require('../../../src/services/orchestration/escalation-model');
 const Constants = require('../../../src/services/constants');
-const Notification = require('../../../src/services/notification/notification-model');
+const User = require('../../../src/services/user/user-model');
 const Message = require('../../../src/services/message/message-model');
+const Notification = require('../../../src/services/notification/notification-model');
+const Escalation = require('../../../src/services/orchestration/escalation-model');
 
 function createEscalation() {
   let user = 'someId';
@@ -24,6 +28,7 @@ function createEscalation() {
   return escalation.save();
 }
 
+
 describe('orchestration service', function() {
 
   it('did not register the orchestration service', () => {
@@ -36,6 +41,13 @@ describe('orchestration service', function() {
 
   it('clean escalations', (done) => {
     Escalation
+      .remove({})
+      .then(() => {
+        done();
+      });
+  });
+  it('clean users', (done) => {
+    User
       .remove({})
       .then(() => {
         done();
@@ -84,6 +96,61 @@ describe('orchestration service', function() {
         });
     });
 
+    it('working notification.', (done) => {
+      // replace the send function of firebase
+      let stub = sinon.stub(sendInterface, 'send', function(news, devices) {
+        // console.log('sendInterface.send()', devices);
+        return Promise.resolve({
+          success: 0,
+          failure: 0,
+          results: []
+        });
+      });
+
+
+      let newDevice = {
+        token: 'TEST_token',
+        type: 'mobile',
+        service: 'firebase',
+        name: 'TEST_name',
+        OS: 'android',
+        state: 'registered'
+      };
+
+      let newUser = new User({
+        schulcloudId: 'userSchulcloudId',
+        devices: [newDevice]
+      });
+
+      newUser
+        .save()
+        .then(user => {
+          let message = Message({});
+          let notification = Notification({
+            state: Constants.NOTIFICATION_STATES.ESCALATING,
+            message: message,
+            user: user.schulcloudId
+          });
+          let escalation = Escalation({
+            notification: notification,
+            nextEscalationType: Constants.DEVICE_TYPES.DESKTOP
+          });
+          return escalation.save();
+        })
+        .then(escalation => {
+          return orchestration
+            .escalate(escalation)
+            .then(data => {
+              assert.ok(data);
+            });
+        })
+        .then(() => {
+          // cleanup
+          assert(stub.called);
+          sendInterface.send.restore();
+          done();
+        });
+    });
 
     // TODO: more tests
   });
@@ -132,7 +199,6 @@ describe('orchestration service', function() {
             });
         });
     });
-
 
     it('from DESKTOP_MOBILE to EMAIL with "high".', function(done) {
       createEscalation()
