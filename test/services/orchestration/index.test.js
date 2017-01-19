@@ -31,6 +31,15 @@ function createEscalation() {
 
 describe('orchestration service', function() {
 
+  beforeEach(function() {
+    return User.remove({});
+  });
+
+  beforeEach(function() {
+    return Escalation.remove({});
+  });
+
+
   it('did not register the orchestration service', () => {
     assert.ok(!app.service('orchestration'));
   });
@@ -38,22 +47,6 @@ describe('orchestration service', function() {
   it('has access to orchestration', () => {
     assert.ok(orchestration);
   });
-
-  it('clean escalations', (done) => {
-    Escalation
-      .remove({})
-      .then(() => {
-        done();
-      });
-  });
-  it('clean users', (done) => {
-    User
-      .remove({})
-      .then(() => {
-        done();
-      });
-  });
-
 
   describe('reescalate(): ', () => {
     it('perform without anything queued.', (done) => {
@@ -96,10 +89,58 @@ describe('orchestration service', function() {
         });
     });
 
-    it('working notification.', (done) => {
+    it('a working mobile notification without devices.', (done) => {
       // replace the send function of firebase
       let stub = sinon.stub(sendInterface, 'send', function(news, devices) {
-        // console.log('sendInterface.send()', devices);
+        assert.equal(devices.length, 1);
+        assert.equal(devices[0].service, 'email');
+        return Promise.resolve({
+          success: 0,
+          failure: 0,
+          results: []
+        });
+      });
+
+      let newUser = new User({
+        schulcloudId: 'userSchulcloudId',
+        devices: []
+      });
+
+      newUser
+        .save()
+        .then(user => {
+          let message = Message({});
+          let notification = Notification({
+            state: Constants.NOTIFICATION_STATES.ESCALATING,
+            message: message,
+            user: user.schulcloudId
+          });
+          let escalation = Escalation({
+            notification: notification,
+            nextEscalationType: Constants.DEVICE_TYPES.DESKTOP
+          });
+          return escalation.save();
+        })
+        .then(escalation => {
+          return orchestration
+            .escalate(escalation)
+            .then(data => {
+              assert.ok(data);
+            });
+        })
+        .then(() => {
+          // cleanup
+          assert(stub.called);
+          sendInterface.send.restore();
+          done();
+        });
+    });
+
+    it('a working mobile notification.', (done) => {
+      // replace the send function of firebase
+      let stub = sinon.stub(sendInterface, 'send', function(news, devices) {
+        assert.equal(devices.length, 1);
+        assert.equal(devices[0].type, Constants.DEVICE_TYPES.MOBILE);
         return Promise.resolve({
           success: 0,
           failure: 0,
@@ -134,6 +175,141 @@ describe('orchestration service', function() {
           let escalation = Escalation({
             notification: notification,
             nextEscalationType: Constants.DEVICE_TYPES.DESKTOP
+          });
+          return escalation.save();
+        })
+        .then(escalation => {
+          return orchestration
+            .escalate(escalation)
+            .then(data => {
+              assert.ok(data);
+            });
+        })
+        .then(() => {
+          // cleanup
+          assert(stub.called);
+          sendInterface.send.restore();
+          done();
+        });
+    });
+
+    it('a working desktop notification.', (done) => {
+      // replace the send function of firebase
+      let stub = sinon.stub(sendInterface, 'send', function(news, devices) {
+        assert.equal(devices.length, 1);
+        assert.equal(devices[0].type, Constants.DEVICE_TYPES.DESKTOP);
+        return Promise.resolve({
+          success: 0,
+          failure: 0,
+          results: []
+        });
+      });
+
+
+      let newDeviceMobile = {
+        token: 'TEST_token',
+        type: 'mobile',
+        service: 'firebase',
+        name: 'TEST_name',
+        OS: 'android',
+        state: 'registered'
+      };
+      let newDeviceDesktop = {
+        token: 'TEST_token',
+        type: 'desktop',
+        service: 'firebase',
+        name: 'TEST_name',
+        OS: 'android',
+        state: 'registered'
+      };
+
+      let newUser = new User({
+        schulcloudId: 'userSchulcloudId',
+        devices: [
+          newDeviceMobile,
+          newDeviceDesktop
+        ]
+      });
+
+      newUser
+        .save()
+        .then(user => {
+          let message = Message({});
+          let notification = Notification({
+            state: Constants.NOTIFICATION_STATES.ESCALATING,
+            message: message,
+            user: user.schulcloudId
+          });
+          let escalation = Escalation({
+            notification: notification,
+            nextEscalationType: Constants.DEVICE_TYPES.DESKTOP
+          });
+          return escalation.save();
+        })
+        .then(escalation => {
+          return orchestration
+            .escalate(escalation)
+            .then(data => {
+              assert.ok(data);
+            });
+        })
+        .then(() => {
+          // cleanup
+          assert(stub.called);
+          sendInterface.send.restore();
+          done();
+        });
+    });
+
+    it('a working mobile_desktop notification.', (done) => {
+      // replace the send function of firebase
+      let stub = sinon.stub(sendInterface, 'send', function(news, devices) {
+        assert.equal(devices.length, 2);
+        return Promise.resolve({
+          success: 0,
+          failure: 0,
+          results: []
+        });
+      });
+
+
+      let newDeviceMobile = {
+        token: 'TEST_token',
+        type: 'mobile',
+        service: 'firebase',
+        name: 'TEST_name',
+        OS: 'android',
+        state: 'registered'
+      };
+      let newDeviceDesktop = {
+        token: 'TEST_token',
+        type: 'desktop',
+        service: 'firebase',
+        name: 'TEST_name',
+        OS: 'android',
+        state: 'registered'
+      };
+
+      let newUser = new User({
+        schulcloudId: 'userSchulcloudId',
+        devices: [
+          newDeviceMobile,
+          newDeviceDesktop
+        ]
+      });
+
+      newUser
+        .save()
+        .then(user => {
+          let message = Message({});
+          let notification = Notification({
+            state: Constants.NOTIFICATION_STATES.ESCALATING,
+            message: message,
+            user: user.schulcloudId
+          });
+          let escalation = Escalation({
+            notification: notification,
+            nextEscalationType: Constants.DEVICE_TYPES.DESKTOP_MOBILE
           });
           return escalation.save();
         })
