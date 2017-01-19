@@ -19,9 +19,7 @@ class Orchestration {
     this.lowReescalationTime = 360000;
 
     // timer checks all 5 seconds for remaining escalations to be send
-    setTimeout(() => {
-      setInterval(this.reescalate, 5000);
-    }, 60000); // wait 60 seconds from start
+    setInterval(this.reescalate, 5000);
 
   }
 
@@ -43,7 +41,7 @@ class Orchestration {
       .then(escalations => {
         if (escalations.length) {
           console.log(' - escalate', escalations.length, 'scheduled notifications...');
-          return Promise.all(escalations.map(escalation=> {
+          return Promise.all(escalations.map(escalation => {
             return this.escalate(escalation);
           }));
         } else {
@@ -51,11 +49,11 @@ class Orchestration {
           return true;
         }
       })
-      .then(()=> {
+      .then(() => {
         this.reescalationRunning = false;
         console.log('[SCHEDULED ESCALATION] end...');
       })
-      .catch(err=> {
+      .catch(err => {
         this.reescalationRunning = false;
         console.log('[SCHEDULED ESCALATION] end after error...', err);
       });
@@ -88,7 +86,7 @@ class Orchestration {
               token: escalation.notification.user
             }];
           } else {
-            devices = user.devices.filter(function (device) {
+            devices = user.devices.filter(device => {
               if (escalation.nextEscalationType === Constants.DEVICE_TYPES.DESKTOP_MOBILE) {
                 return device.type === Constants.DEVICE_TYPES.DESKTOP || device.type === Constants.DEVICE_TYPES.MOBILE;
               } else {
@@ -126,6 +124,10 @@ class Orchestration {
             return this.updateEscalation(escalation);
           });
 
+      })
+      .catch(err => {
+        console.log('[INFO] Failed to escalate, remove ' + escalation._id, err);
+        return escalation.remove();
       });
   }
 

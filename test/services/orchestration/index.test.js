@@ -28,13 +28,13 @@ function createEscalation() {
 }
 
 
-describe('orchestration service', function() {
+describe('orchestration service', () => {
 
-  beforeEach(function() {
+  beforeEach(() => {
     return User.remove({});
   });
 
-  beforeEach(function() {
+  beforeEach(() => {
     return Escalation.remove({});
   });
 
@@ -80,7 +80,7 @@ describe('orchestration service', function() {
     });
 
     it('test reescalation fails, reset running flag', () => {
-      let stub = sinon.stub(orchestration, 'escalate', function() {
+      let stub = sinon.stub(orchestration, 'escalate', () => {
         return Promise.reject();
       });
 
@@ -97,24 +97,64 @@ describe('orchestration service', function() {
           assert.ok(false, 'Reescalate should catch errors, we should never be here!');
         });
     });
+
+    it('test reescalation not escalates a future escalation', () => {
+      let stub = sinon.stub(orchestration, 'escalate', () => {
+        return Promise.resolve();
+      });
+
+      return createEscalation()
+        .then(escalation => {
+          escalation.nextEscalationDue = Date.now() + 5000;
+          return escalation.save();
+        })
+        .then(() => {
+          return orchestration.reescalate();
+        })
+        .then(() => {
+          assert(!stub.called);
+          assert.equal(orchestration.reescalationRunning, false);
+          orchestration.escalate.restore();
+        });
+    });
   });
 
 
   describe('escalate(): ', () => {
 
-    it('stop clicked notifications.', (done) => {
-      createEscalation()
+    it('stop clicked notifications.', () => {
+      return createEscalation()
         .then(escalation => {
           escalation.notification.changeState(Constants.NOTIFICATION_STATES.CLICKED);
-          orchestration
+          return orchestration
             .escalate(escalation)
             .then(data => {
               assert.ok(data);
 
               // check escalation deletion
-              Escalation.findOne(escalation._id).then(result => {
+              return Escalation.findOne(escalation._id).then(result => {
                 assert.equal(result, null);
-                done();
+              });
+            });
+        });
+    });
+
+    it('stop invalid escalation.', () => {
+      return createEscalation()
+        .then(escalation => {
+          escalation.notification.user = null;
+          escalation.notification.changeState(Constants.NOTIFICATION_STATES.ESCALATING);
+          return escalation.save();
+        })
+        .then(escalation => {
+          return orchestration
+            .escalate(escalation)
+            .then(data => {
+              assert.ok(data);
+
+              // check escalation deletion
+              return Escalation.findOne(escalation._id).then(result => {
+                assert.equal(result, null);
               });
             });
         });
@@ -122,7 +162,7 @@ describe('orchestration service', function() {
 
     it('a working mobile notification without devices.', (done) => {
       // replace the send function of firebase
-      let stub = sinon.stub(sendInterface, 'send', function(news, devices) {
+      let stub = sinon.stub(sendInterface, 'send', (news, devices) => {
         assert.equal(devices.length, 1);
         assert.equal(news.length, devices.length);
         assert.equal(devices[0].service, 'email');
@@ -170,7 +210,7 @@ describe('orchestration service', function() {
 
     it('a working mobile notification.', (done) => {
       // replace the send function of firebase
-      let stub = sinon.stub(sendInterface, 'send', function(news, devices) {
+      let stub = sinon.stub(sendInterface, 'send', (news, devices) => {
         assert.equal(devices.length, 1);
         assert.equal(news.length, devices.length);
         assert.equal(devices[0].type, Constants.DEVICE_TYPES.MOBILE);
@@ -228,7 +268,7 @@ describe('orchestration service', function() {
 
     it('a working desktop notification.', (done) => {
       // replace the send function of firebase
-      let stub = sinon.stub(sendInterface, 'send', function(news, devices) {
+      let stub = sinon.stub(sendInterface, 'send', (news, devices) => {
         assert.equal(devices.length, 1);
         assert.equal(news.length, devices.length);
         assert.equal(devices[0].type, Constants.DEVICE_TYPES.DESKTOP);
@@ -297,7 +337,7 @@ describe('orchestration service', function() {
 
     it('a working mobile_desktop notification.', (done) => {
       // replace the send function of firebase
-      let stub = sinon.stub(sendInterface, 'send', function(news, devices) {
+      let stub = sinon.stub(sendInterface, 'send', (news, devices) => {
         assert.equal(devices.length, 2);
         assert.equal(news.length, devices.length);
         return Promise.resolve({
@@ -369,76 +409,63 @@ describe('orchestration service', function() {
 
   describe('updateEscalation(): ', () => {
 
-    it('from DESKTOP to MOBILE.', function(done) {
-      createEscalation()
+    it('from DESKTOP to MOBILE.', () => {
+      return createEscalation()
         .then(escalation => {
           escalation.nextEscalationType = Constants.DEVICE_TYPES.DESKTOP;
-          orchestration
-            .updateEscalation(escalation)
-            .then(function(saved) {
-              assert.equal(saved.nextEscalationType, Constants.DEVICE_TYPES.MOBILE);
-              // TODO: check updated time
-              done();
-            });
+          return orchestration.updateEscalation(escalation);
+        })
+        .then(saved => {
+          assert.equal(saved.nextEscalationType, Constants.DEVICE_TYPES.MOBILE);
         });
     });
 
-    it('from MOBILE to EMAIL.', function(done) {
-      createEscalation()
+    it('from MOBILE to EMAIL.', () => {
+      return createEscalation()
         .then(escalation => {
           escalation.nextEscalationType = Constants.DEVICE_TYPES.MOBILE;
-          orchestration
-            .updateEscalation(escalation)
-            .then(function(saved) {
-              assert.equal(saved.nextEscalationType, Constants.DEVICE_TYPES.EMAIL);
-              // TODO: check updated time
-              done();
-            });
+          return orchestration.updateEscalation(escalation);
+        })
+        .then(saved => {
+          assert.equal(saved.nextEscalationType, Constants.DEVICE_TYPES.EMAIL);
         });
     });
 
-    it('from DESKTOP_MOBILE to EMAIL.', function(done) {
-      createEscalation()
+    it('from DESKTOP_MOBILE to EMAIL.', () => {
+      return createEscalation()
         .then(escalation => {
           escalation.nextEscalationType = Constants.DEVICE_TYPES.DESKTOP_MOBILE;
-          orchestration
-            .updateEscalation(escalation)
-            .then(function(saved) {
-              assert.equal(saved.nextEscalationType, Constants.DEVICE_TYPES.EMAIL);
-              // TODO: check updated time
-              done();
-            });
+          return orchestration.updateEscalation(escalation);
+        })
+        .then(saved => {
+          assert.equal(saved.nextEscalationType, Constants.DEVICE_TYPES.EMAIL);
         });
     });
 
-    it('from DESKTOP_MOBILE to EMAIL with "high".', function(done) {
-      createEscalation()
+    it('from DESKTOP_MOBILE to EMAIL with "high".', () => {
+      return createEscalation()
         .then(escalation => {
           escalation.nextEscalationType = Constants.DEVICE_TYPES.DESKTOP_MOBILE;
           escalation.notification.message.priority = Constants.MESSAGE_PRIORITIES.HIGH;
-          orchestration
-            .updateEscalation(escalation)
-            .then(function(saved) {
-              assert.equal(saved.nextEscalationType, Constants.DEVICE_TYPES.EMAIL);
-              // TODO: check updated time
-              done();
-            });
+          return orchestration.updateEscalation(escalation);
+        })
+        .then(saved => {
+          assert.equal(saved.nextEscalationType, Constants.DEVICE_TYPES.EMAIL);
         });
     });
 
-    it('from EMAIL to removed.', function(done) {
-      createEscalation()
+    it('from EMAIL to removed.', () => {
+      return createEscalation()
         .then(escalation => {
           escalation.nextEscalationType = Constants.DEVICE_TYPES.EMAIL;
-          orchestration
+          return orchestration
             .updateEscalation(escalation)
-            .then(function(success) {
+            .then(success => {
               assert.equal(success, true);
 
               // check escalation deletion
-              Escalation.findOne(escalation._id).then(result => {
+              return Escalation.findOne(escalation._id).then(result => {
                 assert.equal(result, null);
-                done();
               });
             });
         });
