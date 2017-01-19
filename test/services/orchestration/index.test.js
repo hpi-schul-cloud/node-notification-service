@@ -22,10 +22,9 @@ function createEscalation() {
   });
   let escalation = Escalation({
     notification: notification,
-    priority: notification.priority,
     nextEscalationType: Constants.DEVICE_TYPES.DESKTOP
   });
-  return escalation.save();
+  return notification.save().then(escalation.save);
 }
 
 
@@ -49,23 +48,55 @@ describe('orchestration service', function() {
   });
 
   describe('reescalate(): ', () => {
-    it('perform without anything queued.', (done) => {
-      orchestration
-        .reescalate()
-        .then(done);
+
+    it('perform without anything queued.', () => {
+      return orchestration
+        .reescalate();
     });
 
-    it('perform without already running reescalation.', (done) => {
+    it('perform without already running reescalation.', () => {
       orchestration.reescalationRunning = true;
-      orchestration
+      return orchestration
         .reescalate()
         .then(() => {
           orchestration.reescalationRunning = false;
-          done();
         });
     });
 
-    // TODO: more tests
+    it('test reescalation escalates a due escalation', () => {
+      let stub = sinon.stub(orchestration, 'escalate', () => {
+        return Promise.resolve();
+      });
+
+      return createEscalation()
+        .then(() => {
+          return orchestration.reescalate();
+        })
+        .then(() => {
+          assert(stub.called);
+          assert.equal(orchestration.reescalationRunning, false);
+          orchestration.escalate.restore();
+        });
+    });
+
+    it('test reescalation fails, reset running flag', () => {
+      let stub = sinon.stub(orchestration, 'escalate', function() {
+        return Promise.reject();
+      });
+
+      return createEscalation()
+        .then(() => {
+          return orchestration.reescalate();
+        })
+        .then(() => {
+          assert(stub.called);
+          assert.equal(orchestration.reescalationRunning, false);
+          orchestration.escalate.restore();
+        })
+        .catch(() => {
+          assert.ok(false, 'Reescalate should catch errors, we should never be here!');
+        });
+    });
   });
 
 
@@ -74,7 +105,7 @@ describe('orchestration service', function() {
     it('stop clicked notifications.', (done) => {
       createEscalation()
         .then(escalation => {
-          escalation.notification.state = Constants.NOTIFICATION_STATES.CLICKED;
+          escalation.notification.changeState(Constants.NOTIFICATION_STATES.CLICKED);
           orchestration
             .escalate(escalation)
             .then(data => {
@@ -93,9 +124,10 @@ describe('orchestration service', function() {
       // replace the send function of firebase
       let stub = sinon.stub(sendInterface, 'send', function(news, devices) {
         assert.equal(devices.length, 1);
+        assert.equal(news.length, devices.length);
         assert.equal(devices[0].service, 'email');
         return Promise.resolve({
-          success: 0,
+          success: 1,
           failure: 0,
           results: []
         });
@@ -140,9 +172,10 @@ describe('orchestration service', function() {
       // replace the send function of firebase
       let stub = sinon.stub(sendInterface, 'send', function(news, devices) {
         assert.equal(devices.length, 1);
+        assert.equal(news.length, devices.length);
         assert.equal(devices[0].type, Constants.DEVICE_TYPES.MOBILE);
         return Promise.resolve({
-          success: 0,
+          success: 1,
           failure: 0,
           results: []
         });
@@ -197,9 +230,10 @@ describe('orchestration service', function() {
       // replace the send function of firebase
       let stub = sinon.stub(sendInterface, 'send', function(news, devices) {
         assert.equal(devices.length, 1);
+        assert.equal(news.length, devices.length);
         assert.equal(devices[0].type, Constants.DEVICE_TYPES.DESKTOP);
         return Promise.resolve({
-          success: 0,
+          success: 1,
           failure: 0,
           results: []
         });
@@ -265,8 +299,9 @@ describe('orchestration service', function() {
       // replace the send function of firebase
       let stub = sinon.stub(sendInterface, 'send', function(news, devices) {
         assert.equal(devices.length, 2);
+        assert.equal(news.length, devices.length);
         return Promise.resolve({
-          success: 0,
+          success: 2,
           failure: 0,
           results: []
         });
@@ -414,17 +449,16 @@ describe('orchestration service', function() {
 
   describe('orchestrate(): ', () => {
 
-    it('perform without notifications.', (done) => {
+    it('perform without notifications.', () => {
       let notifications = [];
-      orchestration
+      return orchestration
         .orchestrate(notifications)
         .then(data => {
           assert.equal(data.length, notifications.length);
-          done();
         });
     });
 
-    it('perform one "high" notification.', (done) => {
+    it('perform one "high" notification.', () => {
       let user = 'someId';
       let message = Message({
         priority: Constants.MESSAGE_PRIORITIES.HIGH
@@ -437,16 +471,15 @@ describe('orchestration service', function() {
       let notifications = [
         notification
       ];
-      orchestration
+      return orchestration
         .orchestrate(notifications)
         .then(data => {
           assert.equal(data.length, notifications.length);
           assert.equal(data[0].nextEscalationType, Constants.DEVICE_TYPES.DESKTOP_MOBILE);
-          done();
         });
     });
 
-    it('perform three notification.', (done) => {
+    it('perform three notification.', () => {
       let user = 'someId';
       let message = Message({});
       let notification = Notification({
@@ -459,11 +492,10 @@ describe('orchestration service', function() {
         notification,
         notification
       ];
-      orchestration
+      return orchestration
         .orchestrate(notifications)
         .then(data => {
           assert.equal(data.length, notifications.length);
-          done();
         });
     });
 

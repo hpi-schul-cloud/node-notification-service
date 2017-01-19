@@ -18,8 +18,10 @@ class Orchestration {
     // next escalation wait time in ms for low priority emails
     this.lowReescalationTime = 360000;
 
-    // timer checks all 10 seconds for remaining escalations to be send
-    setInterval(this.reescalate, 10000);
+    // timer checks all 5 seconds for remaining escalations to be send
+    setTimeout(() => {
+      setInterval(this.reescalate, 5000);
+    }, 60000); // wait 60 seconds from start
 
   }
 
@@ -32,7 +34,7 @@ class Orchestration {
     console.log('[SCHEDULED ESCALATION] starts...');
     if (this.reescalationRunning === true) {
       console.log('- await last reescalate finished...');
-      return Promise.resolve();
+      return Promise.resolve(true);
     }
     this.reescalationRunning = true;
     return Escalation
@@ -46,7 +48,7 @@ class Orchestration {
           }));
         } else {
           console.log(' - no escalations scheduled...');
-          return Promise.resolve();
+          return true;
         }
       })
       .then(()=> {
@@ -73,74 +75,57 @@ class Orchestration {
         schulcloudId: escalation.notification.user
       })
       .then(user => {
-
-        if (user === null) { // TODO this should not happen...
-          return Promise.reject('[ERROR] could not resolve user using scope ' +  escalation.notification.user + ' in escalation ' + escalation.id);
-        }
-
-
         let devices = [];
 
         // finds first escalation type where the user already has devices registered
         // if there are no devices registered, escalation will be removed
-        // FIXME(max): reescalte instead of while loop
-        while (devices.length === 0 && escalation.notification.state === Constants.NOTIFICATION_STATES.ESCALATING) {
+        while (devices.length === 0) {
 
           // find devices that match the current escalation type
-          devices = user.devices.filter(function (device) {
-            if (escalation.nextEscalationType === Constants.DEVICE_TYPES.DESKTOP_MOBILE) {
-              return device.type === Constants.DEVICE_TYPES.DESKTOP || device.type === Constants.DEVICE_TYPES.MOBILE;
-            } else {
-              return device.type === escalation.nextEscalationType;
+          if (escalation.nextEscalationType === Constants.DEVICE_TYPES.EMAIL) {
+            devices = [{
+              service: Constants.DEVICE_TYPES.EMAIL,
+              token: escalation.notification.user
+            }];
+          } else {
+            devices = user.devices.filter(function (device) {
+              if (escalation.nextEscalationType === Constants.DEVICE_TYPES.DESKTOP_MOBILE) {
+                return device.type === Constants.DEVICE_TYPES.DESKTOP || device.type === Constants.DEVICE_TYPES.MOBILE;
+              } else {
+                return device.type === escalation.nextEscalationType;
+              }
+            });
+
+            // go to next escalation step immediately
+            if (devices.length === 0) {
+              switch (escalation.nextEscalationType) {
+                case Constants.DEVICE_TYPES.DESKTOP:
+                  escalation.nextEscalationType = Constants.DEVICE_TYPES.MOBILE;
+                  break;
+                case Constants.DEVICE_TYPES.MOBILE:
+                case Constants.DEVICE_TYPES.DESKTOP_MOBILE:
+                  escalation.nextEscalationType = Constants.DEVICE_TYPES.EMAIL;
+                  break;
+              }
             }
+          }
+        }
+
+        // devices(or email) have been found... send
+        console.log(devices.length, 'devices found...');
+
+        // prepare notifications by multiplication for devices
+        let news = [];
+        for (let i = 0; i < devices.length; i++) {
+          news.push(escalation.notification);
+        }
+
+        return sendInterface.send(news, devices)
+          .then(() => {
+            console.log('[INFO] notifications sent to', devices.length, 'devices');
+            return this.updateEscalation(escalation);
           });
 
-
-          // FIXME(max): if there is no device we can go to the next step using updateEscalation()
-          // FIXME(max): NOT_ESCALATED can be set wrong
-          if (devices.length === 0) {
-            switch (escalation.nextEscalationType) {
-              case Constants.DEVICE_TYPES.DESKTOP:
-                escalation.nextEscalationType = Constants.DEVICE_TYPES.MOBILE;
-                break;
-              case Constants.DEVICE_TYPES.MOBILE:
-              case Constants.DEVICE_TYPES.DESKTOP_MOBILE:
-                escalation.nextEscalationType = Constants.DEVICE_TYPES.EMAIL;
-                devices = [{
-                  service: Constants.DEVICE_TYPES.EMAIL,
-                  token: escalation.notification.user
-                }];
-                break;
-              default:
-                escalation.notification.changeState(Constants.NOTIFICATION_STATES.NOT_ESCALATED);
-                return escalation.notification.save()
-                  .then(()=> {
-                    console.log('[INFO] no devices found for escalation', escalation.id)
-                    return escalation.remove();
-                  });
-            }
-          }
-        }
-
-        // devices have been found... send
-        if (devices.length !== 0) {
-          console.log(devices.length, 'devices found...');
-
-          // prepare notifications by multiplication for devices
-          let news = [];
-          for (let i = 0; i < devices.length; i++) {
-            news.push(escalation.notification);
-          }
-
-          return sendInterface.send(news, devices)
-            .then(() => {
-              console.log('[INFO] notifications sent to', devices.length, 'devices');
-              return this.updateEscalation(escalation);
-            });
-        }
-      })
-      .catch(err => {
-        console.log(err);
       });
   }
 
@@ -209,10 +194,6 @@ class Orchestration {
 
           return escalation.save();
         }));
-      })
-      .then(escalations => {
-        this.reescalate();
-        return escalations;
       });
   }
 
