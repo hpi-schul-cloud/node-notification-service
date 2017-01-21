@@ -42,18 +42,21 @@ class ApnAdapter {
 
   _buildResponse(notifications, devices, apnResponse) {
     let response = {};
-
     response.success = apnResponse.sent.length;
     response.failure = apnResponse.failed.length;
 
     let successResults = [];
     if (response.success > 0) {
       successResults = apnResponse.sent.reduce((accumulator, token) => {
-        let index = devices.findIndex(device => device.token === token);
-        let result = {
-          notificationId: notifications[index]._id,
-          deviceId: devices[index]._id
-        };
+        let result = {};
+
+        let index = devices.findIndex(device => device.token === token.device);
+        if (index !== -1) {
+          result = {
+            notificationId: notifications[index]._id,
+            deviceId: devices[index]._id
+          };
+        }
 
         return accumulator.concat(result);
       }, []);
