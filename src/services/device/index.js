@@ -4,6 +4,7 @@ const hooks = require('./hooks');
 const user = require('../user/user-model');
 const Resolve = require('../resolve');
 const errors = require('feathers-errors');
+const Authentication = require('../authentication');
 
 const docs = require('./docs.json');
 
@@ -37,7 +38,7 @@ class Service {
     return user.findOne({ schulcloudId: data.schulcloudId })
       .then(user => {
         if (!user) {
-          var user = newUser;
+          user = newUser;
         } else {
           const deviceExists = user.devices.some(device => {
             if (device.token === newDevice.token) return true;
@@ -48,6 +49,35 @@ class Service {
         }
         return user.save();
       })
+  }
+
+  remove(data, params) {
+    // TODO: move auth in hooks
+    // TODO: find better way then passing token as query param
+    return Authentication
+      .verifyUser(params.query.user_token)
+      .then(schulcloudId => {
+        return user.findOne({ schulcloudId: schulcloudId })
+      })
+      .then(user => {
+        if (user) {
+          // find device
+          let index = -1;
+          for (let i = 0; i < user.devices.length; i++) {
+            if (user.devices[i].token === data) {
+              index = i;
+              break;
+            }
+          }
+
+          // remove device
+          if (index > -1) {
+            user.devices.splice(index, 1);
+          }
+
+          return user.save();
+        }
+      });
   }
 }
 
