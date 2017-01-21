@@ -19,7 +19,7 @@ describe('apnDevice service', function() {
       .post('/v1/devices/theDeviceToken/registrations/web.org.schul-cloud')
       .set('authorization', 'ApplePushNotifications usertoken2')
       .send({})
-      .expect(201);
+      .expect(200);
   });
 
   it('does not register an invalid device', () => {
