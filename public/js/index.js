@@ -1,10 +1,10 @@
 var pushManager = {
   requestPermissionCallback: null,
 
-  setRegistrationId: function(id) {
+  setRegistrationId: function(id, service, device) {
     console.log('set registration id: ' + id);
 
-    sendRegistrationId(id);
+    sendRegistrationId(id, service, device);
   },
 
   error: function(error, msg) {

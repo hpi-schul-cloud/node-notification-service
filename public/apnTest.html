@@ -1,45 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <title></title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script>
-      window.onload = function() {
-          // Ensure that the user can receive Safari Push Notifications.
-          if ('safari' in window && 'pushNotification' in window.safari) {
-              var permissionData = window.safari.pushNotification.permission('web.org.schul-cloud');
-              checkRemotePermission(permissionData);
-          }
-      };
+<head>
+  <title></title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
 
-      var checkRemotePermission = function (permissionData) {
-          if (permissionData.permission === 'default') {
-              console.log('[INFO] Requesting permission...');
-              // This is a new web service URL and its validity is unknown.
-              window.safari.pushNotification.requestPermission(
-                  'https://schul-cloud.org:3030', // The web service URL.
-                  'web.org.schul-cloud',     // The Website Push ID.
-                  {
-                    userToken: 'usertokenwithmin16chars'
-                  }, // Data that you choose to send to your server to help you identify the user.
-                  checkRemotePermission         // The callback function.
-              );
-          }
-          else if (permissionData.permission === 'denied') {
-              // The user said no.
-              console.log('[INFO] Permission denied.');
-          }
-          else if (permissionData.permission === 'granted') {
-              // The web service URL is a valid push provider, and the user said yes.
-              // permissionData.deviceToken is now available to use.
-              console.log('[INFO] Permission granted. Token:', permissionData.deviceToken);
-          }
-          console.log('[INFO] Permission data:', permissionData);
-      };
+<!-- THE APP -->
+<script type="text/javascript" src="js/callback.js"></script>
+<script type="text/javascript" src="js/index.js"></script>
 
-    </script>
-  </head>
-  <body>
-  </body>
+<!-- START:Safari -->
+<script type="text/javascript" src="js/indexSafari.js"></script>
+<!-- END:Safari -->
+
+</body>
 </html>

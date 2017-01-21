@@ -9,15 +9,15 @@ var DEFAULT_HEADERS = {
 var SERVER_URL = 'https://schul-cloud.org:3030';
 // var SERVER_URL = 'http://localhost:3030';
 
-function sendRegistrationId(id) {
+function sendRegistrationId(id, service, device) {
   var url = SERVER_URL + '/devices';
   var body = {
-    "service": "firebase",
+    "service": service ? service : "firebase",
     "type": "mobile",
     "name": "test2",
     "user_token": "usertoken1",
     "service_token": id,
-    "OS": "android7"
+    "OS": device ? device : "android7"
   };
   var data = JSON.stringify(body);
 

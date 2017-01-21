@@ -34,21 +34,24 @@ class Service {
 
     fs.appendFile(publicPath + '/apn.log', '[' + (new Date()).toISOString() + '] Register device:' + userToken + ', ' + token + '\n');
 
-    req.app.service('devices')
-      .create({
-        'user_token': userToken,
-        'service_token': token,
-        'type': 'desktop',
-        'service': 'apn',
-        'name': 'Safari',
-        'OS': 'safari'
-      })
-      .then(userWithNewDevice => {
-        res.status(200).send(userWithNewDevice);
-      })
-      .catch((err) => {
-        res.status(500).send(err);
-      });
+    // let the frontend handle matching user and token
+    res.status(200).send({});
+
+    // req.app.service('devices')
+    //   .create({
+    //     'user_token': userToken,
+    //     'service_token': token,
+    //     'type': 'desktop',
+    //     'service': 'apn',
+    //     'name': 'Safari',
+    //     'OS': 'safari'
+    //   })
+    //   .then(userWithNewDevice => {
+    //     res.status(200).send(userWithNewDevice);
+    //   })
+    //   .catch((err) => {
+    //     res.status(500).send(err);
+    //   });
   }
 
   delete(req, res) {
