@@ -28,9 +28,9 @@ class ApnAdapter {
     message.topic = 'org.schulcloud';
     message.title = notification.message.title;
     message.body = notification.message.body;
-    message.expiry = notification.timeToLive; // TODO: should be UNIX timestamp
+    // message.expiry = notification.timeToLive; // TODO: should be UNIX timestamp
     message.priority = notification.priority === 'high' ? 10 : 5;
-    message.contentAvailable = true;
+    // message.contentAvailable = true;
 
     if (message.priority === 10) {
       // we must trigger this for messages with high priority
