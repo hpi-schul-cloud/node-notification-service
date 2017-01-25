@@ -37,8 +37,6 @@
   <div ng-if="error">
   {{response}}</div>
   <div ng-else>
-    {{response}}
-
     <div ng-hide="hide">
       <table>
         <tr>
@@ -71,7 +69,7 @@
         </tr>
       </table>
       <br>
-
+      {{response}}
     </div>
   </div>
   </div>
@@ -90,16 +88,15 @@
 
       {{idResponse}}
       {{range}}
-
+      <table>
         <tr>
           <th>User</th>
           <th>Status</th>
         </tr>
-      <div ng-repeat="notification in idResponse.data">
-        <table>
-          <tr>
+          <!-- Todo devices per user -->
+          <tr ng-repeat="notification in idResponse.data">
             <td>{{notification.user}}</td>
-            <td>{{notification.clicked}}</td>
+            <td ng-style="notification.clicked.toString() === 'true' ? {  background:'green' } : { background: 'red' }">{{notification.clicked}}</td>
         </tr>
       </table>
     </div>
