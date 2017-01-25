@@ -15,6 +15,12 @@ const callbackSchema = new Schema({
   createdAt: { type: Date, 'default': Date.now }
 });
 
+const deviceSchema = new Schema({
+  deviceName: { type: String, required: true},
+  status: {type: String},
+  timestamp: {type: Date}
+});
+
 // TODO notification model for db
 const notificationSchema = new Schema({
   message: { type: Object, required: true },
@@ -23,7 +29,8 @@ const notificationSchema = new Schema({
   stateHistory: [],
   callbacks: [callbackSchema],
   createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now }
+  updatedAt: { type: Date, default: Date.now },
+  devices: [deviceSchema]
 });
 
 notificationSchema.methods.changeState = function changeState(newState) {

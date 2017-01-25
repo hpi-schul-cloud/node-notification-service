@@ -45,6 +45,19 @@ class SendInterface {
           this._addResponse(accumulatedResponses, response);
         });
 
+        // let device = new DeviceSchema {};
+        accumulatedResponses.results.forEach((entry) =>
+        {
+          console.log('Device Entry', entry);
+          let deviceId = entry.deviceId;
+          console.log("Id", deviceId);
+
+          // device.
+
+        });
+
+
+
         if (accumulatedResponses.failure === notifications.length) {
           reject(accumulatedResponses);
         } else {

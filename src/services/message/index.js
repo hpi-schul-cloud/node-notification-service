@@ -32,7 +32,8 @@ class Service {
         let result = notifications.map(function (notification) {
           return { // create some stats about which user has notifications clicked
             user: notification.user,
-            clicked: notification.state === Constants.NOTIFICATION_STATES.CLICKED
+            clicked: notification.state === Constants.NOTIFICATION_STATES.CLICKED,
+            devices: notification.devices
           };
         });
         return result;
