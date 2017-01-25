@@ -25,35 +25,36 @@ class ApnAdapter {
   _buildMessage(notification) {
     let message = new apn.Notification();
 
-    message.topic = 'org.schulcloud';
+    message.topic = 'web.org.schul-cloud';
+    message.urlArgs = ['index.php']; // TODO: set this to something meaningful
     message.title = notification.message.title;
     message.body = notification.message.body;
-    message.expiry = notification.timeToLive; // TODO: should be UNIX timestamp
     message.priority = notification.priority === 'high' ? 10 : 5;
-    message.contentAvailable = true;
-
-    if (message.priority === 10) {
-      // we must trigger this for messages with high priority
-      message.alert = notification.message.title;
-    }
+    // UNIX epoch time in seconds
+    // message.expiry = Math.floor(expiration.getTime()/1000);
+    // Can be used to send silent notifications
+    // message.contentAvailable = 1;
 
     return message;
   }
 
   _buildResponse(notifications, devices, apnResponse) {
     let response = {};
-
     response.success = apnResponse.sent.length;
     response.failure = apnResponse.failed.length;
 
     let successResults = [];
     if (response.success > 0) {
       successResults = apnResponse.sent.reduce((accumulator, token) => {
-        let index = devices.findIndex(device => device.token === token);
-        let result = {
-          notificationId: notifications[index]._id,
-          deviceId: devices[index]._id
-        };
+        let result = {};
+
+        let index = devices.findIndex(device => device.token === token.device);
+        if (index !== -1) {
+          result = {
+            notificationId: notifications[index]._id,
+            deviceId: devices[index]._id
+          };
+        }
 
         return accumulator.concat(result);
       }, []);

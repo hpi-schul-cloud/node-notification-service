@@ -3,11 +3,12 @@
 const hooks = require('./hooks');
 const error = require('feathers-errors');
 const spawn = require('child_process').spawn;
-const fs = require('fs');
+const fs = require('fs-extra');
 const crypto = require('crypto');
 const zip = require('express-zip');
 
 // paths
+const publicPath = __dirname + '/../../../public';
 const securePath = __dirname + '/../../../secure';
 const certPath = securePath + '/certificates';
 const iconsetPath = __dirname+'/pushPackage/icon.iconset';
@@ -18,47 +19,62 @@ const password = require(securePath + '/config.json').certificates.password;
 // website.json content
 const websiteName = 'Schul-Cloud';
 const websitePushID = 'web.org.schul-cloud';
-const urlFormatString = 'https://schul-cloud.org';
-const webServiceURL = 'https://schul-cloud.org:3030/';
-const allowedDomains = [urlFormatString];
+const urlFormatString = 'https://schul-cloud.org/%@';
+const webServiceURL = 'https://schul-cloud.org:3030';
+const allowedDomains = ['https://schul-cloud.org', webServiceURL];
 
 class Service {
   constructor() {
     this.createPushPackage = this.createPushPackage.bind(this);
-    this.cleanTempDir = this.cleanTempDir.bind(this);
-    this._deleteFolderRecursive = this._deleteFolderRecursive.bind(this);
   }
 
   register(req, res) {
     let userToken = req.headers.authorization.split(' ')[1];
     let token = req.params.deviceToken;
 
-    req.app.service('devices')
-      .create({
-        'user_token': userToken,
-        'service_token': token,
-        'type': 'desktop',
-        'service': 'apn',
-        'name': 'Safari',
-        'OS': 'safari'
-      })
-      .then(userWithNewDevice => {
-        res.status(201).send(userWithNewDevice);
-      })
-      .catch((err) => {
-        res.status(500).send(err);
-      });
+    fs.appendFile(publicPath + '/apn.log', '[' + (new Date()).toISOString() + '] Register device:' + userToken + ', ' + token + '\n');
+
+    // let the frontend handle matching user and token
+    res.status(200).send({});
+
+    // req.app.service('devices')
+    //   .create({
+    //     'user_token': userToken,
+    //     'service_token': token,
+    //     'type': 'desktop',
+    //     'service': 'apn',
+    //     'name': 'Safari',
+    //     'OS': 'safari'
+    //   })
+    //   .then(userWithNewDevice => {
+    //     res.status(200).send(userWithNewDevice);
+    //   })
+    //   .catch((err) => {
+    //     res.status(500).send(err);
+    //   });
   }
 
   delete(req, res) {
-    let userId = req.headers.authorization.split(' ')[1];
+    let userToken = req.headers.authorization.split(' ')[1];
+    fs.appendFile(publicPath + '/apn.log', '[' + (new Date()).toISOString() + '] Delete device: ' + userToken + '\n');
     res.sendStatus(200);
     // TOOD: not yet implemented in device service
     //req.app.service('/devices')
     // .delete();
   }
 
+  log(req, res) {
+    fs.appendFile(publicPath + '/apn.log', '[' + (new Date()).toISOString() + '] ' + JSON.stringify(req.body) + '\n', (err) => {
+      if (err) {
+        res.sendStatus(500);
+      } else {
+        res.sendStatus(200);
+      }
+    });
+  }
+
   checkAuthorizationHeader(req, res, next) {
+    fs.appendFile(publicPath + '/apn.log', '[' + (new Date()).toISOString() + '] Check authorization: ' + JSON.stringify(req.headers) + '\n');
     if (!req.headers.authorization) {
       res.status(500).send(new error.BadRequest('Missing authorization.'));
       return;
@@ -74,6 +90,7 @@ class Service {
   }
 
   checkWebsitePushID(req, res, next) {
+    fs.appendFile(publicPath + '/apn.log', '[' + (new Date()).toISOString() + '] Check websitePushId: ' + JSON.stringify(req.params) + '\n');
     if (req.params.websitePushID !== websitePushID) {
       res.status(400).send(new error.NotFound('Invalid websitePushID.'));
     } else {
@@ -83,9 +100,26 @@ class Service {
 
   createPushPackage(req, res, next) {
     const tempPrefix = '/tmp/pushPackage-';
-    // as token the Schul-Cloud Token is used
-    let token = req.body.userToken;
+    const token = req.body.userToken; // as token the Schul-Cloud Token is used
 
+    fs.appendFile(publicPath + '/apn.log', '[' + (new Date()).toISOString() + '] Requested push package: ' + token + '\n');
+
+    if (!token) {
+      res.status(400).send(new error.BadRequest('Missing user token.'));
+      return;
+    }
+
+    // return pregenerated pushpackage
+    if (token === 'usertokenwithmin16chars') {
+      res.writeHead(200, {
+        'Content-Type': 'application/zip',
+        'Content-Disposition': 'attachment; filename=pushPackage.zip'
+      });
+      fs.createReadStream(__dirname + '/pushPackage.zip').pipe(res);
+      return;
+    }
+
+    // generate pushpackage on the fly
     fs.mkdtemp(tempPrefix, (err, tempDir) => {
       if (err) {
         res.status(500).send(new error.GeneralError('Unable to create pushPackage.'));
@@ -97,26 +131,15 @@ class Service {
 
       this._createWebsiteJSON(tempDir, token)
         .then((tempDir) => {
-          return this._createManifest(tempDir);
+          return this._createPackage(tempDir);
         })
-        .then((tempDir) => {
-          return this._createSignature(tempDir);
-        })
-        .then((tempDir) => {
-          res.zip([
-            // TODO: maybe a more compact way to do this
-            { path: iconsetPath + '/icon_16x16.png', name: '/icon.iconset/icon_16x16.png' },
-            { path: iconsetPath + '/icon_16x16@2x.png', name: '/icon.iconset/icon_16x16@2x.png' },
-            { path: iconsetPath + '/icon_32x32.png', name: '/icon.iconset/icon_32x32.png' },
-            { path: iconsetPath + '/icon_32x32@2x.png', name: '/icon.iconset/icon_32x32@2x.png' },
-            { path: iconsetPath + '/icon_128x128.png', name: '/icon.iconset/icon_128x128.png' },
-            { path: iconsetPath + '/icon_128x128@2x.png', name: '/icon.iconset/icon_128x128@2x.png' },
-            { path: tempDir + '/website.json', name: '/website.json' },
-            { path: tempDir + '/manifest.json', name: '/manifest.json' },
-            { path: tempDir + '/signature', name: '/signature' }
-          ], 'pushPackage.zip', (err) => {
+        .then((path) => {
+          res.sendFile(path, {
+            headers: {
+              'Content-Disposition' : 'attachment; filename=pushPackage.zip'
+            }
+          }, (err) => {
             next();
-            return Promise.resolve(tempDir);
           });
         })
         .catch((err) => {
@@ -126,86 +149,38 @@ class Service {
     });
   }
 
+  _createPackage(dir) {
+    return new Promise((resolve, reject) => {
+
+      // copy iconset to temp dir
+      fs.copySync(iconsetPath, dir + '/icon.iconset');
+
+      const args = [__dirname + '/createPushPackage.php', dir, securePath];
+      let process = spawn('php', args);
+      process.on('close', (code) => {
+        if (code !== 0) {
+          reject('Unable to create package. Closed with code ' + code + '.');
+        } else {
+          resolve(dir + '.zip');
+        }
+      });
+    });
+  }
+
   _createWebsiteJSON(dir, token) {
     return new Promise((resolve, reject) => {
-      fs.writeFile(dir + '/website.json', JSON.stringify({
+      const websiteJSON = {
         websiteName: websiteName,
         websitePushID: websitePushID,
         allowedDomains: allowedDomains,
         urlFormatString: urlFormatString,
         authenticationToken: token,
         webServiceURL: webServiceURL
-      }), (err) => {
+      };
+
+      fs.writeFile(dir + '/website.json', JSON.stringify(websiteJSON), (err) => {
         if (err) {
           reject(err);
-        } else {
-          resolve(dir);
-        }
-      });
-    });
-  }
-
-  _createManifest(dir) {
-    return new Promise((resolve, reject) => {
-      let manifest = {};
-
-      // read iconset directory
-      fs.readdir(iconsetPath, (err, files) => {
-        if (err) {
-          reject(err);
-        } else {
-          // create hash for website.json
-          let hash = crypto.createHash('SHA1');
-          hash.setEncoding('hex');
-          hash.write(fs.readFileSync(dir + '/' + 'website.json'));
-          hash.end();
-          manifest['website.json'] = hash.read();
-
-          // create hashes for iconset
-          files.forEach((file) => {
-            let hash = crypto.createHash('SHA1');
-            hash.setEncoding('hex');
-            hash.write(fs.readFileSync(iconsetPath + '/' + file));
-            hash.end();
-            manifest['icon.iconset/' + file] = hash.read();
-          });
-
-          // write manifest to file
-          fs.writeFile(dir + '/manifest.json', JSON.stringify(manifest), (err) => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve(dir);
-            }
-          });
-        }
-      });
-    });
-  }
-
-  _createSignature(dir) {
-    return new Promise((resolve, reject) => {
-      const cert = certPath + '/cert.pem';
-      const key = certPath + '/key.pem';
-      const intermediate = certPath + '/intermediate.pem';
-      const manifest = dir + '/manifest.json';
-      const signature = dir + '/signature';
-
-      const args = [
-        'smime', '-sign', '-binary',
-        '-in', manifest,
-        '-out', signature,
-        '-outform', 'DER',
-        '-signer', cert,
-        '-inkey', key,
-        '-certfile', intermediate,
-        '-passin', 'pass:' + password
-      ];
-
-      let process = spawn('openssl', args);
-      process.on('close', (code) => {
-        if (code !== 0) {
-          reject('Unable to create signature. Exited with code ' + code + '.');
         } else {
           resolve(dir);
         }
@@ -214,24 +189,11 @@ class Service {
   }
 
   cleanTempDir(req, res) {
-    this._deleteFolderRecursive(req.tempDir);
-
+    fs.removeSync(req.tempDir);
+    fs.removeSync(req.tempDir + '.zip');
     if (res.errorMessage) {
+      fs.appendFile(publicPath + '/apn.log', '[' + (new Date()).toISOString() + '] Failed to delete ' + req.tempDir + '\n');
       res.status(500).send(res.errorMessage);
-    }
-  }
-
-  _deleteFolderRecursive(path) {
-    if (fs.existsSync(path)) {
-      fs.readdirSync(path).forEach(function(file) {
-        let curPath = path + '/' + file;
-        if (fs.statSync(curPath).isDirectory()) {
-          this._deleteFolderRecursive(curPath);
-        } else {
-          fs.unlinkSync(curPath);
-        }
-      });
-      fs.rmdirSync(path);
     }
   }
 }
@@ -249,11 +211,13 @@ module.exports = function(){
     service.checkAuthorizationHeader,
     service.delete);
 
-  app.post('/:version/pushPackage/:websitePushID',
+  app.post('/:version/pushPackages/:websitePushID',
     service.checkWebsitePushID,
     service.createPushPackage,
     service.cleanTempDir
   );
+
+  app.post('/:version/log', service.log);
 };
 
 module.exports.Service = new Service();

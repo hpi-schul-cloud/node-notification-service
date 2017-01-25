@@ -13,7 +13,7 @@ exports.before = {
   create: [Auth.userAuthHook()],
   update: [],
   patch: [],
-  remove: []
+  // remove: []
 };
 
 exports.after = {
