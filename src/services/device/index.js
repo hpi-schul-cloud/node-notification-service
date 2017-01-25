@@ -5,6 +5,7 @@ const user = require('../user/user-model');
 const Resolve = require('../resolve');
 const errors = require('feathers-errors');
 const Authentication = require('../authentication');
+const Constants = require('../constants');
 
 const docs = require('./docs.json');
 
@@ -26,7 +27,7 @@ class Service {
       service: data.service,
       name: data.name,
       OS: data.OS,
-      state: 'registered'
+      state: Constants.DEVICE_STATES.REGISTERED
     };
 
     let newUser = new user({
