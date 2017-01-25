@@ -10,88 +10,109 @@
 <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
 <script src="javascript/send.js"> </script>
 
-<h1>Send a message to clients</h1>
-<form id="send-request">
-  <label for="sender">Sender:
-    <input id="sender" name="sender" ng-model="sender">
-  </label>
-  <br>
-  <label for="target">Target:
-    <input id="target" name="target">
-  </label>
-  <br>
-  <label for="title">Title:
-    <input id="title" name="title" ng-model="data.title">
-  </label>
-  <br> <br>
-  <textarea maxlength="160" rows="4" cols="50" ng-model="data.body">This is a generic sample message so we don't have to type one for every test.
-  </textarea>
-  <br>
-  <button type="button" name="Submit" ng-click="sendRequest()">Send message</button>
-</form>
+<div id="wrapper">
 
-<div ng-if="error">
-{{response}}</div>
-<div ng-else>
-  {{response}}
+  <div class="send">
 
-  <div ng-hide="hide">
-    <table>
-      <tr>
-        <th>Name</th>
-        <th>Value</th>
-      </tr>
-      <tr>
-        <td>Title</td>
-        <td>{{response.data.title}}</td>
-      </tr>
-      <tr>
-        <td>Body</td>
-        <td>{{response.data.body}}</td>
-      </tr>
-      <tr>
-        <td>id</td>
-        <td>{{response.data._id}}</td>
-      </tr>
-      <tr>
-        <td>Updated At</td>
-        <td>{{response.data.updatedAt}}</td>
-      </tr>
-      <tr>
-        <td>Created At</td>
-        <td>{{response.data.createdAt}}</td>
-      </tr>
-      <tr>
-        <td>user Ids</td>
-        <td>{{response.data.userIds}}</td>
-      </tr>
-    </table>
+  <h1>Send a message to clients</h1>
+  <form id="send-request">
+    <label for="sender">Sender:
+      <input id="sender" name="sender" ng-model="sender">
+    </label>
     <br>
+    <label for="target">Target:
+      <input id="target" name="target">
+    </label>
+    <br>
+    <label for="title">Title:
+      <input id="title" name="title" ng-model="data.title">
+    </label>
+    <br> <br>
+    <textarea maxlength="160" rows="4" cols="50" ng-model="data.body">This is a generic sample message so we don't have to type one for every test.
+    </textarea>
+    <br>
+    <button type="button" name="Submit" ng-click="sendRequest()">Send message</button>
+  </form>
+
+  <div ng-if="error">
+  {{response}}</div>
+  <div ng-else>
+    {{response}}
+
+    <div ng-hide="hide">
+      <table>
+        <tr>
+          <th>Name</th>
+          <th>Value</th>
+        </tr>
+        <tr>
+          <td>Title</td>
+          <td>{{response.data.title}}</td>
+        </tr>
+        <tr>
+          <td>Body</td>
+          <td>{{response.data.body}}</td>
+        </tr>
+        <tr>
+          <td>id</td>
+          <td>{{response.data._id}}</td>
+        </tr>
+        <tr>
+          <td>Updated At</td>
+          <td>{{response.data.updatedAt}}</td>
+        </tr>
+        <tr>
+          <td>Created At</td>
+          <td>{{response.data.createdAt}}</td>
+        </tr>
+        <tr>
+          <td>user Ids</td>
+          <td>{{response.data.userIds}}</td>
+        </tr>
+      </table>
+      <br>
+
+    </div>
+  </div>
+  </div>
+
+  <div class="research">
     <form id="search-request">
       <label for="messageId">Message Id: <br>
         <input id="messageId" name="messageId" type="text" ng-model="receivedId">
       </label>
-      <button type="button" name="Submit" ng-click="researchID()">Research Id</button>
+      <button type="submit" name="Submit" ng-click="researchID()">Research Id</button>
     </form>
 
     <div ng-if="idResponse.status == 200">
-      Message was successfully transmitted.
+
       {{idResponse}}
+      {{range}}
+
+        <tr>
+          <th>User</th>
+          <th>Status</th>
+        </tr>
+      <div ng-repeat="notification in idResponse.data">
+        <table>
+          <tr>
+            <td>{{notification.user}}</td>
+            <td>{{notification.clicked}}</td>
+        </tr>
+      </table>
     </div>
+
+
     <div ng-show="idResponse" ng-if="idResponse.status != 200">
       Message Error.
     </div>
 
-    <div data-ng-repeat="i in range">
-      <tr>
-        <td>{{idResponse.data[i].user}}</td>
-        <td>{{idResponse.data[i].status}}</td>
-      </tr>
+
 
     </div>
   </div>
-</div>
 
+</div>
 
 </body>
 </html>
