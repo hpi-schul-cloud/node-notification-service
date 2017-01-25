@@ -1,7 +1,7 @@
 'use strict';
 
-const chai = require('chai');
-const should = chai.should();
+const assert = require('assert');
+
 const util = require('../src/services/util');
 
 describe('util class', function() {
@@ -13,20 +13,20 @@ describe('util class', function() {
   const def = 'yeah';
 
   it('checks if any object in array is set', () => {
-    util.isAnySet(array1).should.be.true;
-    util.isAnySet(array2).should.to.be.false;
-    util.isAnySet(array3).should.to.be.true;
+    assert.equal(util.isAnySet(array1), true);
+    assert.equal(util.isAnySet(array2), false);
+    assert.equal(util.isAnySet(array3), true);
   });
 
   it('checks if all objects in array is set', () => {
-    util.isAllSet(array1).should.be.false;
-    util.isAllSet(array2).should.to.be.false;
-    util.isAllSet(array3).should.to.be.true;
+    assert.equal(util.isAllSet(array1), false);
+    assert.equal(util.isAllSet(array2), false);
+    assert.equal(util.isAllSet(array3), true);
   });
 
   it('checks an object is set', () => {
-    util.isSet(undef).should.be.false;
-    util.isSet(def).should.to.be.true;
+    assert.equal(util.isSet(undef), false);
+    assert.equal(util.isSet(def), true);
   });
 
 });

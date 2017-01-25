@@ -61,9 +61,9 @@ describe('device service', () => {
         'device_token': 'testToken',
         'OS': 'android7'
       })
-      .catch(function(res) {
-        res.code.should.equal(401);
-      });
+        .catch(function(res) {
+          assert.equal(res.code, 401);
+        });
     });
 
     it('calls the service two times with the same device token', () => {
@@ -76,7 +76,7 @@ describe('device service', () => {
           res.devices.forEach((device) => {
             if (device.token === validPayload.device_token) i++;
           });
-          i.should.equal(1);
+          assert.equal(i, 1);
         });
     });
 
@@ -91,7 +91,7 @@ describe('device service', () => {
           res.devices.forEach((device) => {
             if (device.token === validPayload.device_token) i++;
           });
-          i.should.equal(1);
+          assert.equal(i, 1);
         });
     });
 

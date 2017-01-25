@@ -1,7 +1,6 @@
 'use strict';
 
 const assert = require('assert');
-const expect = require('chai').expect;
 const app = require('../../../src/app');
 
 describe('message service', function() {
@@ -19,11 +18,8 @@ describe('message service', function() {
         'testScopeId'
       ]
     })
-    .then(res => {
-      expect(res).not.to.exist;
-    })
     .catch(err => {
-      expect(err.code).to.equal(401);
+      assert.equal(err.code, 401);
     });
   });
 
@@ -39,10 +35,7 @@ describe('message service', function() {
       ]
     })
     .then(res => {
-      expect(res.code).to.equal(201);
-    })
-    .catch(err => {
-      expect(err).not.to.exist;
+      assert.equal(res.code, 201);
     });
   });
 
@@ -55,11 +48,8 @@ describe('message service', function() {
         '316866a2-41c3-444b-b82c-274697c546a0'
       ]
     })
-    .then(res => {
-      expect(res.code).to.be.above(399);
-    })
     .catch(err => {
-      expect(err.code).to.be.above(399);
+      assert.equal(err.code, 400);
     });
   });
 
@@ -72,11 +62,8 @@ describe('message service', function() {
         '316866a2-41c3-444b-b82c-274697c546a0'
       ]
     })
-    .then(res => {
-      expect(res).not.to.exist;
-    })
     .catch(err => {
-      expect(err.code).to.equal(403);
+      assert.equal(err.code, 403);
     });
   });
 
@@ -89,11 +76,8 @@ describe('message service', function() {
         '8b0753ab-6fa8-4f42-80bd-700fe8f7d66d'
       ]
     })
-    .then(res => {
-      expect(res).not.to.exist;
-    })
     .catch(err => {
-      expect(err.code).to.equal(403);
+      assert.equal(err.code, 403);
     });
   });
 
@@ -109,12 +93,8 @@ describe('message service', function() {
         '316866a2-41c3-444b-b82c-274697c546a0'
       ]
     })
-    .then(res => {
-      expect(res.code).to.not.exist;
-    })
     .catch(err => {
-      expect(err.code).to.equal(400);
-
+      assert.equal(err.code, 400);
     });
   })
 

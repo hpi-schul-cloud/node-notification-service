@@ -1,13 +1,11 @@
 'use strict';
 
-const chai = require('chai');
-const rp = require('request-promise');
-const should = chai.should();
-
+const assert = require('assert');
+const requestPromise = require('request-promise');
 const app = require('../src/app');
 
-const port = 3131;
-const host = 'http://localhost:' + port;
+const port = app.get('port');
+const host = app.get('protocol') + '://' + app.get('host') + ':' + port;
 
 describe('Swagger documentation', function() {
 
@@ -21,12 +19,9 @@ describe('Swagger documentation', function() {
   });
 
   it('displays Swagger UI', () => {
-    return rp(host + '/docs')
+    return requestPromise(host + '/docs')
       .then((htmlString) => {
-        htmlString.should.include('swagger');
-      })
-      .catch((err) => {
-        err.should.not.be.ok;
+        assert(htmlString.indexOf('swagger') !== -1);
       });
   });
 
