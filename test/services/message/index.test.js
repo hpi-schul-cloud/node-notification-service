@@ -114,7 +114,7 @@ describe('message service', function() {
       expect(res.code).to.not.exist;
     })
     .catch(err => {
-      expect(err.code).to.equal(400);
+      expect(err.code).to.equal(401);
     });
   })
 
