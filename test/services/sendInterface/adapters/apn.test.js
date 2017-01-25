@@ -2,6 +2,7 @@
 
 const expect = require('chai').expect;
 const sinon = require('sinon');
+const constants = require('../../../../src/services/constants');
 const apn = require('../../../../src/services/sendInterface/adapters/apn');
 const apnMock = require('apn/mock');
 
@@ -43,7 +44,7 @@ describe('apn service adapter', function() {
           title: 'test',
           body: 'test'
         },
-        priority: 'high'
+        priority: constants.MESSAGE_PRIORITIES.HIGH
       },
       {
         _id: 'mockNotificationId2',
@@ -51,7 +52,7 @@ describe('apn service adapter', function() {
           title: 'test',
           body: 'test'
         },
-        priority: 'high'
+        priority: constants.MESSAGE_PRIORITIES.HIGH
       },
       {
         _id: 'mockNotificationId3',
@@ -59,23 +60,23 @@ describe('apn service adapter', function() {
           title: 'test',
           body: 'test'
         },
-        priority: 'high'
+        priority: constants.MESSAGE_PRIORITIES.HIGH
       }
     ];
     let devices = [
       {
         _id: 'mockDeviceId',
-        service: 'apn',
+        service: constants.SEND_SERVICES.APN,
         token: '98508ab0dcd490ec2811bbaaf956d8250da89754c193fed3f4af5929ed8da8f2'
       },
       {
         _id: 'mockDeviceId2',
-        service: 'apn',
+        service: constants.SEND_SERVICES.APN,
         token: 'da89754c193fed3f4af59baaf956d82508508ab0dcd490ec2811b929ed8da8f2'
       },
       {
         _id: 'mockDeviceId3',
-        service: 'apn',
+        service: constants.SEND_SERVICES.APN,
         token: '18508ab0dcd40da89754c193fed3f4af5929ed8da8f290ec2811bbaaf956d825'
       }
     ];
@@ -115,13 +116,13 @@ describe('apn service adapter', function() {
           title: 'test',
           body: 'test'
         },
-        priority: 'high'
+        priority: constants.MESSAGE_PRIORITIES.HIGH
       }
     ];
     let devices = [
       {
         _id: 'mockDeviceId',
-        service: 'apn',
+        service: constants.SEND_SERVICES.APN,
         token: '2FEA7FF49957A07378639C51E9345C9A3055488316A4638D31C8E06D8CF7CC43'
       }
     ];

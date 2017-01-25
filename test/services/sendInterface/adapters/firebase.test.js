@@ -4,6 +4,7 @@ const expect = require('chai').expect;
 const assert = require('assert');
 const sinon = require('sinon');
 const firebase = require('../../../../src/services/sendInterface/adapters/firebase');
+const constants = require('../../../../src/services/constants');
 
 describe('firebase service adapter', function() {
 
@@ -26,7 +27,7 @@ describe('firebase service adapter', function() {
     }];
     let devices = [{
       _id: 'mockDeviceId',
-      service: 'firebase',
+      service: constants.SEND_SERVICES.FIREBASE,
       token: ''
     }];
 
@@ -61,7 +62,7 @@ describe('firebase service adapter', function() {
     }];
     let devices = [{
       _id: 'mockDeviceId',
-      service: 'firebase',
+      service: constants.SEND_SERVICES.FIREBASE,
       token: ''
     }];
 
@@ -89,7 +90,7 @@ describe('firebase service adapter', function() {
     let devices = [
       {
         _id: 'mockDeviceId',
-        service: 'firebase',
+        service: constants.SEND_SERVICES.FIREBASE,
         token: 'ezz1Dl1-d6M:APA91bEyUgSReqXCFXlHfaASkT3ZFIp7bBkJ-H8Fxc9zcwdVGOsSTR7Zkq8PegpVQTMrdsn0xA053HN8xzP3Icbple6Oq4NY7G7g2FUnlbZm-6Rvz7hElZK2OpARHoa2Rb6_5KmKGppG'
       }
     ];

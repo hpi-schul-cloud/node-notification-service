@@ -1,5 +1,6 @@
 'use strict';
 const config = require('../../../../secure/config.json').sendServices.apn;
+const constants = require('../../constants');
 const apn = require('apn');
 const errors = require('feathers-errors');
 
@@ -29,7 +30,7 @@ class ApnAdapter {
     message.urlArgs = ['index.php']; // TODO: set this to something meaningful
     message.title = notification.message.title;
     message.body = notification.message.body;
-    message.priority = notification.priority === 'high' ? 10 : 5;
+    message.priority = notification.priority === constants.MESSAGE_PRIORITIES.HIGH ? 10 : 5;
     // UNIX epoch time in seconds
     // message.expiry = Math.floor(expiration.getTime()/1000);
     // Can be used to send silent notifications

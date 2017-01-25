@@ -2,6 +2,7 @@
 
 const assert = require('assert');
 const request = require('request');
+const constants = require('../../../src/services/constants');
 const app = require('../../../src/app');
 
 describe('device service', () => {
@@ -15,8 +16,8 @@ describe('device service', () => {
     });
 
     const validPayload = {
-      'service': 'firebase',
-      'type': 'mobile',
+      'service': constants.SEND_SERVICES.FIREBASE,
+      'type': constants.DEVICE_TYPES.MOBILE,
       'name': 'test2',
       'user_token': 'usertoken2',
       'service_token': 'testToken',
@@ -32,8 +33,8 @@ describe('device service', () => {
 
     it('call with unknown token', () => {
       return app.service('devices').create({
-        'service': 'firebase',
-        'type': 'mobile',
+        'service': constants.SEND_SERVICES.FIREBASE,
+        'type': constants.DEVICE_TYPES.MOBILE,
         'name': 'test2',
         'user_token': 'ungültig',
         'service_token': 'testToken',

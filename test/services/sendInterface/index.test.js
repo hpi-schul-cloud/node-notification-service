@@ -4,6 +4,7 @@ const assert = require('assert');
 const sinon = require('sinon');
 const sendInterface = require('../../../src/services/sendInterface/index');
 const firebase = require('../../../src/services/sendInterface/adapters/firebase');
+const constants = require('../../../src/services/constants');
 
 describe('sendInterface service', function() {
   it('registered the sendInterfaces service', () => {
@@ -45,7 +46,7 @@ describe('sendInterface service', function() {
     }];
     let devices = [{
       _id: 'mockDeviceId',
-      service: 'firebase',
+      service: constants.SEND_SERVICES.FIREBASE,
       token: ''
     }];
     return sendInterface.send(notifications, devices)
@@ -75,7 +76,7 @@ describe('sendInterface service', function() {
   //   }];
   //   let devices = [{
   //     _id: 'mockDeviceId',
-  //     service: 'firebase',
+  //     service: constants.SEND_SERVICES.FIREBASE,
   //     token: ''
   //   }];
   //   sendInterface.send(notifications, devices)
