@@ -68,16 +68,16 @@ class FirebaseAdapter {
 
     // additional data
     if (notification.message.data) {
-      message.data.senderData = notification.messsage.data
+      message.data.senderData = notification.message.data
     }
 
     // TODO: message.action = notification.action;
-    message.priority = notification.priority === constants.MESSAGE_PRIORITIES.HIGH ? FIREBASE_PRIORITIES.HIGH : FIREBASE_PRIORITIES.MEDIUM;
+    message.priority = notification.message.priority === constants.MESSAGE_PRIORITIES.HIGH ? FIREBASE_PRIORITIES.HIGH : FIREBASE_PRIORITIES.MEDIUM;
 
     // TODO: evaluate usage for escalation to avoid multiple notifications
     // seconds the message is kept on the server if it was not possible to push it immediately
-    if (notification.timeToLive) {
-      const timeDifference = (new Date()).getTime() - notification.timeToLive.getTime();
+    if (notification.message.timeToLive) {
+      const timeDifference = (new Date()).getTime() - notification.message.timeToLive.getTime();
       message.timeToLive = Math.floor(timeDifference / 1000);
     }
 

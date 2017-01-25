@@ -36,7 +36,7 @@ class ApnAdapter {
     message.title = notification.message.title;
     message.body = notification.message.body;
     message.payload.senderData = notification.message.data;
-    message.priority = notification.priority === constants.MESSAGE_PRIORITIES.HIGH ? APN_PRIORITIES.HIGH : APN_PRIORITIES.MEDIUM;
+    message.priority = notification.message.priority === constants.MESSAGE_PRIORITIES.HIGH ? APN_PRIORITIES.HIGH : APN_PRIORITIES.MEDIUM;
     // UNIX epoch time in seconds
     if (notification.message.timeToLive) {
       message.expiry = Math.floor(notification.message.timeToLive.getTime() / 1000);

@@ -60,7 +60,10 @@ describe('firebase service adapter', function() {
       message: {
         title: 'test',
         body: 'test',
-        timeToLive: timeToLive
+        timeToLive: timeToLive,
+        data: {
+          some: 'data'
+        }
       }
     }];
     let devices = [{
