@@ -10,7 +10,6 @@
 // Add a table for devices
 
 const mongoose = require('mongoose');
-const messageModel = require('../message/message-model.js');
 const Schema = mongoose.Schema;
 
 const deviceSchema = new Schema({
