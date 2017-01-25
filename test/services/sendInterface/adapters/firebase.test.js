@@ -1,6 +1,5 @@
 'use strict';
 
-const expect = require('chai').expect;
 const assert = require('assert');
 const sinon = require('sinon');
 const firebase = require('../../../../src/services/sendInterface/adapters/firebase');
@@ -111,7 +110,7 @@ describe('firebase service adapter', function() {
 
     return firebase.send(notifications, devices)
       .then(response => {
-        expect(response).to.deep.equal(expected);
+        assert.deepEqual(response, expected);
       });
   });
 
