@@ -113,8 +113,8 @@ describe('message service', function() {
       expect(res.code).to.not.exist;
     })
     .catch(err => {
-      console.log('[BIG PAYLOAD] ' + JSON.stringify(err));
       expect(err.code).to.equal(400);
+
     });
   })
 
