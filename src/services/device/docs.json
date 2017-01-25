@@ -56,5 +56,36 @@
          "description": "internal error try again later."
        }
      }
-   }
+   },
+  "remove": {
+    "summary": "Remove a new Device",
+    "description": "TODO",
+    "parameters": [
+      {
+        "name": "id",
+        "in": "path",
+        "description": "token of the device to delete",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "name": "user_token",
+        "in": "query",
+        "description": "Schul-Cloud SSO Token",
+        "required": true,
+        "type": "string"
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Device was removed"
+      },
+      "400": {
+        "description": "The Provided payload is either incomplete or one or more values are invalid"
+      },
+      "500": {
+        "description": "internal error try again later."
+      }
+    }
+  }
 }

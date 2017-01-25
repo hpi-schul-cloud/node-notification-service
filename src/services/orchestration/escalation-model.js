@@ -8,17 +8,11 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const Util = require("../util.js");
-const Constants = require("../constants.js");
+const Util = require('../util.js');
+const Constants = require('../constants.js');
 
 const escalationSchema = new Schema({
   notification: {type: String, ref: 'notification', required: true},
-  priority: {
-    type: String,
-    enum: Util.getEnumValues(Constants.MESSAGE_PRIORITIES),
-    default: Constants.MESSAGE_PRIORITIES.MEDIUM,
-    required: true
-  },
   nextEscalationType: {
     type: String,
     enum: Util.getEnumValues(Constants.DEVICE_TYPES),

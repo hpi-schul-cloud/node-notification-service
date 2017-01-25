@@ -1,7 +1,7 @@
 'use strict';
 
 const chai = require('chai');
-var rp = require('request-promise');
+const rp = require('request-promise');
 const should = chai.should();
 
 const app = require('../src/app');

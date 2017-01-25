@@ -17,7 +17,9 @@ describe('apn service adapter', function() {
     // Since we want to define the response we "mock" the send function again
     let stub = sinon.stub(apn.apnProvider, 'send', (notification, recipients) => {
       return Promise.resolve({
-        sent: ['da89754c193fed3f4af59baaf956d82508508ab0dcd490ec2811b929ed8da8f2'],
+        sent: [{
+          device: 'da89754c193fed3f4af59baaf956d82508508ab0dcd490ec2811b929ed8da8f2'
+        }],
         failed: [
           {
             device: '98508ab0dcd490ec2811bbaaf956d8250da89754c193fed3f4af5929ed8da8f2',
@@ -101,6 +103,39 @@ describe('apn service adapter', function() {
         expect(stub.called).to.be.true;
         apn.apnProvider.send.restore();
 
+        expect(response).to.deep.equal(expected);
+      });
+  });
+
+  it.skip('send real message', function() {
+    let notifications = [
+      {
+        _id: 'mockNotificationId',
+        message: {
+          title: 'test',
+          body: 'test'
+        },
+        priority: 'high'
+      }
+    ];
+    let devices = [
+      {
+        _id: 'mockDeviceId',
+        service: 'apn',
+        token: '2FEA7FF49957A07378639C51E9345C9A3055488316A4638D31C8E06D8CF7CC43'
+      }
+    ];
+    let expected = {
+      success: 1,
+      failure: 0,
+      results: [{
+        notificationId: 'mockNotificationId',
+        deviceId: 'mockDeviceId'
+      }]
+    };
+
+    return apn.send(notifications, devices)
+      .then(response => {
         expect(response).to.deep.equal(expected);
       });
   });

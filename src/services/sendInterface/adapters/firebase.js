@@ -55,7 +55,8 @@ class FirebaseAdapter {
       // we can not call this attribute 'notification' - phonegap will fail
       news: {
         title: notification.message.title,
-        body: notification.message.body
+        body: notification.message.body,
+        img: notification.message.image
       }
     };
 

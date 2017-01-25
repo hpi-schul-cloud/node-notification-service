@@ -15,6 +15,10 @@
            "type": "string",
            "description": "Body of the Notification"
          },
+         "image": {
+           "type": "string",
+           "description": "Url to the image that is shown in the notification"
+         },
          "action": {
            "type": "string",
            "description": "Action to be done when the user clicks the notification"
