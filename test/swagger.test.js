@@ -1,6 +1,7 @@
 'use strict';
 
-const rp = require('request-promise');
+const assert = require('assert');
+const requestPromise = require('request-promise');
 const app = require('../src/app');
 
 const port = app.get('port');
@@ -18,9 +19,9 @@ describe('Swagger documentation', function() {
   });
 
   it('displays Swagger UI', () => {
-    return rp(host + '/docs')
+    return requestPromise(host + '/docs')
       .then((htmlString) => {
-        htmlString.should.include('swagger');
+        assert(htmlString.indexOf('swagger') !== -1);
       });
   });
 

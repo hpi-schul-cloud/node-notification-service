@@ -60,7 +60,7 @@ describe('device service', () => {
         'OS': 'android7'
       })
         .catch(function(res) {
-          res.code.should.equal(403);
+          assert.equal(res.code, 403);
         });
     });
 
@@ -74,7 +74,7 @@ describe('device service', () => {
           res.devices.forEach((device) => {
             if (device.token === validPayload.service_token) i++;
           });
-          i.should.equal(1);
+          assert.equal(i, 1);
         });
     });
 
@@ -89,7 +89,7 @@ describe('device service', () => {
           res.devices.forEach((device) => {
             if (device.token === validPayload.service_token) i++;
           });
-          i.should.equal(1);
+          assert.equal(i, 1);
         });
     });
 
