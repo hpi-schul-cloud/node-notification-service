@@ -1,10 +1,8 @@
 'use strict';
 
-const service = require('feathers-mongoose');
 const Message = require('./message-model');
 const hooks = require('./hooks');
 const errors = require('feathers-errors');
-const Util = require('../util');
 const Resolve = require('../resolve');
 const Orchestration = require('../orchestration');
 const Notification = require('../notification/notification-model');
