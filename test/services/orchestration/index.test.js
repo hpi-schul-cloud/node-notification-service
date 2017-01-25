@@ -27,17 +27,7 @@ function createEscalation() {
   return notification.save().then(escalation.save);
 }
 
-
 describe('orchestration service', () => {
-
-  beforeEach(() => {
-    return User.remove({});
-  });
-
-  beforeEach(() => {
-    return Escalation.remove({});
-  });
-
 
   it('did not register the orchestration service', () => {
     assert.ok(!app.service('orchestration'));
