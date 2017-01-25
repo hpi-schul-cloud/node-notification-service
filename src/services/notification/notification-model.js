@@ -16,7 +16,7 @@ const callbackSchema = new Schema({
 });
 
 const deviceSchema = new Schema({
-  deviceName: { type: String, required: true},
+  deviceId: { type: String, required: true},
   status: {type: String},
   timestamp: {type: Date}
 });
