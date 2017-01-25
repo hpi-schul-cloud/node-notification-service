@@ -4,6 +4,11 @@ const constants = require('../../constants');
 const firebase = require('node-gcm');
 const errors = require('feathers-errors');
 
+const FIREBASE_PRIORITIES = {
+  HIGH: 'high',
+  MEDIUM: 'normal'
+}
+
 class FirebaseAdapter {
   constructor() {
     this.firebaseSender = new firebase.Sender(config.serverToken);
@@ -67,7 +72,7 @@ class FirebaseAdapter {
     }
 
     // TODO: message.action = notification.action;
-    message.priority = notification.priority === constants.MESSAGE_PRIORITIES.HIGH ? 'high' : 'normal';
+    message.priority = notification.priority === constants.MESSAGE_PRIORITIES.HIGH ? FIREBASE_PRIORITIES.HIGH : FIREBASE_PRIORITIES.MEDIUM;
 
     // TODO: evaluate usage for escalation to avoid multiple notifications
     // seconds the message is kept on the server if it was not possible to push it immediately
