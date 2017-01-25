@@ -38,7 +38,9 @@ class ApnAdapter {
     message.payload.senderData = notification.message.data;
     message.priority = notification.priority === constants.MESSAGE_PRIORITIES.HIGH ? APN_PRIORITIES.HIGH : APN_PRIORITIES.MEDIUM;
     // UNIX epoch time in seconds
-    // message.expiry = Math.floor(expiration.getTime()/1000);
+    if (notification.message.timeToLive) {
+      message.expiry = Math.floor(notification.message.timeToLive.getTime() / 1000);
+    }
     // Can be used to send silent notifications
     // message.contentAvailable = 1;
 

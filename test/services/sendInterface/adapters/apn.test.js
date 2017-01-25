@@ -37,12 +37,15 @@ describe('apn service adapter', function() {
       });
     });
 
+    let timeToLive = new Date();
+    timeToLive.setMilliseconds(timeToLive.getMilliseconds() + 600000);
     let notifications = [
       {
         _id: 'mockNotificationId',
         message: {
           title: 'test',
-          body: 'test'
+          body: 'test',
+          timeToLive: timeToLive
         },
         priority: constants.MESSAGE_PRIORITIES.HIGH
       },

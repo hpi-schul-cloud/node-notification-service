@@ -76,7 +76,10 @@ class FirebaseAdapter {
 
     // TODO: evaluate usage for escalation to avoid multiple notifications
     // seconds the message is kept on the server if it was not possible to push it immediately
-    // message.timeToLive = notification.timeToLive; // TODO: parse correctly
+    if (notification.timeToLive) {
+      const timeDifference = (new Date()).getTime() - notification.timeToLive.getTime();
+      message.timeToLive = Math.floor(timeDifference / 1000);
+    }
 
     return new firebase.Message(message);
   }
