@@ -21,7 +21,7 @@
          },
          "action": {
            "type": "string",
-           "description": "Action to be done whenpmn the user clicks the notification"
+           "description": "Action to be done when the user clicks the notification"
          },
          "data": {
            "type": "object",
