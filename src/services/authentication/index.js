@@ -18,25 +18,19 @@ class Authentication {
             response.data = response.data[0];
 
           console.log('[AUTHENTICATION] token is valid');
-
-          var authorities = [];
-
-          if (response.data.attributes.canWrite)
-            authorities.push('canWrite');
-
-          if (response.data.attributes.canRead)
-            authorities.push('canRead');
-
+          hook.data.schulcloudId = response.data.id;
+          hook.data.type = response.data.type;
           console.log('[AUTHENTICATION] assigned ' + response.data.id + ' to request');
 
-          hook.data.schulcloudId = response.data.id;
-          // hook.data.authorities = response.data.authorities;    in the future, when authorities are directly provided
-          hook.data.authorities = authorities;
+          return Promise.resolve(hook);
 
+        })
+        .catch(err => {
+          return Promise.reject(new errors.NotAuthenticated('user or service token is invalid'));
         });
 
       } else {
-        return Promise.reject(new errors.BadRequest('auth token missing'));
+        return Promise.reject(new errors.BadRequest('user or service token missing'));
       }
     }
   }

@@ -11,12 +11,15 @@ class Authorization {
 
     return function(hook) {
 
-      console.log(hook.data.authorities);
-      let q = (hook.data.authorities.indexOf(constants.AUTHORITIES.CAN_SEND) > -1)
-
-      console.log(q ?'[AUTHORIZATION] account can send' : '[AUTHORIZATION] account can not send')
-
-      return q ? Promise.resolve(hook) : Promise.reject(errors.Forbidden('can not send'));
+      return Resolve.verifyScopes(hook.data.token).then(result => {
+        let matches = result.data.filter(scope => {
+          if (hook.data.scopeIds.includes(scope.id) && scope.attributes.authorities.includes(constants.AUTHORITIES.CAN_SEND_NOTIFICATIONS)) return true;
+        })
+        if (matches.length === hook.data.scopeIds.length)
+          return Promise.resolve(hook);
+        else
+          return Promise.reject(new errors.Forbidden('User is not allowed to send to all defined scopes'));
+      })
 
     }
   }
@@ -26,9 +29,10 @@ class Authorization {
     return function(hook) {
 
       let q = (hook.data.type === 'user')
+
       console.log(q ?'[AUTHORIZATION] it is a user' : '[AUTHORIZATION] it is not a user')
 
-      return q ? Promise.resolve(hook) : Promise.reject(errors.Forbidden('is not a user'));
+      return q ? Promise.resolve(hook) : Promise.reject(new errors.Forbidden('is not a user'));
 
     }
   }

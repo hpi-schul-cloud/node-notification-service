@@ -17,7 +17,7 @@ describe('apnDevice service', function() {
   it('registers a valid device', () => {
     return request(app)
       .post('/v1/devices/theDeviceToken/registrations/web.org.schul-cloud')
-      .set('authorization', 'ApplePushNotifications usertoken2')
+      .set('authorization', 'ApplePushNotifications student1_1')
       .send({})
       .expect(201);
   });
@@ -34,7 +34,7 @@ describe('apnDevice service', function() {
     // TODO: not yet implemented by device service
     return request(app)
       .delete('/v1/devices/theDeviceToken/registrations/web.org.schul-cloud')
-      .set('authorization', 'ApplePushNotifications usertoken2')
+      .set('authorization', 'ApplePushNotifications student1_1')
       .send({})
       .expect(200);
   });
@@ -43,7 +43,7 @@ describe('apnDevice service', function() {
     return request(app)
       .post('/v1/pushPackage/web.org.schul-cloud')
       .send({
-        userId: 'usertoken2'
+        userId: 'student1_1'
       })
       .expect(200)
       .expect('Content-Type', /application\/zip/);
@@ -59,7 +59,7 @@ describe('apnDevice service', function() {
   it('fails on invalid authorization header', () => {
     return request(app)
       .post('/v1/devices/theDeviceToken/registrations/web.org.schul-cloud')
-      .set('authorization', 'AppleTypoNotifications usertoken2')
+      .set('authorization', 'AppleTypoNotifications student1_1')
       .send({})
       .expect(500);
   });
@@ -67,7 +67,7 @@ describe('apnDevice service', function() {
   it('fails on invalid websitePushID', () => {
     return request(app)
       .post('/v1/devices/theDeviceToken/registrations/web.com.google')
-      .set('authorization', 'ApplePushNotifications usertoken2')
+      .set('authorization', 'ApplePushNotifications student1_1')
       .send({})
       .expect(400);
   });
@@ -80,7 +80,7 @@ describe('apnDevice service', function() {
     request(app)
       .post('/v1/pushPackage/web.org.schul-cloud')
       .send({
-        userId: 'usertoken2'
+        userId: 'student1_1'
       })
       .end((err, res) => {
         expect(stub.called).to.be.true;
@@ -98,7 +98,7 @@ describe('apnDevice service', function() {
     request(app)
       .post('/v1/pushPackage/web.org.schul-cloud')
       .send({
-        userId: 'usertoken2'
+        userId: 'student1_1'
       })
       .end((err, res) => {
         expect(stub.called).to.be.true;

@@ -5,67 +5,49 @@ const Util = require('../util');
 const rp = require('request-promise');
 const constants = require('../constants');
 
-var options = {
-  uri: 'https://api.github.com/user/repos',
-  json: true
-};
-
-rp(options)
-  .then(function(repos) {
-    console.log('User has %d repos', repos.length);
-  })
-  .catch(function(err) {
-    // API call failed...
-  });
-
-
 class Resolve {
 
   // return schulcloud user ids for given array of user or scope ids
   static resolveScope(ids) {
 
-    let resolved = ids.map((id) => {
-      if (id === 'testScopeId')
-        return ['idFromScope1', 'idFromScope2', 'idFromScope3']
-      else
-        return id;
-    });
+    console.log('[RESOLVE] resolving scopes...')
 
-    resolved = Util.flatten(resolved);
+    if (!Array.isArray(ids)) return Promise.reject(new errors.BadRequest('scope id param has to be an array'));
 
-    return Promise.resolve(resolved);
+    return Promise.all(ids.map(id => {
 
-    //
-    // var userIDs = [];
-    // // Mocking Data
-    // userIDs.push('fsdk23eoce8jrw3oejed');
-    //
-    // return Promise.resolve(userIDs);
+      console.log('[RESOLVE] resolving ' + id);
+      console.log('[RESOLVE] calling ' + constants.CONFIG.RESOLVE_API_ENDPOINT + id);
 
-    // TODO Call Schul-Cloud Server
-    // contactSchulCloud(ids);
+      var options = {
+        uri: constants.CONFIG.RESOLVE_API_ENDPOINT + id,
+        json: true
+      };
+
+      return rp(options);
+    })).then(all => {
+
+      console.log('[RESOLVE] all scopes resolved');
+
+      let allIds = all.map(segment => {
+        console.log('[RESOLVE] '+segment.data.length+' users in scope');
+        return segment.data.map(user => {
+          return user.id;
+        });
+      })
+
+      console.log('[RESOLVE] resolved ids: ' + Util.flatten(allIds));
+
+      return Promise.resolve(Util.flatten(allIds));
+    })
+
   }
 
   // get User ID from schulcloud db by sso Token
-  static verifyToken(ssoToken) {
-
-
-    // const mock = {
-    //   usertoken1: 'useridfürusertoken1',
-    //   usertoken2: 'useridfürusertoken2',
-    //   usertoken3: 'useridfürusertoken3',
-    //   usertokenwithmin16chars: 'useridfürusertoken4',
-    // };
-
-    // return new Promise((resolve, reject) => {
-    //   if (mock[ssoToken])
-    //     resolve(mock[ssoToken]);
-    //   else
-    //     reject(new errors.Forbidden('user token not valid'));
-    // });
+  static verifyToken(token) {
 
     var options = {
-      uri: constants.CONFIG.AUTH_API_ENDPOINT + ssoToken,
+      uri: constants.CONFIG.AUTHENTICATION_API_ENDPOINT + token,
       json: true
     };
 
@@ -73,21 +55,16 @@ class Resolve {
 
   }
 
-  // see if service token is registered with schulcloud db
-  static verifyService(token) {
+  // get scopes for user
+  static verifyScopes(token) {
 
-    const mock = {
-      servicetoken1: 'serviceidfürservicetoken1',
-      servicetoken2: 'serviceidfürservicetoken2',
-      servicetoken3: 'serviceidfürservicetoken3',
+    var options = {
+      uri: constants.CONFIG.AUTHORIZATION_API_ENDPOINT + token,
+      json: true
     };
 
-    return new Promise((resolve, reject) => {
-      if (mock[token])
-        resolve(mock[token]);
-      else
-        reject(new errors.BadRequest('service token not valid'));
-    });
+    return rp(options);
+
   }
 
 

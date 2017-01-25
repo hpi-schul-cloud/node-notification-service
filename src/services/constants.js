@@ -5,12 +5,13 @@ class Constants {
   constructor(options) {
 
     this.CONFIG = {
-      AUTH_API_ENDPOINT : 'https://schulcloud-api-mock.herokuapp.com/api/user/',
-      RESOLVE_API_ENDPOINT : 'https://schulcloud-api-mock.herokuapp.com/api/all_users/'
+      AUTHENTICATION_API_ENDPOINT : 'https://schulcloud-api-mock.herokuapp.com/api/user/',
+      AUTHORIZATION_API_ENDPOINT  : 'https://schulcloud-api-mock.herokuapp.com/api/all_scopes/',
+      RESOLVE_API_ENDPOINT        : 'https://schulcloud-api-mock.herokuapp.com/api/all_users/'
     }
 
     this.AUTHORITIES = {
-      CAN_SEND : 'canWrite'
+      CAN_SEND_NOTIFICATIONS : 'can-send-notifications'
     }
 
     this.CALLBACK_TYPES = {

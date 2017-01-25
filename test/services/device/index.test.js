@@ -18,8 +18,8 @@ describe('device service', () => {
       'service': 'firebase',
       'type': 'mobile',
       'name': 'test2',
-      'user_token': 'usertoken2',
-      'service_token': 'testToken',
+      'token': 'student1_1',
+      'device_token': 'testToken',
       'OS': 'android7'
     }
 
@@ -35,12 +35,12 @@ describe('device service', () => {
         'service': 'firebase',
         'type': 'mobile',
         'name': 'test2',
-        'user_token': 'ungültig',
-        'service_token': 'testToken',
+        'token': 'ungültig',
+        'device_token': 'testToken',
         'OS': 'android7'
       })
       .catch(function(res) {
-        res.code.should.equal(403);
+        res.code.should.equal(401);
       });
     });
 
