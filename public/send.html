@@ -14,14 +14,14 @@
 
   <div class="send">
 
-  <h1>Send a message to clients</h1>
+  <h2>Send a message to clients</h2>
   <form id="send-request">
     <label for="sender">Sender:
-      <input id="sender" name="sender" ng-model="sender">
+      <input id="sender" name="sender" ng-model="data.initiatorId">
     </label>
     <br>
     <label for="target">Target:
-      <input id="target" name="target">
+      <input id="target" name="target" ng-model="data.scopeIds">
     </label>
     <br>
     <label for="title">Title:
@@ -76,7 +76,9 @@
   </div>
   </div>
 
+
   <div class="research">
+    <h2>Research a message</h2>
     <form id="search-request">
       <label for="messageId">Message Id: <br>
         <input id="messageId" name="messageId" type="text" ng-model="receivedId">
@@ -106,9 +108,6 @@
     <div ng-show="idResponse" ng-if="idResponse.status != 200">
       Message Error.
     </div>
-
-
-
     </div>
   </div>
 

@@ -9,6 +9,7 @@ angular.module('sendApp', [])
       title: "Sample Message",
       body: "the long message",
       token: "servicetoken2",
+      initiatorId: "1",
       scopeIds: [
         "useridfürusertoken1"
       ]
