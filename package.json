@@ -44,7 +44,8 @@
     "node-gcm": "^0.14.4",
     "passport": "^0.3.2",
     "serve-favicon": "^2.3.0",
-    "winston": "^2.3.0"
+    "winston": "^2.3.0",
+    "jsonapi-serializer": "latest"
   },
   "devDependencies": {
     "chai": "^3.5.0",

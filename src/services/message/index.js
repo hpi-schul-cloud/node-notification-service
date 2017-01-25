@@ -1,6 +1,7 @@
 'use strict';
 
 const service = require('feathers-mongoose');
+const serializer = require('jsonapi-serializer').Serializer;
 const Message = require('./message-model');
 const hooks = require('./hooks');
 const errors = require('feathers-errors');
@@ -8,6 +9,7 @@ const Util = require('../util');
 const Resolve = require('../resolve');
 const Orchestration = require('../orchestration');
 const Notification = require('../notification/notification-model');
+
 
 const docs = require('./docs.json')
 
@@ -20,7 +22,7 @@ class Service {
 
   get(id, params) {
     console.log('[INFO] get message ' + id);
-    return Message.findOne({ _id: id });
+    return Message.findOne({_id: id});
   }
 
   create(data, params) {
@@ -49,12 +51,27 @@ class Service {
       })
       .then(notifications => {
         return Orchestration.orchestrate(notifications);
-        // resolve(message);
+      })
+      .then(()=> {
+        return Promise.resolve(new serializer('message',{
+          id: '_id',
+          pluralizeType: false,
+          attributes:[
+            'title',
+            'body',
+            'action',
+            'image',
+            'priority',
+            'timeToLive',
+            'initiatorId',
+            'createdAt'
+          ]
+        }).serialize(message));
       })
   }
 }
 
-module.exports = function() {
+module.exports = function () {
   const app = this;
 
   // Initialize our service with any options it requires
