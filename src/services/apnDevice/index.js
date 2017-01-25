@@ -110,14 +110,14 @@ class Service {
     }
 
     // return pregenerated pushpackage
-    if (token === 'usertokenwithmin16chars') {
+    /*if (token === 'usertokenwithmin16chars') {
       res.writeHead(200, {
         'Content-Type': 'application/zip',
         'Content-Disposition': 'attachment; filename=pushPackage.zip'
       });
       fs.createReadStream(__dirname + '/pushPackage.zip').pipe(res);
       return;
-    }
+    }*/
 
     // generate pushpackage on the fly
     fs.mkdtemp(tempPrefix, (err, tempDir) => {
