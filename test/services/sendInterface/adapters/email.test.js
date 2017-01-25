@@ -2,6 +2,7 @@
 
 const assert = require('assert');
 const email = require('../../../../src/services/sendInterface/adapters/email');
+const constants = require('../../../../src/services/constants');
 
 describe('email service adapter', function() {
 
@@ -20,7 +21,7 @@ describe('email service adapter', function() {
     }];
     let devices = [{
       _id: 'mockDeviceId',
-      service: 'email',
+      service: constants.DEVICE_TYPES.EMAIL,
       token: ''
     }];
     let expectedResponse = {

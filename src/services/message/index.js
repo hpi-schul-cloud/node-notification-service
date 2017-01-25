@@ -24,13 +24,10 @@ class Service {
   }
 
   create(data, params) {
-    if (!Util.isAllSet([data.title, data.body, data.token, data.scopeIds]))
-      return Promise.reject(new errors.BadRequest('Parameters missing.'));
-
     let message = new Message(data);
 
     return Resolve
-      .resolveUser(message.scopeIds).then(userIds => {
+      .resolveScope(message.scopeIds).then(userIds => {
         // set resolved userIds
         message.userIds = userIds;
         return message.save()

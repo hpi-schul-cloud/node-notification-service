@@ -1,7 +1,13 @@
 'use strict';
 const config = require('../../../../secure/config.json').sendServices.firebase;
+const constants = require('../../constants');
 const firebase = require('node-gcm');
 const errors = require('feathers-errors');
+
+const FIREBASE_PRIORITIES = {
+  HIGH: 'high',
+  MEDIUM: 'normal'
+}
 
 class FirebaseAdapter {
   constructor() {
@@ -60,12 +66,20 @@ class FirebaseAdapter {
       }
     };
 
+    // additional data
+    if (notification.message.data) {
+      message.data.senderData = notification.message.data
+    }
+
     // TODO: message.action = notification.action;
-    message.priority = notification.priority === 'high' ? 'high' : 'normal';
+    message.priority = notification.message.priority === constants.MESSAGE_PRIORITIES.HIGH ? FIREBASE_PRIORITIES.HIGH : FIREBASE_PRIORITIES.MEDIUM;
 
     // TODO: evaluate usage for escalation to avoid multiple notifications
     // seconds the message is kept on the server if it was not possible to push it immediately
-    // message.timeToLive = notification.timeToLive; // TODO: parse correctly
+    if (notification.message.timeToLive) {
+      const timeDifference = (new Date()).getTime() - notification.message.timeToLive.getTime();
+      message.timeToLive = Math.floor(timeDifference / 1000);
+    }
 
     return new firebase.Message(message);
   }

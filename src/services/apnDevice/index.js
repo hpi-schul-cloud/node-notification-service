@@ -6,6 +6,7 @@ const spawn = require('child_process').spawn;
 const fs = require('fs-extra');
 const crypto = require('crypto');
 const zip = require('express-zip');
+const constants = require('../constants');
 
 // paths
 const publicPath = __dirname + '/../../../public';
@@ -41,8 +42,8 @@ class Service {
     //   .create({
     //     'user_token': userToken,
     //     'service_token': token,
-    //     'type': 'desktop',
-    //     'service': 'apn',
+    //     'type': constants.DEVICE_TYPES.DESKTOP,
+    //     'service': constants.SEND_SERVICES.APN,
     //     'name': 'Safari',
     //     'OS': 'safari'
     //   })

@@ -33,7 +33,7 @@ describe('apnDevice service', function() {
       method: 'POST',
       uri: host + '/v1/devices/theDeviceToken/registrations/web.org.schul-cloud',
       headers: {
-        'authorization': 'ApplePushNotifications usertoken2'
+        'authorization': 'ApplePushNotifications student1_1'
       }
     });
   });
@@ -54,7 +54,7 @@ describe('apnDevice service', function() {
       method: 'DELETE',
       uri: host + '/v1/devices/theDeviceToken/registrations/web.org.schul-cloud',
       headers: {
-        'authorization': 'ApplePushNotifications usertoken2'
+        'authorization': 'ApplePushNotifications student1_1'
       }
     });
   });
@@ -64,7 +64,7 @@ describe('apnDevice service', function() {
       method: 'POST',
       uri: host + '/v1/pushPackages/web.org.schul-cloud',
       body: {
-        userToken: 'usertoken2'
+        userToken: 'student1_1'
       },
       json: true,
       resolveWithFullResponse: true
@@ -103,7 +103,7 @@ describe('apnDevice service', function() {
       method: 'POST',
       uri: host + '/v1/devices/theDeviceToken/registrations/web.org.google',
       headers: {
-        'authorization': 'ApplePushNotifications usertoken2'
+        'authorization': 'ApplePushNotifications student1_1'
       }
     })
       .catch(err => {
@@ -120,7 +120,7 @@ describe('apnDevice service', function() {
       method: 'POST',
       uri: host + '/v1/pushPackages/web.org.schul-cloud',
       body: {
-        userToken: 'usertoken2'
+        userToken: 'student1_1'
       },
       json: true
     })
@@ -131,6 +131,7 @@ describe('apnDevice service', function() {
         done();
       });
   });
+
 
   it('creates a log file', () => {
     return requestPromise({

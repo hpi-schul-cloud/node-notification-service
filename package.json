@@ -16,7 +16,7 @@
     "node": ">= 0.12.0"
   },
   "scripts": {
-    "test": "export NODE_ENV=testing && npm run coverage && npm run eslint",
+    "test": "set NODE_ENV=testing && npm run coverage && npm run eslint",
     "testing": "nodemon --inspect src/ --exec \"npm test  || true\"",
     "jshint": "jshint src/. test/. --config",
     "eslint": "eslint src/. test/. ",

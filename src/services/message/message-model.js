@@ -16,10 +16,11 @@ const messageSchema = new Schema({
   body: { type: String, required: true },
   action: { type: String, required: false },
   image: { type: String, required: false },
+  data: { type: Object, required: false },
   priority: { type: String, default: Constants.MESSAGE_PRIORITIES.MEDIUM, enum: Util.getEnumValues(Constants.MESSAGE_PRIORITIES) },
   timeToLive: { type: Date, required: false },
 
-  initiatorId: { type: String, required: true }, // ID (nicht token!!!) von dem service oder dem user der die message geschickt hat
+  schulcloudId: { type: String, required: true }, // ID (nicht token!!!) von dem service oder dem user der die message geschickt hat
   scopeIds: { type: [String], required: true },
 
   userIds: { type: [String], required: false },
