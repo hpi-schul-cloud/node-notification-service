@@ -29,6 +29,41 @@ describe('message service', function() {
     });
   });
 
+  it('rejects missing parameters', () => {
+    return app.service('messages').create({
+      body: 'You have a new Notification',
+      token: 'invalidToken',
+      scopeIds: [
+        'userIdOrScopeId',
+        'testScopeId'
+      ]
+    })
+    .then(res => {
+      expect(res.code).to.be.above(399);
+    })
+    .catch(err => {
+      expect(err.code).to.be.above(399);
+    });
+  });
+
+  it('rejects title longer than 140 characters', () => {
+    return app.service('messages').create({
+      title: 'New Notification with very very very very very very very very very very very very very very very very very very very very very very long title',
+      body: 'You have a new Notification',
+      token: 'invalidToken',
+      scopeIds: [
+        'userIdOrScopeId',
+        'testScopeId'
+      ]
+    })
+    .then(res => {
+      expect(res.code).to.be.above(399);
+    })
+    .catch(err => {
+      expect(err.code).to.be.above(399);
+    });
+  });
+
   it('sends a message', () => {
     return app.service('messages').create({
       title: 'New Notification',

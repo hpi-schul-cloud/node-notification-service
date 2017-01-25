@@ -40,12 +40,6 @@ class Util {
     }
     return newObject;
   }
-
-  static sizeOfJSON(object) {
-    // TODO: not very accurate
-    return JSON.stringify(object).length;
-  }
-
 }
 
 module.exports = Util;
