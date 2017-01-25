@@ -61,6 +61,11 @@ class FirebaseAdapter {
       }
     };
 
+    // additional data
+    if (notification.message.data) {
+      message.data.senderData = notification.messsage.data
+    }
+
     // TODO: message.action = notification.action;
     message.priority = notification.priority === constants.MESSAGE_PRIORITIES.HIGH ? 'high' : 'normal';
 

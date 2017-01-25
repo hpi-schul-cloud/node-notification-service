@@ -16,6 +16,7 @@ const messageSchema = new Schema({
   body: { type: String, required: true },
   action: { type: String, required: false },
   image: { type: String, required: false },
+  data: { type: Object, required: false },
   priority: { type: String, default: Constants.MESSAGE_PRIORITIES.MEDIUM, enum: Util.getEnumValues(Constants.MESSAGE_PRIORITIES) },
   timeToLive: { type: Date, required: false },
 

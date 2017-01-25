@@ -29,6 +29,9 @@ class Service {
 
     let message = new Message(data);
 
+    if (Util.sizeOfJSON(message.toObject()) > 2048)
+      return Promise.reject(new errors.BadRequest('Message size exceeds limit of 2048 bytes.'));
+
     return Resolve
       .resolveUser(message.scopeIds).then(userIds => {
         // set resolved userIds
