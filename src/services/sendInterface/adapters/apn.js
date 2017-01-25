@@ -25,17 +25,15 @@ class ApnAdapter {
   _buildMessage(notification) {
     let message = new apn.Notification();
 
-    message.topic = 'org.schulcloud';
+    message.topic = 'web.org.schul-cloud';
+    message.urlArgs = ['index.php']; // TODO: set this to something meaningful
     message.title = notification.message.title;
     message.body = notification.message.body;
-    // message.expiry = notification.timeToLive; // TODO: should be UNIX timestamp
     message.priority = notification.priority === 'high' ? 10 : 5;
-    // message.contentAvailable = true;
-
-    if (message.priority === 10) {
-      // we must trigger this for messages with high priority
-      message.alert = notification.message.title;
-    }
+    // UNIX epoch time in seconds
+    // message.expiry = Math.floor(expiration.getTime()/1000);
+    // Can be used to send silent notifications
+    // message.contentAvailable = 1;
 
     return message;
   }
