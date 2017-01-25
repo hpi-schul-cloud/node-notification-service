@@ -47,11 +47,6 @@ describe('orchestration service', () => {
     return Escalation.remove({});
   });
 
-  beforeEach(() => {
-    return Notification.remove({});
-  });
-
-
   it('did not register the orchestration service', () => {
     assert.ok(!app.service('orchestration'));
   });
@@ -87,9 +82,12 @@ describe('orchestration service', () => {
           .populate('notification')
       }).then(escalations => {
         let users = ['firstUser', 'secondUser'];
-        for (var escalation in escalations) {
-          let username = escalations[escalation].notification.user;
-          assert(users.indexOf(username) >= 0, 'unknown username ' + escalations[escalation].user);
+        for (var user in users) {
+          let escalation = escalations.filter(escalation=>{
+            return escalation.notification.user === user;
+          });
+          assert(escalation.length, 1, 'user should have one escalation only');
+          assert(escalation[0].notification.user === user, 'unknown username ' + escalations[escalation].user);
         }
       });
   });
