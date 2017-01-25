@@ -37,7 +37,7 @@
          },
          "token": {
            "type": "string",
-           "description": "Token of the initiating service or user"
+           "description": "SSO Token of the initiating service or user"
          },
          "scopeIds": {
            "type": "array",
@@ -48,10 +48,10 @@
          }
        },
        "example": {
-         "title": "New Notification",
+         "title": "New Notification from Teacher1_1",
          "body": "You have a new Notification",
-         "token": "servicetoken2",
-         "scopeIds": ["userIdOrScopeId", "testScopeId"]
+         "token": "teacher1_1",
+         "scopeIds": ["316866a2-41c3-444b-b82c-274697c546a0"]
        }
      }
    },

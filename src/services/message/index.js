@@ -27,7 +27,7 @@ class Service {
     let message = new Message(data);
 
     return Resolve
-      .resolveUser(message.scopeIds).then(userIds => {
+      .resolveScope(message.scopeIds).then(userIds => {
         // set resolved userIds
         message.userIds = userIds;
         return message.save()

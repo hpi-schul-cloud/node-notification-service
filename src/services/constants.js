@@ -4,6 +4,16 @@ class Constants {
 
   constructor() {
 
+    this.CONFIG = {
+      AUTHENTICATION_API_ENDPOINT : 'https://schulcloud-api-mock.herokuapp.com/api/user/',
+      AUTHORIZATION_API_ENDPOINT  : 'https://schulcloud-api-mock.herokuapp.com/api/all_scopes/',
+      RESOLVE_API_ENDPOINT        : 'https://schulcloud-api-mock.herokuapp.com/api/all_users/'
+    }
+
+    this.AUTHORITIES = {
+      CAN_SEND_NOTIFICATIONS : 'can-send-notifications'
+    }
+
     this.CALLBACK_TYPES = {
       RECEIVED : 'received',
       CLICKED : 'clicked'
