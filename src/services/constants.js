@@ -37,11 +37,22 @@ class Constants {
       EMAIL: 'email'
     };
 
+    this.DEVICE_STATES = {
+      REGISTERED: 'registered',
+      FAILED: 'failed'
+    };
+
     this.MESSAGE_PRIORITIES = {
       HIGH: 'high',
       MEDIUM: 'medium',
       LOW: 'low'
     };
+
+    this.SEND_SERVICES = {
+      APN: 'apn',
+      EMAIL: 'email',
+      FIREBASE: 'firebase'
+    }
 
   }
 

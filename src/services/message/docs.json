@@ -1,5 +1,5 @@
  {
-   "description": "Post to this service to send Notifications",
+   "description": "Post to this service to send Notifications (max. 2048 bytes)",
    "definitions": {
      "messages": {
        "type": "object",
@@ -22,6 +22,10 @@
          "action": {
            "type": "string",
            "description": "Action to be done when the user clicks the notification"
+         },
+         "data": {
+           "type": "object",
+           "description": "additional JSON data, that can be send with the notification"
          },
          "priority": {
            "type": "string",

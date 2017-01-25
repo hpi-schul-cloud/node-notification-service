@@ -201,7 +201,7 @@ describe('orchestration service', () => {
       let stub = sinon.stub(sendInterface, 'send', (news, devices) => {
         assert.equal(devices.length, 1);
         assert.equal(news.length, devices.length);
-        assert.equal(devices[0].service, 'email');
+        assert.equal(devices[0].service, Constants.DEVICE_TYPES.EMAIL);
         return Promise.resolve({
           success: 1,
           failure: 0,
@@ -260,11 +260,11 @@ describe('orchestration service', () => {
 
       let newDevice = {
         token: 'TEST_token',
-        type: 'mobile',
-        service: 'firebase',
+        type: Constants.DEVICE_TYPES.MOBILE,
+        service: Constants.SEND_SERVICES.FIREBASE,
         name: 'TEST_name',
         OS: 'android',
-        state: 'registered'
+        state: Constants.DEVICE_STATES.REGISTERED
       };
 
       let newUser = new User({
@@ -318,19 +318,19 @@ describe('orchestration service', () => {
 
       let newDeviceMobile = {
         token: 'TEST_token',
-        type: 'mobile',
-        service: 'firebase',
+        type: Constants.DEVICE_TYPES.MOBILE,
+        service: Constants.SEND_SERVICES.FIREBASE,
         name: 'TEST_name',
         OS: 'android',
-        state: 'registered'
+        state: Constants.DEVICE_STATES.REGISTERED
       };
       let newDeviceDesktop = {
         token: 'TEST_token',
-        type: 'desktop',
-        service: 'firebase',
+        type: Constants.DEVICE_TYPES.DESKTOP,
+        service: Constants.SEND_SERVICES.FIREBASE,
         name: 'TEST_name',
         OS: 'android',
-        state: 'registered'
+        state: Constants.DEVICE_STATES.REGISTERED
       };
 
       let newUser = new User({
@@ -386,19 +386,19 @@ describe('orchestration service', () => {
 
       let newDeviceMobile = {
         token: 'TEST_token',
-        type: 'mobile',
-        service: 'firebase',
+        type: Constants.DEVICE_TYPES.MOBILE,
+        service: Constants.SEND_SERVICES.FIREBASE,
         name: 'TEST_name',
         OS: 'android',
-        state: 'registered'
+        state: Constants.DEVICE_STATES.REGISTERED
       };
       let newDeviceDesktop = {
         token: 'TEST_token',
-        type: 'desktop',
-        service: 'firebase',
+        type: Constants.DEVICE_TYPES.DESKTOP,
+        service: Constants.SEND_SERVICES.FIREBASE,
         name: 'TEST_name',
         OS: 'android',
-        state: 'registered'
+        state: Constants.DEVICE_STATES.REGISTERED
       };
 
       let newUser = new User({

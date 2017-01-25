@@ -11,14 +11,16 @@
 
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const Constants = require('../constants');
+const Util = require('../util');
 
 const deviceSchema = new Schema({
   token: { type: String, required: true, unique: true },
-  type: { type: String, enum: ['mobile', 'desktop', 'email'], required: true },
-  service: { type: String, enum: ['firebase', 'apn', 'email'], required: true },
+  type: { type: String, enum: Util.getEnumValues(Constants.DEVICE_TYPES), required: true },
+  service: { type: String, enum: Util.getEnumValues(Constants.SEND_SERVICES), required: true },
   OS: { type: String, required: true},
   name: { type: String, required: true},
-  state: {type: String, enum: ['registered','failed','removed'], required: true},
+  state: {type: String, enum: Util.getEnumValues(Constants.DEVICE_STATES), required: true},
   active: { type: Boolean, default: false }, // Active device at the moment
   createdAt: { type: Date, 'default': Date.now },
   updatedAt: { type: Date, 'default': Date.now }
