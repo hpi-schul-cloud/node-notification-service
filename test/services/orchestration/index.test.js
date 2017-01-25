@@ -13,6 +13,15 @@ const Message = require('../../../src/services/message/message-model');
 const Notification = require('../../../src/services/notification/notification-model');
 const Escalation = require('../../../src/services/orchestration/escalation-model');
 
+function createNotification(username) {
+  let message = Message({});
+  let notification = Notification({
+    message: message,
+    user: username
+  });
+  return notification.save();
+}
+
 function createEscalation() {
   let user = 'someId';
   let message = Message({});
@@ -35,6 +44,43 @@ describe('orchestration service', () => {
 
   it('has access to orchestration', () => {
     assert.ok(orchestration);
+  });
+
+  it('orchestrate multiple notifications', ()=> {
+
+    return createNotification('firstUser')
+      .then(() => {
+        return createNotification('secondUser');
+      })
+      .then(()=> {
+        return Notification.find({});
+      })
+      .then(notifications => {
+        assert.equal(notifications.length, 2);
+        return orchestration
+          .orchestrate(notifications);
+      })
+      .then(()=> {
+        return Notification.find({});
+      })
+      .then(notifications=> {
+        assert.equal(notifications.length, 2);
+        assert.equal(notifications[0].state, Constants.NOTIFICATION_STATES.ESCALATING);
+        assert.equal(notifications[1].state, Constants.NOTIFICATION_STATES.ESCALATING);
+      }).then(()=> {
+        return Escalation
+          .find({})
+          .populate('notification')
+      }).then(escalations => {
+        let users = ['firstUser', 'secondUser'];
+        for (var user in users) {
+          let escalation = escalations.filter(escalation=> {
+            return escalation.notification.user === users[user];
+          });
+          assert(escalation.length, 1, 'user should have one escalation only');
+          assert(escalation[0].notification.user === users[user], 'unknown username ' + escalation[0].user);
+        }
+      });
   });
 
   describe('reescalate(): ', () => {
