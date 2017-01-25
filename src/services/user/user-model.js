@@ -21,7 +21,7 @@ const deviceSchema = new Schema({
   service: { type: String, enum: Util.getEnumValues(Constants.SEND_SERVICES), required: true },
   OS: { type: String, required: true},
   name: { type: String, required: true},
-  state: {type: String, enum: Util.getEnumValues(Constants.SEND_STATES), required: true},
+  state: {type: String, enum: Util.getEnumValues(Constants.DEVICE_STATES), required: true},
   active: { type: Boolean, default: false }, // Active device at the moment
   createdAt: { type: Date, 'default': Date.now },
   updatedAt: { type: Date, 'default': Date.now }
