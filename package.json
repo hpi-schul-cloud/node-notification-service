@@ -45,7 +45,7 @@
     "passport": "^0.3.2",
     "serve-favicon": "^2.3.0",
     "winston": "^2.3.0",
-    "jsonapi-serializer": "latest"
+    "jsonapi-serializer": "^3.4.2"
   },
   "devDependencies": {
     "chai": "^3.5.0",

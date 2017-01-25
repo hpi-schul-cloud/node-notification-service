@@ -5,8 +5,8 @@ class Constants {
   constructor() {
 
     this.CALLBACK_TYPES = {
-      RECEIVED : 'received',
-      CLICKED : 'clicked'
+      RECEIVED: 'received',
+      CLICKED: 'clicked'
     };
 
     this.NOTIFICATION_STATES = {
@@ -31,6 +31,13 @@ class Constants {
       HIGH: 'high',
       MEDIUM: 'medium',
       LOW: 'low'
+    };
+
+    this.SERIALIZE = {
+      options: {
+        id: '_id',
+        pluralizeType: false
+      }
     };
 
   }

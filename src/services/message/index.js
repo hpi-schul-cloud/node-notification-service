@@ -22,7 +22,10 @@ class Service {
 
   get(id, params) {
     console.log('[INFO] get message ' + id);
-    return Message.findOne({_id: id});
+    return Message.findOne({_id: id})
+      .then(message => {
+        return new serializer('message', Message.attributes).serialize(message)
+      });
   }
 
   create(data, params) {
@@ -53,20 +56,7 @@ class Service {
         return Orchestration.orchestrate(notifications);
       })
       .then(()=> {
-        return Promise.resolve(new serializer('message',{
-          id: '_id',
-          pluralizeType: false,
-          attributes:[
-            'title',
-            'body',
-            'action',
-            'image',
-            'priority',
-            'timeToLive',
-            'initiatorId',
-            'createdAt'
-          ]
-        }).serialize(message));
+        return Promise.resolve(new serializer(Message.typename, Message.attributes).serialize(message));
       })
   }
 }

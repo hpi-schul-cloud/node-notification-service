@@ -29,7 +29,7 @@ describe('message service', function() {
     });
   });
 
-  it.only('sends a message', () => {
+  it('sends a message', () => {
     return app.service('messages').create({
       title: 'New Notification',
       body: 'You have a new Notification',
@@ -39,13 +39,35 @@ describe('message service', function() {
         'testScopeId'
       ]
     })
-    .then(res => {
-      console.log(res);
-      expect(res.code).not.to.be.above(299);
+      .then(res => {
+        console.log(res);
+        expect(res.code).not.to.be.above(299);
+      })
+      .catch(err => {
+        expect(err.code).not.to.exist;
+      });
+  });
+
+  it.only('sends and retrieve a message', () => {
+    let id;
+    return app.service('messages').create({
+      title: 'New Notification',
+      body: 'You have a new Notification',
+      token: 'servicetoken2',
+      scopeIds: [
+        'userIdOrScopeId',
+        'testScopeId'
+      ]
     })
-    .catch(err => {
-      expect(err.code).not.to.exist;
-    });
+      .then(res => {
+        id = res.data.id;
+        //console.log('last id was', id, res);
+        return app.service('messages').get(''+id);
+      })
+      .then(res=>{
+        //console.log('second result', res);
+        assert(res.data.id, id);
+      });
   });
 
 });
