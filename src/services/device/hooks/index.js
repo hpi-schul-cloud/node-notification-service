@@ -13,7 +13,7 @@ exports.before = {
   create: [Authentication.auth(),Authorization.isUser()],
   update: [],
   patch: [],
-  // remove: []
+  remove: [Authentication.auth()]
 };
 
 exports.after = {

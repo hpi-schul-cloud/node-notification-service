@@ -19,6 +19,8 @@ class Service {
   // Adds a device for a user to the database
   create(data, params) {
 
+    console.log('[DEVICE] ' + JSON.stringify(data));
+
     // Create device object
     const newDevice = {
       token: data.device_token,
@@ -30,12 +32,13 @@ class Service {
     };
 
     let newUser = new user({
-      schulcloudId: data.schulcloudId,
+      schulcloudId: data.author.id,
       devices: [newDevice]
     });
 
+
     // Insert data into DB
-    return user.findOne({ schulcloudId: data.schulcloudId })
+    return user.findOne({ schulcloudId: data.author.id })
       .then(user => {
         if (!user) {
           user = newUser;
@@ -52,13 +55,10 @@ class Service {
   }
 
   remove(data, params) {
+    console.log('[DEVICE REMOVE]' + JSON.stringify(params));
     // TODO: move auth in hooks
     // TODO: find better way then passing token as query param
-    return Authentication
-      .verifyUser(params.query.user_token)
-      .then(schulcloudId => {
-        return user.findOne({ schulcloudId: schulcloudId })
-      })
+    return user.findOne({ schulcloudId: params.author.id })
       .then(user => {
         if (user) {
           // find device

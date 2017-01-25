@@ -28,7 +28,7 @@ class Authorization {
 
     return function(hook) {
 
-      let q = (hook.data.type === 'user')
+      let q = hook.data ? (hook.data.author.type === 'user') : (hook.params.author.type === 'user');
 
       console.log(q ?'[AUTHORIZATION] it is a user' : '[AUTHORIZATION] it is not a user')
 

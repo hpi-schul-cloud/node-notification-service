@@ -36,7 +36,7 @@
         "service": "firebase",
         "type": "mobile",
         "name": "test2",
-        "token": "usertoken1",
+        "token": "student1_1",
         "device_token": "anderestoken",
         "OS": "android7"
       }
@@ -69,7 +69,7 @@
         "type": "string"
       },
       {
-        "name": "user_token",
+        "name": "token",
         "in": "query",
         "description": "Schul-Cloud SSO Token",
         "required": true,

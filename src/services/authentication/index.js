@@ -10,22 +10,33 @@ class Authentication {
 
     return function(hook) {
 
-      if (hook.data.token) {
+      // console.log('[AUTH] ' + JSON.stringify(hook));
 
-        return Resolve.verifyToken(hook.data.token).then(response => {
+      let token;
+
+      if (hook.params.query && hook.params.query.token)
+        token = hook.params.query.token;
+
+      if (hook.data && hook.data.token)
+        token = hook.data.token;
+
+      if (token) {
+
+        return Resolve.verifyToken(token).then(response => {
 
           if (Array.isArray(response.data))
             response.data = response.data[0];
 
           console.log('[AUTHENTICATION] token is valid');
-          hook.data.schulcloudId = response.data.id;
-          hook.data.type = response.data.type;
+          if (hook.data) hook.data.author = response.data;
+          if (hook.params) hook.params.author = response.data;
           console.log('[AUTHENTICATION] assigned ' + response.data.id + ' to request');
 
           return Promise.resolve(hook);
 
         })
         .catch(err => {
+          // console.log(err);
           return Promise.reject(new errors.NotAuthenticated('user or service token is invalid'));
         });
 
