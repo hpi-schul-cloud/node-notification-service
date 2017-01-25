@@ -64,7 +64,7 @@ describe('apnDevice service', function() {
       method: 'POST',
       uri: host + '/v1/pushPackages/web.org.schul-cloud',
       body: {
-        userToken: 'student1_1'
+        userToken: 'usertokenwithmin16chars'
       },
       json: true,
       resolveWithFullResponse: true
