@@ -111,9 +111,12 @@ describe('apnDevice service', function() {
       method: 'POST',
       uri: host + '/v1/devices/theDeviceToken/registrations/web.org.schul-cloud',
       headers: {
-        'authorization': 'ApplePushNotifications usertoken2'
+        'authorization': 'AppleShupNotifications usertoken2'
       }
     })
+      .then(response => {
+        assert.equal(response.statusCode, 500);
+      })
       .catch(err => {
         assert.equal(err.statusCode, 500);
       });
