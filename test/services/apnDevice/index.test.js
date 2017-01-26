@@ -101,8 +101,11 @@ describe('apnDevice service', function() {
       method: 'POST',
       uri: host + '/v1/devices/theDeviceToken/registrations/web.org.schul-cloud'
     })
+      .then(response => {
+        assert.equal(response.statusCode, 400);
+      })
       .catch(err => {
-        assert.equal(err.statusCode, 500);
+        assert.equal(err.statusCode, 400);
       });
   });
 
@@ -115,10 +118,10 @@ describe('apnDevice service', function() {
       }
     })
       .then(response => {
-        assert.equal(response.statusCode, 500);
+        assert.equal(response.statusCode, 400);
       })
       .catch(err => {
-        assert.equal(err.statusCode, 500);
+        assert.equal(err.statusCode, 400);
       });
   });
 
@@ -130,6 +133,9 @@ describe('apnDevice service', function() {
         'authorization': 'ApplePushNotifications student1_1'
       }
     })
+      .then(response => {
+        assert.equal(response.statusCode, 400);
+      })
       .catch(err => {
         assert.equal(err.statusCode, 400);
       });

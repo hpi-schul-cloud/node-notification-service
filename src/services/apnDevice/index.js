@@ -57,13 +57,13 @@ class Service {
 
   checkAuthorizationHeader(req, res, next) {
     if (!req.headers.authorization) {
-      res.status(500).send(new error.BadRequest('Missing authorization.'));
+      res.status(400).send(new error.BadRequest('Missing authorization.'));
       return;
     }
 
     let authorization = req.headers.authorization.split(' ');
     if (authorization[0] !== 'ApplePushNotifications') {
-      res.status(500).send(new error.BadRequest('Invalid authorization.'));
+      res.status(400).send(new error.BadRequest('Invalid authorization.'));
       return;
     }
 
