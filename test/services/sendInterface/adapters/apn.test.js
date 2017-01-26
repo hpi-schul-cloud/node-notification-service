@@ -1,6 +1,6 @@
 'use strict';
 
-const expect = require('chai').expect;
+const assert = require('assert');
 const sinon = require('sinon');
 const constants = require('../../../../src/services/constants');
 const apn = require('../../../../src/services/sendInterface/adapters/apn');
@@ -9,7 +9,7 @@ const apnMock = require('apn/mock');
 describe('apn service adapter', function() {
 
   it('registered the apn service adapter', () => {
-    expect(apn).to.be.ok;
+    assert(apn);
   });
 
   it('runs with mocked success/error', () => {
@@ -107,10 +107,10 @@ describe('apn service adapter', function() {
 
     return apn.send(notifications, devices)
       .then((response) => {
-        expect(stub.called).to.be.true;
+        assert(stub.called);
         apn.apnProvider.send.restore();
 
-        expect(response).to.deep.equal(expected);
+        assert.deepEqual(response, expected);
       });
   });
 
@@ -143,7 +143,7 @@ describe('apn service adapter', function() {
 
     return apn.send(notifications, devices)
       .then(response => {
-        expect(response).to.deep.equal(expected);
+        assert.deepEqual(response, expected);
       });
   });
 });

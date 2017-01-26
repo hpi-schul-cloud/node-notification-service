@@ -1,10 +1,8 @@
 'use strict';
 
-const service = require('feathers-mongoose');
 const Message = require('./message-model');
 const hooks = require('./hooks');
 const errors = require('feathers-errors');
-const Util = require('../util');
 const Resolve = require('../resolve');
 const Orchestration = require('../orchestration');
 const Notification = require('../notification/notification-model');
@@ -27,7 +25,7 @@ class Service {
     let message = new Message(data);
 
     return Resolve
-      .resolveUser(message.scopeIds).then(userIds => {
+      .resolveScope(message.scopeIds).then(userIds => {
         // set resolved userIds
         message.userIds = userIds;
         return message.save()
