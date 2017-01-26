@@ -4,7 +4,6 @@ const assert = require('assert');
 const sinon = require('sinon');
 
 const requestPromise = require('request-promise');
-const fs = require('fs-extra');
 const app = require('../../../src/app');
 const apnDevice = require('../../../src/services/apnDevice/index');
 
@@ -28,7 +27,7 @@ describe('apnDevice service', function() {
     assert(apnDevice);
   });
 
-  it('registers a valid device', () => {
+  it('responds on the registration route', () => {
     return requestPromise({
       method: 'POST',
       uri: host + '/v1/devices/theDeviceToken/registrations/web.org.schul-cloud',
@@ -38,18 +37,7 @@ describe('apnDevice service', function() {
     });
   });
 
-  it('does not register an invalid device', () => {
-    return requestPromise({
-      method: 'POST',
-      uri: host + '/v1/devices/theDeviceToken/registrations/web.org.schul-cloud',
-      headers: {
-        'authorization': 'ApplePushNotifications userInvalidtoken'
-      }
-    });
-  });
-
-  it('deletes a device', () => {
-    // TODO: not yet implemented by device service
+  it('responds on the delete route', () => {
     return requestPromise({
       method: 'DELETE',
       uri: host + '/v1/devices/theDeviceToken/registrations/web.org.schul-cloud',
@@ -59,7 +47,7 @@ describe('apnDevice service', function() {
     });
   });
 
-  it('creates the pushPackage', () => {
+  it('sends the pushPackage', () => {
     return requestPromise({
       method: 'POST',
       uri: host + '/v1/pushPackages/web.org.schul-cloud',
@@ -73,6 +61,39 @@ describe('apnDevice service', function() {
         assert.equal(response.headers['content-type'], 'application/zip');
         assert.equal(response.statusCode, 200);
       });
+  });
+
+  it('fails on missing userToken', () => {
+    return requestPromise({
+      method: 'POST',
+      uri: host + '/v1/pushPackages/web.org.schul-cloud',
+      json: true,
+      resolveWithFullResponse: true
+    })
+      .then(response => {
+        assert.equal(response.statusCode, 400);
+      })
+      .catch(error => {
+        assert.equal(error.statusCode, 400);
+      })
+  });
+
+  it('fails on wrong userToken', () => {
+    return requestPromise({
+      method: 'POST',
+      uri: host + '/v1/pushPackages/web.org.schul-cloud',
+      body: {
+        userToken: 'usertokenwithmax16chars'
+      },
+      json: true,
+      resolveWithFullResponse: true
+    })
+      .then(response => {
+        assert.equal(response.statusCode, 400);
+      })
+      .catch(error => {
+        assert.equal(error.statusCode, 400);
+      })
   });
 
   it('fails on missing authorization header', () => {
@@ -111,29 +132,7 @@ describe('apnDevice service', function() {
       });
   });
 
-  it('fails if unable to create temp dir', (done) => {
-    let stub = sinon.stub(fs, 'mkdtemp', (prefix, callback) => {
-      callback(true, '');
-    });
-
-    requestPromise({
-      method: 'POST',
-      uri: host + '/v1/pushPackages/web.org.schul-cloud',
-      body: {
-        userToken: 'student1_1'
-      },
-      json: true
-    })
-      .catch(err => {
-        assert(stub.called);
-        assert.equal(err.statusCode, 500);
-        fs.mkdtemp.restore();
-        done();
-      });
-  });
-
-
-  it('creates a log file', () => {
+  it('logs an error', () => {
     return requestPromise({
       method: 'POST',
       uri: host + '/v1/log',
