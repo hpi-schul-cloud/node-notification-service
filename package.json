@@ -2,16 +2,20 @@
   "name": "node-notification-service",
   "description": "feathers app to provide the schulcloud notification api",
   "version": "0.0.0",
-  "homepage": "",
+  "homepage": "https://github.com/schulcloud/node-notification-service",
   "main": "src/",
   "keywords": [
-    "feathers"
+    "push",
+    "notifications"
   ],
   "license": "MIT",
-  "repository": {},
-  "author": {},
-  "contributors": [],
-  "bugs": {},
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/schulcloud/node-notification-service.git"
+  },
+  "bugs": {
+    "url": "https://github.com/schulcloud/node-notification-service/issues"
+  },
   "engines": {
     "node": ">= 0.12.0"
   },
