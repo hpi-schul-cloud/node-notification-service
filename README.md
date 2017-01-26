@@ -34,6 +34,7 @@ As API framework, we use [Feathers](http://feathersjs.com).
     ```
     mongod --dbpath=data/db
     ```
+
 5. Create private `config.json`
 
     ```
@@ -48,32 +49,22 @@ As API framework, we use [Feathers](http://feathersjs.com).
 
 ## Testing
 
-To run the tests, make sure mocha and chai are installed.
-Simply run `npm test` and all your tests in the `test/` directory will be run.
-The test script executes jshint and mocha. If you just want to run either of them use: `mocha test/ --recursive` or `jshint src/. test/. --config`  
+To run the tests, simply run `npm test` and all your tests in the `test/` directory will be run.
+The test script executes the unit tests using mocha and lints the code using eslint.
 
-## Scaffolding
-
-Feathers has a powerful command line interface. Here are a few things it can do:
-
+In addition the following commands are available:
+```shell
+npm run testing # execute the tests whenever a file is changed
+npm run coverage # execute the tests once
+npm run eslint # lint the code use eslint
+npm run jshint # lint the code using jshint
 ```
-$ npm install -g feathers-cli             # Install Feathers CLI
-
-$ feathers generate service               # Generate a new Service
-$ feathers generate hook                  # Generate a new Hook
-$ feathers generate model                 # Generate a new Model
-$ feathers help                           # Show all commands
-```
-
-## Help
-
-For more information on all the things you can do with Feathers visit [docs.feathersjs.com](http://docs.feathersjs.com).
 
 ## Changelog
 
 __0.1.0__
 
-- Initial release
+- pending...
 
 ## License
 

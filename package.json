@@ -10,8 +10,8 @@
   ],
   "license": "MIT",
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/schulcloud/node-notification-service.git"
+    "type": "git",
+    "url": "https://github.com/schulcloud/node-notification-service.git"
   },
   "bugs": {
     "url": "https://github.com/schulcloud/node-notification-service/issues"
@@ -20,13 +20,12 @@
     "node": ">= 0.12.0"
   },
   "scripts": {
-    "test": "set NODE_ENV=testing && npm run coverage && npm run eslint",
-    "testing": "nodemon --inspect src/ --exec \"npm test  || true\"",
-    "jshint": "jshint src/. test/. --config",
-    "eslint": "eslint src/. test/. ",
     "start": "nodemon --inspect src/",
-    "coverage": "./node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha ./test/**/*.test.js",
-    "mocha": "mocha test/ --recursive"
+    "test": "npm run coverage && npm run eslint",
+    "testing": "nodemon --inspect src/ --exec \"npm test  || true\"",
+    "coverage": "cross-env NODE_ENV=testing ./node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha ./test/**/*.test.js",
+    "eslint": "eslint src/. test/. ",
+    "jshint": "jshint src/. test/. --config"
   },
   "dependencies": {
     "apn": "^2.1.2",
@@ -48,9 +47,10 @@
     "winston": "^2.3.0"
   },
   "devDependencies": {
+    "cross-env": "^3.1.4",
+    "eslint": "^2.13.0",
     "istanbul": "^0.4.5",
     "jshint": "^2.9.4",
-    "eslint": "^2.13.0",
     "mocha": "^3.1.2",
     "nodemon": "^1.11.0",
     "request": "^2.78.0",
