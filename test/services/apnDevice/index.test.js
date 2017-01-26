@@ -22,13 +22,13 @@ describe('apnDevice service', function() {
       .expect(200);
   });
 
-  // it('does not register an invalid device', () => {
-  //   return request(app)
-  //     .post('/v1/devices/theDeviceToken/registrations/web.org.schul-cloud')
-  //     .set('authorization', 'ApplePushNotifications userInvalidtoken')
-  //     .send({})
-  //     .expect(500);
-  // });
+  it.skip('does not register an invalid device', () => {
+    return request(app)
+      .post('/v1/devices/theDeviceToken/registrations/web.org.schul-cloud')
+      .set('authorization', 'ApplePushNotifications userInvalidtoken')
+      .send({})
+      .expect(500);
+  });
 
   it('deletes a device', () => {
     // TODO: not yet implemented by device service
@@ -39,14 +39,14 @@ describe('apnDevice service', function() {
       .expect(200);
   });
 
-  it.skip('creates the pushPackage', () => {
+  it('creates the pushPackage', () => {
     return request(app)
       .post('/v1/pushPackages/web.org.schul-cloud')
       .send({
         userToken: 'usertoken2'
       })
       .expect(200)
-      .expect('Content-Type', /application\/zip/);
+      .expect('Content-Type', 'application/zip');
   });
 
   it('fails on missing authorization header', () => {
