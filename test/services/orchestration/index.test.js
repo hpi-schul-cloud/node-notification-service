@@ -210,7 +210,7 @@ describe('orchestration service', () => {
       });
 
       let newUser = new User({
-        schulcloudId: 'userSchulcloudId',
+        applicationId: 'userapplicationId',
         devices: []
       });
 
@@ -221,7 +221,7 @@ describe('orchestration service', () => {
           let notification = Notification({
             state: Constants.NOTIFICATION_STATES.ESCALATING,
             message: message,
-            user: user.schulcloudId
+            user: user.applicationId
           });
           let escalation = Escalation({
             notification: notification,
@@ -268,7 +268,7 @@ describe('orchestration service', () => {
       };
 
       let newUser = new User({
-        schulcloudId: 'userSchulcloudId',
+        applicationId: 'userapplicationId',
         devices: [newDevice]
       });
 
@@ -279,7 +279,7 @@ describe('orchestration service', () => {
           let notification = Notification({
             state: Constants.NOTIFICATION_STATES.ESCALATING,
             message: message,
-            user: user.schulcloudId
+            user: user.applicationId
           });
           let escalation = Escalation({
             notification: notification,
@@ -334,7 +334,7 @@ describe('orchestration service', () => {
       };
 
       let newUser = new User({
-        schulcloudId: 'userSchulcloudId',
+        applicationId: 'userapplicationId',
         devices: [
           newDeviceMobile,
           newDeviceDesktop
@@ -348,7 +348,7 @@ describe('orchestration service', () => {
           let notification = Notification({
             state: Constants.NOTIFICATION_STATES.ESCALATING,
             message: message,
-            user: user.schulcloudId
+            user: user.applicationId
           });
           let escalation = Escalation({
             notification: notification,
@@ -402,7 +402,7 @@ describe('orchestration service', () => {
       };
 
       let newUser = new User({
-        schulcloudId: 'userSchulcloudId',
+        applicationId: 'userapplicationId',
         devices: [
           newDeviceMobile,
           newDeviceDesktop
@@ -416,7 +416,7 @@ describe('orchestration service', () => {
           let notification = Notification({
             state: Constants.NOTIFICATION_STATES.ESCALATING,
             message: message,
-            user: user.schulcloudId
+            user: user.applicationId
           });
           let escalation = Escalation({
             notification: notification,

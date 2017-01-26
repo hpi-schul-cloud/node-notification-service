@@ -6,8 +6,7 @@ var CALLBACK_TYPES = {
 var DEFAULT_HEADERS = {
   'Content-Type': 'application/json'
 };
-var SERVER_URL = 'https://schul-cloud.org:3030';
-// var SERVER_URL = 'http://localhost:3030';
+var SERVER_URL = '';
 
 function sendRegistrationId(id, service, device) {
   var url = SERVER_URL + '/devices';
@@ -15,7 +14,7 @@ function sendRegistrationId(id, service, device) {
     "service": service ? service : "firebase",
     "type": "mobile",
     "name": "test2",
-    "user_token": "usertoken1",
+    "token": "student1_1",
     "service_token": id,
     "OS": device ? device : "android7"
   };

@@ -9,5 +9,9 @@
       "secret": "2C1Z1i8HGbOxfrPCTO1RcxYlRke21+jszUBZSDmNKcDFmJPU05rWZbMq3pJ33xQCIgGlWO+cb6xRTJEMUqDoWg=="
     },
     "local": {}
+  },
+  "contact": {
+    "name": "Notification API Dev Team",
+    "url": "https://github.com/schulcloud/node-notification-service"
   }
 }

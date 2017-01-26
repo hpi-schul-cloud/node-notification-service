@@ -33,13 +33,13 @@ class Service {
     };
 
     let newUser = new user({
-      schulcloudId: data.author.id,
+      applicationId: data.author.id,
       devices: [newDevice]
     });
 
 
     // Insert data into DB
-    return user.findOne({ schulcloudId: data.author.id })
+    return user.findOne({ applicationId: data.author.id })
       .then(user => {
         if (!user) {
           user = newUser;
@@ -59,7 +59,7 @@ class Service {
     console.log('[DEVICE REMOVE]' + JSON.stringify(params));
     // TODO: move auth in hooks
     // TODO: find better way then passing token as query param
-    return user.findOne({ schulcloudId: params.author.id })
+    return user.findOne({ applicationId: params.author.id })
       .then(user => {
         if (user) {
           // find device

@@ -8,6 +8,7 @@ const fs = require('fs-extra');
 const app = require('../../../src/app');
 const apnDevice = require('../../../src/services/apnDevice/index');
 
+const config = require('../../../secure/config.json').sendServices.apn;
 const port = app.get('port');
 const host = app.get('protocol') + '://' + app.get('host') + ':' + port;
 
@@ -31,7 +32,7 @@ describe('apnDevice service', function() {
   it('registers a valid device', () => {
     return requestPromise({
       method: 'POST',
-      uri: host + '/v1/devices/theDeviceToken/registrations/web.org.schul-cloud',
+      uri: host + '/v1/devices/theDeviceToken/registrations/' + config.pushId,
       headers: {
         'authorization': 'ApplePushNotifications student1_1'
       }
@@ -41,7 +42,7 @@ describe('apnDevice service', function() {
   it('does not register an invalid device', () => {
     return requestPromise({
       method: 'POST',
-      uri: host + '/v1/devices/theDeviceToken/registrations/web.org.schul-cloud',
+      uri: host + '/v1/devices/theDeviceToken/registrations/' + config.pushId,
       headers: {
         'authorization': 'ApplePushNotifications userInvalidtoken'
       }
@@ -52,7 +53,7 @@ describe('apnDevice service', function() {
     // TODO: not yet implemented by device service
     return requestPromise({
       method: 'DELETE',
-      uri: host + '/v1/devices/theDeviceToken/registrations/web.org.schul-cloud',
+      uri: host + '/v1/devices/theDeviceToken/registrations/' + config.pushId,
       headers: {
         'authorization': 'ApplePushNotifications student1_1'
       }
@@ -62,7 +63,7 @@ describe('apnDevice service', function() {
   it('creates the pushPackage', () => {
     return requestPromise({
       method: 'POST',
-      uri: host + '/v1/pushPackages/web.org.schul-cloud',
+      uri: host + '/v1/pushPackages/' + config.pushId,
       body: {
         userToken: 'usertokenwithmin16chars'
       },
@@ -78,7 +79,7 @@ describe('apnDevice service', function() {
   it('fails on missing authorization header', () => {
     return requestPromise({
       method: 'POST',
-      uri: host + '/v1/devices/theDeviceToken/registrations/web.org.schul-cloud'
+      uri: host + '/v1/devices/theDeviceToken/registrations/' + config.pushId
     })
       .catch(err => {
         assert.equal(err.statusCode, 500);
@@ -88,7 +89,7 @@ describe('apnDevice service', function() {
   it('fails on invalid authorization header', () => {
     return requestPromise({
       method: 'POST',
-      uri: host + '/v1/devices/theDeviceToken/registrations/web.org.schul-cloud',
+      uri: host + '/v1/devices/theDeviceToken/registrations/' + config.pushId,
       headers: {
         'authorization': 'ApplePushNotifications usertoken2'
       }
@@ -118,7 +119,7 @@ describe('apnDevice service', function() {
 
     requestPromise({
       method: 'POST',
-      uri: host + '/v1/pushPackages/web.org.schul-cloud',
+      uri: host + '/v1/pushPackages/' + config.pushId,
       body: {
         userToken: 'student1_1'
       },

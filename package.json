@@ -1,6 +1,6 @@
 {
   "name": "node-notification-service",
-  "description": "feathers app to provide the schulcloud notification api",
+  "description": "feathers app to provide a push notification api",
   "version": "0.0.0",
   "homepage": "https://github.com/schulcloud/node-notification-service",
   "main": "src/",

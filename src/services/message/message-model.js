@@ -20,7 +20,7 @@ const messageSchema = new Schema({
   priority: { type: String, default: Constants.MESSAGE_PRIORITIES.MEDIUM, enum: Util.getEnumValues(Constants.MESSAGE_PRIORITIES) },
   timeToLive: { type: Date, required: false },
 
-  schulcloudId: { type: String, required: true }, // ID (nicht token!!!) von dem service oder dem user der die message geschickt hat
+  applicationId: { type: String, required: true }, // ID (not token!!!) of the user or service that sent the message
   scopeIds: { type: [String], required: true },
 
   userIds: { type: [String], required: false },
