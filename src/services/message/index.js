@@ -24,7 +24,7 @@ class Service {
     console.log('[INFO] get message ' + id);
     return Message.findOne({_id: id})
       .then(message => {
-        return new serializer('message', Message.attributes).serialize(message)
+        return new serializer(Message.typename, Message.attributes).serialize(message)
       });
   }
 

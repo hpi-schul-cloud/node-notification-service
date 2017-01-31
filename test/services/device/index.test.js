@@ -27,14 +27,16 @@ describe('device service', () => {
       app.service('devices').create({});
     });
 
-    it('call with valid data', () => {
+    it.only('call with valid data', () => {
+
       return app.service('devices').create(validPayload)
         .then(function(res) {
+          console.log(res);
           assert.ok(res);
         });
     });
 
-    it('call with valid data and existing user', () => {
+    it('call with valid data and existing User', () => {
       let newUser = new User({
         schulcloudId: 'useridfürusertoken2',
         devices: []
@@ -110,7 +112,7 @@ describe('device service', () => {
       app.service('devices').remove({}, params);
     });
 
-    it('call with valid user', () => {
+    it('call with valid User', () => {
       let newUser = new User({
         schulcloudId: 'useridfürusertoken2',
         devices: []
@@ -128,7 +130,7 @@ describe('device service', () => {
         });
     });
 
-    it('call with valid user and device', () => {
+    it('call with valid User and device', () => {
       let newUser = new User({
         schulcloudId: 'useridfürusertoken2',
         devices: [{

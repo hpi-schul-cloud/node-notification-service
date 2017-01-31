@@ -1,10 +1,12 @@
 'use strict';
 
 const hooks = require('./hooks');
-const user = require('../user/user-model');
+const User = require('../user/user-model');
 const Resolve = require('../resolve');
 const errors = require('feathers-errors');
 const Authentication = require('../authentication');
+const serializer = require('jsonapi-serializer').Serializer;
+
 
 const docs = require('./docs.json');
 
@@ -29,13 +31,13 @@ class Service {
       state: 'registered'
     };
 
-    let newUser = new user({
+    let newUser = new User({
       schulcloudId: data.schulcloudId,
       devices: [newDevice]
     });
 
     // Insert data into DB
-    return user.findOne({ schulcloudId: data.schulcloudId })
+    return User.findOne({schulcloudId: data.schulcloudId})
       .then(user => {
         if (!user) {
           user = newUser;
@@ -47,7 +49,11 @@ class Service {
             user.devices.push(newDevice);
           }
         }
-        return user.save();
+        return user.save().then(user => {
+          console.log(user, "...")
+          let serialized = new serializer(User.typename, User.attributes).serialize(user);
+          return serialized;
+        });
       })
   }
 
@@ -57,7 +63,7 @@ class Service {
     return Authentication
       .verifyUser(params.query.user_token)
       .then(schulcloudId => {
-        return user.findOne({ schulcloudId: schulcloudId })
+        return User.findOne({schulcloudId: schulcloudId})
       })
       .then(user => {
         if (user) {
@@ -81,7 +87,7 @@ class Service {
   }
 }
 
-module.exports = function() {
+module.exports = function () {
   const app = this;
 
   // Initialize our service with any options it requires
