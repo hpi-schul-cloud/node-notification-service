@@ -18,7 +18,7 @@ const callbackSchema = new Schema({
 const deviceSchema = new Schema({
   deviceId: { type: String, required: true},
   status: {type: String},
-  timestamp: {type: Date}
+  timestamp: {type: Date, 'default': Date.now}
 });
 
 // TODO notification model for db

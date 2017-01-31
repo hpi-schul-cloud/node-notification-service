@@ -45,15 +45,17 @@ class SendInterface {
           this._addResponse(accumulatedResponses, response);
         });
 
-        // let devices[];
+
         accumulatedResponses.results.forEach((entry) =>
         {
           console.log('Device Entry', entry);
           let deviceId = entry.deviceId;
           console.log("Id", deviceId);
 
-         // notifications.devices.push({deviceId: deviceId });
-          // devices
+          console.log("Notification: ", notifications[1]._id);
+          notifications[1].devices.push({deviceId: deviceId, status: "bla" });
+
+          notifications[1].save();
 
         });
 
