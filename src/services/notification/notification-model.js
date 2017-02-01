@@ -18,6 +18,7 @@ const callbackSchema = new Schema({
 const deviceSchema = new Schema({
   deviceId: { type: String, required: true},
   status: {type: String},
+  error: {type: String},
   timestamp: {type: Date, 'default': Date.now}
 });
 

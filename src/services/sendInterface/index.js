@@ -50,16 +50,12 @@ class SendInterface {
 
         accumulatedResponses.results.forEach((entry) =>
         {
-          // console.log('Device Entry', entry);
-
-
-          //console.log("Notification: ", notifications);
 
           new Promise((resolve, reject) => {
             notification.findOne({ _id: entry.notificationId })
               .then(foundNotification => {
 
-                foundNotification.devices.push({ deviceId: entry.deviceId, status: entry.error });
+                foundNotification.devices.push({ deviceId: entry.deviceId, error: entry.error });
 
                 return foundNotification.save();
               })
