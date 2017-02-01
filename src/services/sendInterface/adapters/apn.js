@@ -7,7 +7,7 @@ const errors = require('feathers-errors');
 const APN_PRIORITIES = {
   HIGH: 10,
   MEDIUM: 5
-}
+};
 
 class ApnAdapter {
   send(notifications, devices) {
@@ -31,7 +31,7 @@ class ApnAdapter {
   _buildMessage(notification) {
     let message = new apn.Notification();
 
-    message.topic = 'web.org.schul-cloud';
+    message.topic = config.pushId;
     message.urlArgs = ['index.php']; // TODO: set this to something meaningful
     message.title = notification.message.title;
     message.body = notification.message.body;

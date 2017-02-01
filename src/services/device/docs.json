@@ -9,7 +9,7 @@
       "properties": {
         "token": {
           "type": "string",
-          "description": "Schul-Cloud SSO Token"
+          "description": "Application SSO Token"
         },
         "device_token": {
           "type": "string",
@@ -71,7 +71,7 @@
       {
         "name": "token",
         "in": "query",
-        "description": "Schul-Cloud SSO Token",
+        "description": "Application SSO Token",
         "required": true,
         "type": "string"
       }

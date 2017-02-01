@@ -7,6 +7,7 @@ const requestPromise = require('request-promise');
 const app = require('../../../src/app');
 const apnDevice = require('../../../src/services/apnDevice/index');
 
+const config = require('../../../secure/config.json').sendServices.apn;
 const port = app.get('port');
 const host = app.get('protocol') + '://' + app.get('host') + ':' + port;
 
@@ -30,7 +31,7 @@ describe('apnDevice service', function() {
   it('responds on the registration route', () => {
     return requestPromise({
       method: 'POST',
-      uri: host + '/v1/devices/theDeviceToken/registrations/web.org.schul-cloud',
+      uri: host + '/v1/devices/theDeviceToken/registrations/' + config.pushId,
       headers: {
         'authorization': 'ApplePushNotifications student1_1'
       }
@@ -40,7 +41,7 @@ describe('apnDevice service', function() {
   it('responds on the delete route', () => {
     return requestPromise({
       method: 'DELETE',
-      uri: host + '/v1/devices/theDeviceToken/registrations/web.org.schul-cloud',
+      uri: host + '/v1/devices/theDeviceToken/registrations/' + config.pushId,
       headers: {
         'authorization': 'ApplePushNotifications student1_1'
       }
@@ -50,7 +51,7 @@ describe('apnDevice service', function() {
   it('sends the pushPackage', () => {
     return requestPromise({
       method: 'POST',
-      uri: host + '/v1/pushPackages/web.org.schul-cloud',
+      uri: host + '/v1/pushPackages/' + config.pushId,
       body: {
         userToken: 'usertokenwithmin16chars'
       },
@@ -66,7 +67,7 @@ describe('apnDevice service', function() {
   it('fails on missing userToken', () => {
     return requestPromise({
       method: 'POST',
-      uri: host + '/v1/pushPackages/web.org.schul-cloud',
+      uri: host + '/v1/pushPackages/' + config.pushId,
       json: true,
       resolveWithFullResponse: true
     })
@@ -81,7 +82,7 @@ describe('apnDevice service', function() {
   it('fails on wrong userToken', () => {
     return requestPromise({
       method: 'POST',
-      uri: host + '/v1/pushPackages/web.org.schul-cloud',
+      uri: host + '/v1/pushPackages/' + config.pushId,
       body: {
         userToken: 'usertokenwithmax16chars'
       },
@@ -99,7 +100,7 @@ describe('apnDevice service', function() {
   it('fails on missing authorization header', () => {
     return requestPromise({
       method: 'POST',
-      uri: host + '/v1/devices/theDeviceToken/registrations/web.org.schul-cloud'
+      uri: host + '/v1/devices/theDeviceToken/registrations/' + config.pushId
     })
       .then(response => {
         assert.equal(response.statusCode, 400);
@@ -112,7 +113,7 @@ describe('apnDevice service', function() {
   it('fails on invalid authorization header', () => {
     return requestPromise({
       method: 'POST',
-      uri: host + '/v1/devices/theDeviceToken/registrations/web.org.schul-cloud',
+      uri: host + '/v1/devices/theDeviceToken/registrations/' + config.pushId,
       headers: {
         'authorization': 'AppleShupNotifications usertoken2'
       }
