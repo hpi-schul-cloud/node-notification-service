@@ -6,7 +6,7 @@ const constants = require('../../../../src/services/constants');
 const apn = require('../../../../src/services/sendInterface/adapters/apn');
 const apnMock = require('apn/mock');
 
-describe.only('apn service adapter', function() {
+describe('apn service adapter', function() {
 
   it('registered the apn service adapter', () => {
     assert(apn);
