@@ -23,8 +23,8 @@ const messageSchema = new Schema({
   },
   timeToLive: {type: Date, required: false},
 
-  initiatorId: {type: String, required: true}, // ID (nicht token!!!) von dem service oder dem user der die message geschickt hat
-  scopeIds: {type: [String], required: true},
+  applicationId: { type: String, required: true }, // ID (not token!!!) of the user or service that sent the message
+  scopeIds: { type: [String], required: true },
 
   userIds: {type: [String], required: false},
   createdAt: {type: Date, 'default': Date.now},

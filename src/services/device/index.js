@@ -18,7 +18,7 @@ class Service {
     this.docs = docs;
   }
 
-  // Adds a device for a User to the database
+  // Adds a device for a user to the database
   create(data, params) {
 
     console.log('[DEVICE] ' + JSON.stringify(data));
@@ -34,13 +34,13 @@ class Service {
     };
 
     let newUser = new User({
-      schulcloudId: data.author.id,
+      applicationId: data.author.id,
       devices: [newDevice]
     });
 
 
     // Insert data into DB
-    return User.findOne({ schulcloudId: data.author.id })
+    return User.findOne({ applicationId: data.author.id })
       .then(user => {
         if (!user) {
           user = newUser;
@@ -62,7 +62,7 @@ class Service {
     console.log('[DEVICE REMOVE]' + JSON.stringify(params));
     // TODO: move auth in hooks
     // TODO: find better way then passing token as query param
-    return User.findOne({ schulcloudId: params.author.id })
+    return User.findOne({ applicationId: params.author.id })
       .then(user => {
         if (user) {
           // find device
@@ -85,7 +85,7 @@ class Service {
   }
 }
 
-module.exports = function () {
+module.exports = function() {
   const app = this;
 
   // Initialize our service with any options it requires

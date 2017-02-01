@@ -29,7 +29,12 @@ class Service {
   }
 
   create(data, params) {
-    let message = new Message(data);
+    let message = new Message({
+      title: data.title,
+      body: data.body,
+      scopeIds: data.scopeIds,
+      applicationId: data.author.id
+    });
 
     return Resolve
       .resolveScope(message.scopeIds).then(userIds => {

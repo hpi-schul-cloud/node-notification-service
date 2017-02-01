@@ -7,10 +7,10 @@ const constants = require('../constants');
 
 class Resolve {
 
-  // return schulcloud user ids for given array of user or scope ids
+  // return application user ids for given array of user or scope ids
   static resolveScope(ids) {
 
-    console.log('[RESOLVE] resolving scopes...')
+    console.log('[RESOLVE] resolving scopes...');
 
     if (!Array.isArray(ids)) return Promise.reject(new errors.BadRequest('scope id param has to be an array'));
 
@@ -19,7 +19,7 @@ class Resolve {
       console.log('[RESOLVE] resolving ' + id);
       console.log('[RESOLVE] calling ' + constants.CONFIG.RESOLVE_API_ENDPOINT + id);
 
-      var options = {
+      let options = {
         uri: constants.CONFIG.RESOLVE_API_ENDPOINT + id,
         json: true
       };
@@ -34,7 +34,7 @@ class Resolve {
         return segment.data.map(user => {
           return user.id;
         });
-      })
+      });
 
       console.log('[RESOLVE] resolved ids: ' + Util.flatten(allIds));
 
@@ -43,10 +43,10 @@ class Resolve {
 
   }
 
-  // get User ID from schulcloud db by sso Token
+  // get User ID from application db by sso Token
   static verifyToken(token) {
 
-    var options = {
+    let options = {
       uri: constants.CONFIG.AUTHENTICATION_API_ENDPOINT + token,
       json: true
     };
@@ -58,7 +58,7 @@ class Resolve {
   // get scopes for user
   static verifyScopes(token) {
 
-    var options = {
+    let options = {
       uri: constants.CONFIG.AUTHORIZATION_API_ENDPOINT + token,
       json: true
     };

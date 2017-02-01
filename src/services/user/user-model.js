@@ -27,7 +27,7 @@ const deviceSchema = new Schema({
 });
 
 const userSchema = new Schema({
-  schulcloudId: { type: String, required: true, unique: true },
+  applicationId: { type: String, required: true, unique: true },
   devices: { type: [deviceSchema], required: false },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }

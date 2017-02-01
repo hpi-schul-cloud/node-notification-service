@@ -53,7 +53,7 @@ describe('device service', () => {
     // TODO investigate duplicate key error
     it.skip('call with valid data and existing user', () => {
       let newUser = new User({
-        schulcloudId: 'useridfürusertoken2',
+        applicationId: 'useridfürusertoken2',
         devices: []
       });
 
@@ -129,7 +129,7 @@ describe('device service', () => {
 
     it('call with valid User', () => {
       let newUser = new User({
-        schulcloudId: '874a9be4-ea6a-4364-852d-1a46b0d155f3',
+        applicationId: '874a9be4-ea6a-4364-852d-1a46b0d155f3',
         devices: []
       });
 
@@ -147,7 +147,7 @@ describe('device service', () => {
 
     it('call with valid User and device', () => {
       let newUser = new User({
-        schulcloudId: '874a9be4-ea6a-4364-852d-1a46b0d155f3',
+        applicationId: '874a9be4-ea6a-4364-852d-1a46b0d155f3',
         devices: [{
           token: 'testToken2',
           type: 'mobile',

@@ -16,6 +16,12 @@
        "description": "Search for state",
        "required": false
      },{
+       "name": "token",
+       "in": "query",
+       "type": "string",
+       "description": "SSO Token",
+       "required": true
+     },{
        "name": "$limit",
        "in": "query",
        "type" : "integer",
@@ -56,6 +62,19 @@
    "get": {
      "summary": "Find a Notification by ID",
      "description": "Find Notification by ID",
+     "parameters": [{
+       "name": "token",
+       "in": "query",
+       "type": "string",
+       "description": "SSO Token",
+       "required": true
+     },{
+       "name": "_id",
+       "in": "path",
+       "type": "string",
+       "description": "ID of notification",
+       "required": true
+     }],
      "responses": {
        "200": {
          "description": "OK"

@@ -4,6 +4,7 @@
   },
   "sendServices": {
     "apn": {
+      "pushId": "web.com.domain",
       "token": {
         "key": "-----BEGIN PRIVATE KEY-----\naoiufgh38z9823hUAIHSDas7dzhiuf89/(&%AKJFHASKJDHAIUSHF/§EIU§)(U=)Jsudasfsadfkuahfu3287z49238poasjfbagfsjfiwuhe7z928u3wojsldbvkaUH/§)832492hwifuhawrg23rz981(((/%%&jkasbfauiwh8z&87dajsdbkjafh97342kjsb(/T\n-----END PRIVATE KEY-----",
         "keyId": "T0K3NK3Y1D",
