@@ -36,7 +36,6 @@ class Constants {
     this.SERIALIZE = {
       options: {
         id: '_id',
-        pluralizeType: false
       }
     };
 

@@ -3,8 +3,11 @@
 const assert = require('assert');
 const request = require('request');
 const app = require('../../../src/app');
-
+const Serializer = require('jsonapi-serializer').Serializer;
 const User = require('../../../src/services/user/user-model');
+const util = require('util');
+const expect = require('chai').expect;
+
 
 describe('device service', () => {
 
@@ -30,9 +33,17 @@ describe('device service', () => {
     it.only('call with valid data', () => {
 
       return app.service('devices').create(validPayload)
-        .then(function(res) {
-          console.log(res);
-          assert.ok(res);
+        .then(function(result) {
+
+          expect(result.included[0]).to.have.property('id');
+
+          expect(result.included[0]).to.have.property('type').equal('devices');
+          //console.log(util.inspect(result, {showHidden: false, depth: null}))
+          expect(result.included[0].attributes).to.be.eql({
+            token: 'testToken',
+            service: 'firebase',
+            state: 'registered'
+          });
         });
     });
 

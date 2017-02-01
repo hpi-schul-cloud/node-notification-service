@@ -1,6 +1,6 @@
 'use strict';
 
-// user-model.js - A mongoose model
+// User-model.js - A mongoose model
 //
 // See http://mongoosejs.com/docs/models.html
 // for more of what you can do here.
@@ -35,32 +35,22 @@ const userSchema = new Schema({
 const userModel = mongoose.model('user', userSchema);
 
 userModel.typename = 'user';
-userModel.attributes = Object.assign({}, Constants.SERIALIZE, {
+userModel.attributes = {
   id: 'schulcloudId',
-  pluralizeType: false,
   attributes: [
     'createdAt',
-    'updatedAt'
+    'updatedAt',
+    'devices'
   ],
   devices: {
-    // https://github.com/SeyZ/jsonapi-serializer/blob/master/test/serializer.js
-    ref: function (user, device) {
-      console.log("hooo", device._id);
-      return device._id;
-    },
-    included: true,
-    pluralizeType: false,
+    ref: '_id',
+    include: true,
     attributes: [
       'token',
-      'type',
       'service',
-      'state',
-      'active'
+      'state'
     ]
-  },
-  typeForAttribute: function (attribute, record) {
-    return (record && record.type) ? record.type : attribute;
   }
-});
+};
 
 module.exports = userModel;

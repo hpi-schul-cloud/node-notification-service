@@ -5,8 +5,7 @@ const User = require('../user/user-model');
 const Resolve = require('../resolve');
 const errors = require('feathers-errors');
 const Authentication = require('../authentication');
-const serializer = require('jsonapi-serializer').Serializer;
-
+const Serializer = require('jsonapi-serializer').Serializer;
 
 const docs = require('./docs.json');
 
@@ -18,9 +17,8 @@ class Service {
     this.docs = docs;
   }
 
-  // Adds a device for a user to the database
+  // Adds a device for a User to the database
   create(data, params) {
-
     // Create device object
     const newDevice = {
       token: data.service_token,
@@ -50,9 +48,7 @@ class Service {
           }
         }
         return user.save().then(user => {
-          console.log(user, "...")
-          let serialized = new serializer(User.typename, User.attributes).serialize(user);
-          return serialized;
+          return new Serializer(User.typename, User.attributes).serialize(user);
         });
       })
   }
