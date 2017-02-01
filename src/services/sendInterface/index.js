@@ -15,8 +15,6 @@ class SendInterface {
    */
   send(notifications, devices) {
     return new Promise((resolve, reject) => {
-      let results = {};
-
       // group devices and notifications by service
       let groupsByService = this._groupByService(notifications, devices);
       let allPromises = [];
@@ -25,13 +23,8 @@ class SendInterface {
         let serviceNotifications = groupsByService[service].notifications;
         let serviceDevices = groupsByService[service].devices;
 
-        if (notificationServices.hasOwnProperty(service)) {
-          let promise = notificationServices[service].send(serviceNotifications, serviceDevices);
-          allPromises.push(promise);
-        } else {
-          // there is no interface for this service
-          // TODO: handle error
-        }
+        let promise = notificationServices[service].send(serviceNotifications, serviceDevices);
+        allPromises.push(promise);
       }
 
       Promise.all(allPromises).then((responses) => {
@@ -63,12 +56,10 @@ class SendInterface {
 
   _groupByService(notifications, devices) {
     return devices.reduce((groupsByService, device, index) => {
-      if (!groupsByService.hasOwnProperty(device.service)) {
-        groupsByService[device.service] = {
-          notifications: [],
-          devices: []
-        };
-      }
+      groupsByService[device.service] = {
+        notifications: [],
+        devices: []
+      };
 
       groupsByService[device.service].notifications.push(notifications[index]);
       groupsByService[device.service].devices.push(device);
