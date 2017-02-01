@@ -3,12 +3,19 @@
 const sendInterface = require('../sendInterface');
 const User = require('../user/user-model');
 const Escalation = require('./escalation-model');
-
+const winston = require('winston');
 const Constants = require('../constants');
 
 class Orchestration {
 
   constructor() {
+
+    this.logger = new (winston.Logger)({
+      transports: [
+        //new (winston.transports.Console)(),
+        new (winston.transports.File)({ filename: 'log/orchestration.log' })
+      ]
+    });
 
     this.reescalate = this.reescalate.bind(this);
 
@@ -29,9 +36,9 @@ class Orchestration {
    * take care to do not run multiple instances by the same time.
    */
   reescalate() {
-    console.log('[SCHEDULED ESCALATION] starts...');
+    this.logger.info('[SCHEDULED ESCALATION] starts...');
     if (this.reescalationRunning === true) {
-      console.log('- await last reescalate finished...');
+      this.logger.info('- await last reescalate finished...');
       return Promise.resolve(true);
     }
     this.reescalationRunning = true;
@@ -40,31 +47,31 @@ class Orchestration {
       .populate('notification')
       .then(escalations => {
         if (escalations.length) {
-          console.log(' - escalate', escalations.length, 'scheduled notifications...');
+          this.logger.info(' - escalate', escalations.length, 'scheduled notifications...');
           return Promise.all(escalations.map(escalation => {
             return this.escalate(escalation);
           }));
         } else {
-          console.log(' - no escalations scheduled...');
+          this.logger.info(' - no escalations scheduled...');
           return true;
         }
       })
       .then(() => {
         this.reescalationRunning = false;
-        console.log('[SCHEDULED ESCALATION] end...');
+        this.logger.info('[SCHEDULED ESCALATION] end...');
       })
       .catch(err => {
         this.reescalationRunning = false;
-        console.log('[SCHEDULED ESCALATION] end after error...', err);
+        this.logger.info('[SCHEDULED ESCALATION] end after error...', err);
       });
   }
 
   escalate(escalation) {
-    console.log('[INFO] escalating ', escalation._id);
+    this.logger.info('[INFO] escalating ', escalation._id);
 
     // notification has been received and clicked... leave escalation
     if (escalation.notification.state !== Constants.NOTIFICATION_STATES.ESCALATING) {
-      console.log('[INFO] cancel escalation due state change...', escalation._id);
+      this.logger.info('[INFO] cancel escalation due state change...', escalation._id);
       return escalation.remove();
     }
 
@@ -110,7 +117,7 @@ class Orchestration {
         }
 
         // devices(or email) have been found... send
-        console.log(devices.length, 'devices found...');
+        this.logger.info(devices.length, 'devices found...');
 
         // prepare notifications by multiplication for devices
         let news = [];
@@ -126,7 +133,7 @@ class Orchestration {
 
       })
       .catch(err => {
-        console.log('[INFO] Failed to escalate, remove ' + escalation._id, err);
+        this.logger.error('[INFO] Failed to escalate, remove ' + escalation._id, err);
         return escalation.remove();
       });
   }
@@ -174,7 +181,7 @@ class Orchestration {
    * @returns {Promise.<TResult>|Promise}
    */
   orchestrate(notifications) {
-    console.log('[INFO] orchestrating notification');
+    this.logger.info('[INFO] orchestrating notification');
     return Promise
       .all(notifications.map(notification => {
         notification.changeState(Constants.NOTIFICATION_STATES.ESCALATING);
