@@ -6,7 +6,7 @@ const app = require('../../../src/app');
 
 const User = require('../../../src/services/user/user-model');
 
-describe('message service', function() {
+describe('message service', function () {
   it('registered the messages service', () => {
     assert.ok(app.service('messages'));
   });
@@ -21,12 +21,13 @@ describe('message service', function() {
         'testScopeId'
       ]
     })
-    .catch(err => {
-      assert.equal(err.code, 401);
-    });
+      .catch(err => {
+        assert.equal(err.code, 401);
+      });
   });
 
-  it('sends a message to not existing user', () => {
+  it.only('sends a message to not existing user', () => {
+    let id = '';
     return app.service('messages').create({
       title: 'New Notification',
       body: 'You have a new Notification',
@@ -35,6 +36,30 @@ describe('message service', function() {
         '316866a2-41c3-444b-b82c-274697c546a0'
       ]
     });
+  });
+
+  it.only('sends and get a message to existing user', () => {
+    let id = '';
+    let newUser = new User({
+      applicationId: '373fd11a-4c42-48ac-b245-0aa922bc1cc9',
+      devices: []
+    });
+    return newUser.save()
+      .then(() => {
+        return app.service('messages').create({
+          title: 'New Notification',
+          body: 'You have a new Notification',
+          token: 'teacher1_1',
+          scopeIds: [
+            '316866a2-41c3-444b-b82c-274697c546a0'
+          ]
+        }).then(message => {
+          id = message.data.id;
+          return app.service('messages').get(id);
+        }).then(message => {
+          assert.equal(message.data.id, id);
+        });
+      });
   });
 
   it('sends a message to an existing user', () => {
@@ -66,9 +91,9 @@ describe('message service', function() {
         '316866a2-41c3-444b-b82c-274697c546a0'
       ]
     })
-    .catch(err => {
-      assert.equal(err.code, 400);
-    });
+      .catch(err => {
+        assert.equal(err.code, 400);
+      });
   });
 
   it('rejects unauthorized user (1/2)', () => {
@@ -80,9 +105,9 @@ describe('message service', function() {
         '316866a2-41c3-444b-b82c-274697c546a0'
       ]
     })
-    .catch(err => {
-      assert.equal(err.code, 403);
-    });
+      .catch(err => {
+        assert.equal(err.code, 403);
+      });
   });
 
   it('rejects unauthorized user (2/2)', () => {
@@ -94,9 +119,9 @@ describe('message service', function() {
         '8b0753ab-6fa8-4f42-80bd-700fe8f7d66d'
       ]
     })
-    .catch(err => {
-      assert.equal(err.code, 403);
-    });
+      .catch(err => {
+        assert.equal(err.code, 403);
+      });
   });
 
   it('rejects too big payload', () => {
@@ -111,9 +136,9 @@ describe('message service', function() {
         '316866a2-41c3-444b-b82c-274697c546a0'
       ]
     })
-    .catch(err => {
-      assert.equal(err.code, 400);
-    });
+      .catch(err => {
+        assert.equal(err.code, 400);
+      });
   })
 
 });
