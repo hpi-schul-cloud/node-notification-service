@@ -18,14 +18,20 @@ describe('device service', () => {
 
   describe('register', () => {
 
-    const validPayload = {
+    const dev = {
+      token: 'testToken',
+      service: 'firebase',
+      state: 'registered'
+    };
+
+    const validPayload = Object.assign({}, dev, {
       'service': constants.SEND_SERVICES.FIREBASE,
       'type': constants.DEVICE_TYPES.MOBILE,
       'name': 'test2',
       'token': 'student1_1',
       'device_token': 'testToken',
       'OS': 'android7'
-    };
+    });
 
     it('call empty', () => {
       app.service('devices').create({});
@@ -34,17 +40,13 @@ describe('device service', () => {
     it('call with valid data', () => {
 
       return app.service('devices').create(validPayload)
-        .then(function(result) {
+        .then(function (result) {
 
           expect(result.included[0]).to.have.property('id');
 
           expect(result.included[0]).to.have.property('type').equal('devices');
           //console.log(util.inspect(result, {showHidden: false, depth: null}))
-          expect(result.included[0].attributes).to.be.eql({
-            token: 'testToken',
-            service: 'firebase',
-            state: 'registered'
-          });
+          expect(result.included[0].attributes).to.be.eql(dev);
         });
     });
 
@@ -60,7 +62,7 @@ describe('device service', () => {
         .then(() => {
           return app.service('devices').create(validPayload);
         })
-        .then(function(res) {
+        .then(function (res) {
           assert.ok(res);
         });
     });
@@ -74,7 +76,7 @@ describe('device service', () => {
         'device_token': 'testToken',
         'OS': 'android7'
       })
-        .catch(function(res) {
+        .catch(function (res) {
           assert.equal(res.code, 401);
         });
     });
