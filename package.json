@@ -39,7 +39,7 @@
     "feathers-mongoose": "^3.6.1",
     "feathers-rest": "^1.5.2",
     "feathers-swagger": "^0.3.1",
-    "mongoose": "^4.6.7",
+    "mongoose": "4.7.8",
     "node-gcm": "^0.14.4",
     "serve-favicon": "^2.3.0",
     "winston": "^2.3.0"
