@@ -16,7 +16,7 @@
     "node": ">= 0.12.0"
   },
   "scripts": {
-    "test": "export NODE_ENV=testing && npm run coverage && npm run eslint",
+    "test": "set NODE_ENV=testing && npm run coverage && npm run eslint",
     "testing": "nodemon --inspect src/ --exec \"npm test  || true\"",
     "jshint": "jshint src/. test/. --config",
     "eslint": "eslint src/. test/. ",
@@ -29,28 +29,20 @@
     "body-parser": "^1.15.2",
     "compression": "^1.6.2",
     "cors": "^2.8.1",
-    "express-zip": "^2.0.1",
     "feathers": "^2.0.2",
-    "feathers-authentication": "^0.7.12",
     "feathers-configuration": "^0.3.3",
     "feathers-errors": "^2.5.0",
     "feathers-hooks": "^1.6.1",
     "feathers-mongoose": "^3.6.1",
     "feathers-rest": "^1.5.2",
-    "feathers-socketio": "^1.4.2",
     "feathers-swagger": "^0.3.1",
-    "fs-extra": "^2.0.0",
     "mongoose": "^4.6.7",
     "node-gcm": "^0.14.4",
-    "passport": "^0.3.2",
     "serve-favicon": "^2.3.0",
     "winston": "^2.3.0",
     "jsonapi-serializer": "^3.4.2"
   },
   "devDependencies": {
-    "chai": "^3.5.0",
-    "expect": "^1.20.2",
-    "feathers-populate-hook": "0.0.4",
     "istanbul": "^0.4.5",
     "jshint": "^2.9.4",
     "eslint": "^2.13.0",
@@ -58,7 +50,6 @@
     "nodemon": "^1.11.0",
     "request": "^2.78.0",
     "request-promise": "^4.1.1",
-    "sinon": "^1.17.6",
-    "supertest": "^2.0.1"
+    "sinon": "^1.17.6"
   }
 }

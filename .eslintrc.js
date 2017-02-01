@@ -37,7 +37,7 @@ module.exports = {
       }
     ],
     "no-use-before-define": [
-      2,
+      "error",
       {
         "functions": false
       }

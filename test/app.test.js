@@ -4,8 +4,8 @@ const assert = require('assert');
 const request = require('request');
 const app = require('../src/app');
 
-const port = 3131;
-const host = 'http://localhost:' + port;
+const port = app.get('port');
+const host = app.get('protocol') + '://' + app.get('host') + ':' + port;
 
 const User = require('../src/services/user/user-model');
 const Message = require('../src/services/message/message-model');

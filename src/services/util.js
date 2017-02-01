@@ -31,6 +31,15 @@ class Util {
     }, []);
   }
 
+  static pick(object, properties) {
+    let newObject = {};
+    for (let key in object) {
+      if (properties.indexOf(key) !== -1) {
+        newObject[key] = object[key];
+      }
+    }
+    return newObject;
+  }
 }
 
 module.exports = Util;
