@@ -4,6 +4,7 @@ const notificationServices = {
   firebase: require('./adapters/firebase'),
   email: require('./adapters/email')
 };
+const notification = require('../notification/notification-model');
 
 class SendInterface {
 
@@ -16,6 +17,7 @@ class SendInterface {
   send(notifications, devices) {
     return new Promise((resolve, reject) => {
       let results = {};
+
 
       // group devices and notifications by service
       let groupsByService = this._groupByService(notifications, devices);
@@ -48,14 +50,24 @@ class SendInterface {
 
         accumulatedResponses.results.forEach((entry) =>
         {
-          console.log('Device Entry', entry);
-          let deviceId = entry.deviceId;
-          console.log("Id", deviceId);
+          // console.log('Device Entry', entry);
 
-          console.log("Notification: ", notifications[1]._id);
-          notifications[1].devices.push({deviceId: deviceId, status: "bla" });
 
-          notifications[1].save();
+          //console.log("Notification: ", notifications);
+
+          new Promise((resolve, reject) => {
+            notification.findOne({ _id: entry.notificationId })
+              .then(foundNotification => {
+
+                foundNotification.devices.push({ deviceId: entry.deviceId, status: entry.error });
+
+                return foundNotification.save();
+              })
+
+              .catch(err => {
+                reject(new errors.BadRequest(err));
+              })
+          });
 
         });
 
