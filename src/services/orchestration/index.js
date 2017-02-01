@@ -70,7 +70,7 @@ class Orchestration {
 
     return User
       .findOne({
-        schulcloudId: escalation.notification.user
+        applicationId: escalation.notification.user
       })
       .then(user => {
         let devices = [];
