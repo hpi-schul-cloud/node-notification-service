@@ -32,7 +32,7 @@ As API framework, we use [Feathers](http://feathersjs.com).
 4. Create private `config.json`
 
     ```
-    cp src/services/sendInterface/adapters/config.sample.json src/services/sendInterface/adapters/config.json
+    cp secure/config.sample.json secure/config.json
     ```
 
 5. Start your app
@@ -40,6 +40,26 @@ As API framework, we use [Feathers](http://feathersjs.com).
     ```
     npm start
     ```
+
+## Configuration
+
+In this repository we provide you with a sample configuration file, which can be found [here](https://github.com/schulcloud/node-notification-service/blob/master/secure/config.sample.json). Copy it to `/secure/config.json`, as described above.
+
+### Safari Web Notifications
+
+To send Safari Web Notifications you need an Apple developer license. Go to the [Certificates, Identifiers & Profiles](https://developer.apple.com/account/ios/certificate) section of your developer account and register a new Website Push ID. Because we are using the [apn-node](https://github.com/node-apn/node-apn) package, you are free to use the certificate file or the token. Set your configuration according to the [apn.Provider](https://github.com/node-apn/node-apn/blob/master/doc/provider.markdown) documentation in your configuration file under the `sendServices.apn` property.
+
+Safari requires specific endpoints to register with your service. One of them has to serve the Push Package. To create it follow these steps on your local machine:
+
+1. Step one...
+
+Place the `pushPackage.zip` file in the `/secure/` folder. Done.
+
+For more information go to the [official documentation](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/NotificationProgrammingGuideForWebsites/PushNotifications/PushNotifications.html).
+
+### Firebase Notifications
+
+To setup Firebase Notifications all you need is the server token of your project. This can be found in your Firebase project settings under the tab Cloud Messaging. Just copy it to the `config.json` in the `sendServices.firebase.serverToken` property.
 
 ## Testing
 
