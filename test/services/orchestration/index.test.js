@@ -7,34 +7,14 @@ const app = require('../../../src/app');
 const orchestration = require('../../../src/services/orchestration/index');
 const sendInterface = require('../../../src/services/sendInterface/index');
 
+const TestUtil = require('../../testUtil');
+
 const Constants = require('../../../src/services/constants');
 const User = require('../../../src/services/user/user-model');
 const Message = require('../../../src/services/message/message-model');
 const Notification = require('../../../src/services/notification/notification-model');
 const Escalation = require('../../../src/services/orchestration/escalation-model');
 
-function createNotification(username) {
-  let message = Message({});
-  let notification = Notification({
-    message: message,
-    user: username
-  });
-  return notification.save();
-}
-
-function createEscalation() {
-  let user = 'someId';
-  let message = Message({});
-  let notification = Notification({
-    message: message,
-    user: user
-  });
-  let escalation = Escalation({
-    notification: notification,
-    nextEscalationType: Constants.DEVICE_TYPES.DESKTOP
-  });
-  return notification.save().then(escalation.save);
-}
 
 describe('orchestration service', () => {
 
@@ -48,9 +28,9 @@ describe('orchestration service', () => {
 
   it('orchestrate multiple notifications', ()=> {
 
-    return createNotification('firstUser')
+    return TestUtil.createNotification('firstUser')
       .then(() => {
-        return createNotification('secondUser');
+        return TestUtil.createNotification('secondUser');
       })
       .then(()=> {
         return Notification.find({});
@@ -104,7 +84,7 @@ describe('orchestration service', () => {
         return Promise.resolve();
       });
 
-      return createEscalation()
+      return TestUtil.createEscalation()
         .then(() => {
           return orchestration.reescalate();
         })
@@ -120,7 +100,7 @@ describe('orchestration service', () => {
         return Promise.reject();
       });
 
-      return createEscalation()
+      return TestUtil.createEscalation()
         .then(() => {
           return orchestration.reescalate();
         })
@@ -139,7 +119,7 @@ describe('orchestration service', () => {
         return Promise.resolve();
       });
 
-      return createEscalation()
+      return TestUtil.createEscalation()
         .then(escalation => {
           escalation.nextEscalationDue = Date.now() + 5000;
           return escalation.save();
@@ -159,7 +139,7 @@ describe('orchestration service', () => {
   describe('escalate(): ', () => {
 
     it('stop clicked notifications.', () => {
-      return createEscalation()
+      return TestUtil.createEscalation()
         .then(escalation => {
           escalation.notification.changeState(Constants.NOTIFICATION_STATES.CLICKED);
           return orchestration
@@ -176,7 +156,7 @@ describe('orchestration service', () => {
     });
 
     it('stop invalid escalation.', () => {
-      return createEscalation()
+      return TestUtil.createEscalation()
         .then(escalation => {
           escalation.notification.user = null;
           escalation.notification.changeState(Constants.NOTIFICATION_STATES.ESCALATING);
@@ -446,7 +426,7 @@ describe('orchestration service', () => {
   describe('updateEscalation(): ', () => {
 
     it('from DESKTOP to MOBILE.', () => {
-      return createEscalation()
+      return TestUtil.createEscalation()
         .then(escalation => {
           escalation.nextEscalationType = Constants.DEVICE_TYPES.DESKTOP;
           return orchestration.updateEscalation(escalation);
@@ -457,7 +437,7 @@ describe('orchestration service', () => {
     });
 
     it('from MOBILE to EMAIL.', () => {
-      return createEscalation()
+      return TestUtil.createEscalation()
         .then(escalation => {
           escalation.nextEscalationType = Constants.DEVICE_TYPES.MOBILE;
           return orchestration.updateEscalation(escalation);
@@ -468,7 +448,7 @@ describe('orchestration service', () => {
     });
 
     it('from DESKTOP_MOBILE to EMAIL.', () => {
-      return createEscalation()
+      return TestUtil.createEscalation()
         .then(escalation => {
           escalation.nextEscalationType = Constants.DEVICE_TYPES.DESKTOP_MOBILE;
           return orchestration.updateEscalation(escalation);
@@ -479,7 +459,7 @@ describe('orchestration service', () => {
     });
 
     it('from DESKTOP_MOBILE to EMAIL with "high".', () => {
-      return createEscalation()
+      return TestUtil.createEscalation()
         .then(escalation => {
           escalation.nextEscalationType = Constants.DEVICE_TYPES.DESKTOP_MOBILE;
           escalation.notification.message.priority = Constants.MESSAGE_PRIORITIES.HIGH;
@@ -491,7 +471,7 @@ describe('orchestration service', () => {
     });
 
     it('from EMAIL to removed.', () => {
-      return createEscalation()
+      return TestUtil.createEscalation()
         .then(escalation => {
           escalation.nextEscalationType = Constants.DEVICE_TYPES.EMAIL;
           return orchestration

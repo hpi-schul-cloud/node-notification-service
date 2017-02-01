@@ -16,8 +16,7 @@ class Resolve {
 
     return Promise.all(ids.map(id => {
 
-      console.log('[RESOLVE] resolving ' + id);
-      console.log('[RESOLVE] calling ' + constants.CONFIG.RESOLVE_API_ENDPOINT + id);
+      // console.log('[RESOLVE] resolving ' + id);
 
       let options = {
         uri: constants.CONFIG.RESOLVE_API_ENDPOINT + id,
@@ -27,16 +26,16 @@ class Resolve {
       return rp(options);
     })).then(all => {
 
-      console.log('[RESOLVE] all scopes resolved');
+      // console.log('[RESOLVE] all scopes resolved');
 
       let allIds = all.map(segment => {
-        console.log('[RESOLVE] '+segment.data.length+' users in scope');
+        // console.log('[RESOLVE] '+segment.data.length+' users in scope');
         return segment.data.map(user => {
           return user.id;
         });
       });
 
-      console.log('[RESOLVE] resolved ids: ' + Util.flatten(allIds));
+      // console.log('[RESOLVE] resolved ids: ' + Util.flatten(allIds));
 
       return Promise.resolve(Util.flatten(allIds));
     })

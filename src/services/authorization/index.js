@@ -30,7 +30,7 @@ class Authorization {
 
       let q = hook.data ? (hook.data.author.type === 'user') : (hook.params.author.type === 'user');
 
-      console.log(q ?'[AUTHORIZATION] it is a user' : '[AUTHORIZATION] it is not a user')
+      // console.log(q ?'[AUTHORIZATION] it is a user' : '[AUTHORIZATION] it is not a user')
 
       return q ? Promise.resolve(hook) : Promise.reject(new errors.Forbidden('is not a user'));
 

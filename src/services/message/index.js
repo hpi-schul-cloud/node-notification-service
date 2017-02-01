@@ -9,6 +9,7 @@ const Util = require('../util');
 const Resolve = require('../resolve');
 const Orchestration = require('../orchestration');
 const Notification = require('../notification/notification-model');
+const User = require('../user/user-model');
 
 
 const docs = require('./docs.json')
@@ -38,9 +39,28 @@ class Service {
 
     return Resolve
       .resolveScope(message.scopeIds).then(userIds => {
-        // set resolved userIds
-        message.userIds = userIds;
-        return message.save()
+        // create users for unknown ids
+        let createdUsers = [];
+        userIds.forEach((id) => {
+          createdUsers.push(
+            User.findOne({ applicationId: id })
+            .then((user) => {
+              if (user !== null) {
+                return Promise.resolve(user);
+              } else {
+                let newUser = new User({ applicationId: id, devices: [] });
+                return newUser.save();
+              }
+            })
+          );
+        });
+
+        return Promise.all(createdUsers)
+          .then(() => {
+            // set resolved userIds
+            message.userIds = userIds;
+            return message.save();
+          })
       })
       .then(message => {
         // create notification for each user

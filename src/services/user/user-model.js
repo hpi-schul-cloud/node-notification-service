@@ -15,7 +15,7 @@ const Constants = require('../constants');
 const Util = require('../util');
 
 const deviceSchema = new Schema({
-  token: { type: String, required: true, unique: true },
+  token: { type: String, required: true }, // this should be unique, but users with no devices violate this constraint
   type: { type: String, enum: Util.getEnumValues(Constants.DEVICE_TYPES), required: true },
   service: { type: String, enum: Util.getEnumValues(Constants.SEND_SERVICES), required: true },
   OS: { type: String, required: true},
