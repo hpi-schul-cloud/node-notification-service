@@ -49,8 +49,11 @@
        "200": {
          "description": "Device was registered"
        },
-       "400": {
-         "description": "The Provided payload is either incomplete or one or more values are invalid"
+       "401": {
+         "description": "Authentication fails"
+       },
+       "403": {
+         "description": "Device deletion failed or device not existing"
        },
        "500": {
          "description": "internal error try again later."

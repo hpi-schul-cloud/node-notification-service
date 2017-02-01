@@ -14,17 +14,17 @@ class Authentication {
 
       let token;
 
-      // token via query param
+      // DEPRECATED token via query param
       if (hook.params.query && hook.params.query.token)
         token = hook.params.query.token;
+
+      // DEPRECATED token via body
+      if (hook.data && hook.data.token)
+        token = hook.data.token;
 
       // token via header
       if (hook.params.token)
         token = hook.params.token;
-
-      //token via body
-      if (hook.data && hook.data.token)
-        token = hook.data.token;
 
       if (token) {
 

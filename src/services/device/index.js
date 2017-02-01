@@ -1,10 +1,11 @@
 'use strict';
 
 const hooks = require('./hooks');
-const user = require('../user/user-model');
+const User = require('../user/user-model');
 const Resolve = require('../resolve');
 const errors = require('feathers-errors');
 const Authentication = require('../authentication');
+const Serializer = require('jsonapi-serializer').Serializer;
 const Constants = require('../constants');
 
 const docs = require('./docs.json');
@@ -19,7 +20,6 @@ class Service {
 
   // Adds a device for a user to the database
   create(data, params) {
-
     console.log('[DEVICE] ' + JSON.stringify(data));
 
     // Create device object
@@ -32,14 +32,14 @@ class Service {
       state: Constants.DEVICE_STATES.REGISTERED
     };
 
-    let newUser = new user({
+    let newUser = new User({
       applicationId: data.author.id,
       devices: [newDevice]
     });
 
 
     // Insert data into DB
-    return user.findOne({ applicationId: data.author.id })
+    return User.findOne({applicationId: data.author.id})
       .then(user => {
         if (!user) {
           user = newUser;
@@ -51,7 +51,9 @@ class Service {
             user.devices.push(newDevice);
           }
         }
-        return user.save();
+        return user.save().then(user => {
+          return new Serializer(User.typename, User.attributes).serialize(user);
+        });
       })
   }
 
@@ -59,7 +61,8 @@ class Service {
     console.log('[DEVICE REMOVE]' + JSON.stringify(params));
     // TODO: move auth in hooks
     // TODO: find better way then passing token as query param
-    return user.findOne({ applicationId: params.author.id })
+    let device = {};
+    return User.findOne({applicationId: params.author.id})
       .then(user => {
         if (user) {
           // find device
@@ -67,22 +70,25 @@ class Service {
           for (let i = 0; i < user.devices.length; i++) {
             if (user.devices[i].token === data) {
               index = i;
+              device = user.devices[index];
               break;
             }
           }
-
           // remove device
           if (index > -1) {
             user.devices.splice(index, 1);
+            return user.save().then(() => {
+              return Promise.resolve(new Serializer(User.typenameDevice, User.attributesDevice).serialize(device));
+            });
+          } else {
+            return Promise.reject(new errors.Forbidden());
           }
-
-          return user.save();
         }
       });
   }
 }
 
-module.exports = function() {
+module.exports = function () {
   const app = this;
 
   // Initialize our service with any options it requires

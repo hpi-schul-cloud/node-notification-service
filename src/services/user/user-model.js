@@ -35,4 +35,30 @@ const userSchema = new Schema({
 
 const userModel = mongoose.model('user', userSchema);
 
+userModel.typenameDevice = 'device';
+userModel.attributesDevice = {
+  id: '_id',
+  attributes: [
+    'token',
+    'service',
+    'state'
+  ]
+}
+
+userModel.typename = 'user';
+userModel.attributes = {
+  id: '_id',
+  attributes: [
+    'applicationId',
+    'createdAt',
+    'updatedAt',
+    'devices'
+  ],
+  devices: {
+    ref: '_id',
+    include: true,
+    attributes: userModel.attributesDevice.attributes
+  }
+};
+
 module.exports = userModel;

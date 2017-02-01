@@ -15,8 +15,8 @@ class Constants {
     }
 
     this.CALLBACK_TYPES = {
-      RECEIVED : 'received',
-      CLICKED : 'clicked'
+      RECEIVED: 'received',
+      CLICKED: 'clicked'
     };
 
     this.NOTIFICATION_STATES = {
@@ -53,6 +53,12 @@ class Constants {
       EMAIL: 'email',
       FIREBASE: 'firebase'
     }
+
+    this.SERIALIZE = {
+      options: {
+        id: '_id',
+      }
+    };
 
   }
 
