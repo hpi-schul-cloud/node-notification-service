@@ -38,7 +38,7 @@ describe('message service', function () {
     });
   });
 
-  it.only('sends and get a message to existing user', () => {
+  it('sends and get a message to existing user', () => {
     let id = '';
     let newUser = new User({
       applicationId: '373fd11a-4c42-48ac-b245-0aa922bc1cc9',
