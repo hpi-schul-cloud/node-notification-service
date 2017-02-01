@@ -20,7 +20,6 @@ class Service {
 
   // Adds a device for a user to the database
   create(data, params) {
-
     console.log('[DEVICE] ' + JSON.stringify(data));
 
     // Create device object
@@ -79,16 +78,12 @@ class Service {
           if (index > -1) {
             user.devices.splice(index, 1);
             return user.save().then(() => {
-              return new Serializer(User.typename_device, User.attributes_device).serialize(device);
+              return Promise.resolve(new Serializer(User.typenameDevice, User.attributesDevice).serialize(device));
             });
           } else {
-            // or return 403
             return Promise.reject(new errors.Forbidden());
           }
         }
-      })
-      .catch(() =>{
-        return Promise.reject(new errors.Forbidden());
       });
   }
 }

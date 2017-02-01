@@ -54,7 +54,6 @@
     "nodemon": "^1.11.0",
     "request": "^2.78.0",
     "request-promise": "^4.1.1",
-    "sinon": "^1.17.6",
-    "chai": "latest"
+    "sinon": "^1.17.6"
   }
 }

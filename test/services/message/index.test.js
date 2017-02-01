@@ -1,7 +1,6 @@
 'use strict';
 
 const assert = require('assert');
-const expect = require('chai').expect;
 const app = require('../../../src/app');
 
 const User = require('../../../src/services/user/user-model');
@@ -26,7 +25,7 @@ describe('message service', function () {
       });
   });
 
-  it.only('sends a message to not existing user', () => {
+  it('sends a message to not existing user', () => {
     let id = '';
     return app.service('messages').create({
       title: 'New Notification',
