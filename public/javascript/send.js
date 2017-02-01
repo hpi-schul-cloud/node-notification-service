@@ -8,10 +8,10 @@ angular.module('sendApp', [])
     $scope.data = {
       title: "Sample Message",
       body: "the long message",
-      token: "servicetoken2",
+      token: "teacher1_1",
       initiatorId: "1",
       scopeIds: [
-        "useridfürusertoken1"
+        "316866a2-41c3-444b-b82c-274697c546a0"
       ]
     };
 

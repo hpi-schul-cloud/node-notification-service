@@ -8,6 +8,7 @@ const errors = require('feathers-errors');
 const Resolve = require('../resolve');
 const Orchestration = require('../orchestration');
 const Notification = require('../notification/notification-model');
+const Constants = require('../constants');
 
 const docs = require('./docs.json')
 
@@ -50,7 +51,7 @@ class Service {
       applicationId: data.author.id
     });
 
-    let message = new Message(data);
+    // let message = new Message(data);
     return Resolve
       .resolveScope(message.scopeIds).then(userIds => {
         // set resolved userIds
