@@ -1,15 +1,12 @@
 'use strict';
 
 const hooks = require('feathers-hooks');
+const Authentication = require('../../authentication');
 
 exports.before = {
-  all: [],
+  all: [Authentication.auth()],
   find: [],
   get: [],
-  create: hooks.disable(),
-  update: hooks.disable(),
-  patch: hooks.disable(),
-  remove: []
 };
 
 exports.after = {
