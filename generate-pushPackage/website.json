@@ -1,0 +1,8 @@
+{
+  "websiteName": "Your Projects Name",
+  "websitePushID": "web.com.domain",
+  "allowedDomains": ["https://www.domain.com"],
+  "urlFormatString": "https://www.domain.com/%@",
+  "authenticationToken": "usertokenwithmin16chars",
+  "webServiceURL": "https://www.domain.com"
+}
