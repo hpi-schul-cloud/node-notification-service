@@ -29,7 +29,7 @@ class Orchestration {
    * take care to do not run multiple instances by the same time.
    */
   reescalate() {
-    console.log('[SCHEDULED ESCALATION] starts...');
+    // console.log('[SCHEDULED ESCALATION] starts...');
     if (this.reescalationRunning === true) {
       console.log('- await last reescalate finished...');
       return Promise.resolve(true);
@@ -51,11 +51,11 @@ class Orchestration {
       })
       .then(() => {
         this.reescalationRunning = false;
-        console.log('[SCHEDULED ESCALATION] end...');
+        // console.log('[SCHEDULED ESCALATION] end...');
       })
       .catch(err => {
         this.reescalationRunning = false;
-        console.log('[SCHEDULED ESCALATION] end after error...', err);
+        // console.log('[SCHEDULED ESCALATION] end after error...', err);
       });
   }
 

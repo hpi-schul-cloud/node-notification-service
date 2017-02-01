@@ -10,13 +10,19 @@ class Authentication {
 
     return function(hook) {
 
-      // console.log('[AUTH] ' + JSON.stringify(hook));
+      console.log('[AUTH] ' + JSON.stringify(hook));
 
       let token;
 
+      // token via query param
       if (hook.params.query && hook.params.query.token)
         token = hook.params.query.token;
 
+      // token via header
+      if (hook.params.token)
+        token = hook.params.token;
+
+      //token via body
       if (hook.data && hook.data.token)
         token = hook.data.token;
 
@@ -29,7 +35,7 @@ class Authentication {
 
           // console.log('[AUTHENTICATION] token is valid');
           if (hook.data) hook.data.author = response.data;
-          if (hook.params) hook.params.author = response.data;
+          hook.params.author = response.data;
           // console.log('[AUTHENTICATION] assigned ' + response.data.id + ' to request');
 
           return Promise.resolve(hook);
