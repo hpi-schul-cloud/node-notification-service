@@ -40,7 +40,7 @@ class Service {
 
 
     // Insert data into DB
-    return User.findOne({ applicationId: data.author.id })
+    return User.findOne({applicationId: data.author.id})
       .then(user => {
         if (!user) {
           user = newUser;
@@ -62,7 +62,8 @@ class Service {
     console.log('[DEVICE REMOVE]' + JSON.stringify(params));
     // TODO: move auth in hooks
     // TODO: find better way then passing token as query param
-    return User.findOne({ applicationId: params.author.id })
+    let device = {};
+    return User.findOne({applicationId: params.author.id})
       .then(user => {
         if (user) {
           // find device
@@ -70,22 +71,29 @@ class Service {
           for (let i = 0; i < user.devices.length; i++) {
             if (user.devices[i].token === data) {
               index = i;
+              device = user.devices[index];
               break;
             }
           }
-
           // remove device
           if (index > -1) {
             user.devices.splice(index, 1);
+            return user.save().then(() => {
+              return new Serializer(User.typename_device, User.attributes_device).serialize(device);
+            });
+          } else {
+            // or return 403
+            return Promise.reject(new errors.Forbidden());
           }
-
-          return user.save();
         }
+      })
+      .catch(() =>{
+        return Promise.reject(new errors.Forbidden());
       });
   }
 }
 
-module.exports = function() {
+module.exports = function () {
   const app = this;
 
   // Initialize our service with any options it requires
