@@ -5,11 +5,9 @@ const service = require('feathers-mongoose');
 const Message = require('./message-model');
 const hooks = require('./hooks');
 const errors = require('feathers-errors');
-const Util = require('../util');
 const Resolve = require('../resolve');
 const Orchestration = require('../orchestration');
 const Notification = require('../notification/notification-model');
-const Constants = require('../constants');
 
 const docs = require('./docs.json')
 
@@ -45,12 +43,16 @@ class Service {
   }
 
   create(data, params) {
-    if (!Util.isAllSet([data.title, data.body, data.token, data.scopeIds]))
-      return Promise.reject(new errors.BadRequest('Parameters missing.'));
+    let message = new Message({
+      title: data.title,
+      body: data.body,
+      scopeIds: data.scopeIds,
+      applicationId: data.author.id
+    });
 
     let message = new Message(data);
     return Resolve
-      .resolveUser(message.scopeIds).then(userIds => {
+      .resolveScope(message.scopeIds).then(userIds => {
         // set resolved userIds
         message.userIds = userIds;
         return message.save()

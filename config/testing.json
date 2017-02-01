@@ -1,6 +1,7 @@
 {
+  "protocol": "http",
   "host": "localhost",
-  "port": 3030,
+  "port": 3131,
   "mongodb": "mongodb://localhost:27017/nodeNotificationServiceTesting",
   "public": "../public/",
   "auth": {

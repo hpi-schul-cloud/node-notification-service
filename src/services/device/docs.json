@@ -4,14 +4,14 @@
     "devices": {
       "type": "object",
       "required": [
-        "user_token", "service_token", "type", "service", "OS", "name"
+        "user_token", "device_token", "type", "service", "OS", "name"
       ],
       "properties": {
-        "user_token": {
+        "token": {
           "type": "string",
-          "description": "Schul-Cloud SSO Token"
+          "description": "Application SSO Token"
         },
-        "service_token": {
+        "device_token": {
           "type": "string",
           "description": "Device Token"
         },
@@ -36,8 +36,8 @@
         "service": "firebase",
         "type": "mobile",
         "name": "test2",
-        "user_token": "usertoken1",
-        "service_token": "anderestoken",
+        "token": "student1_1",
+        "device_token": "anderestoken",
         "OS": "android7"
       }
     }
@@ -69,9 +69,9 @@
         "type": "string"
       },
       {
-        "name": "user_token",
+        "name": "token",
         "in": "query",
-        "description": "Schul-Cloud SSO Token",
+        "description": "Application SSO Token",
         "required": true,
         "type": "string"
       }

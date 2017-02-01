@@ -1,7 +1,13 @@
 'use strict';
 const config = require('../../../../secure/config.json').sendServices.apn;
+const constants = require('../../constants');
 const apn = require('apn');
 const errors = require('feathers-errors');
+
+const APN_PRIORITIES = {
+  HIGH: 10,
+  MEDIUM: 5
+};
 
 class ApnAdapter {
   send(notifications, devices) {
@@ -25,13 +31,16 @@ class ApnAdapter {
   _buildMessage(notification) {
     let message = new apn.Notification();
 
-    message.topic = 'web.org.schul-cloud';
+    message.topic = config.pushId;
     message.urlArgs = ['index.php']; // TODO: set this to something meaningful
     message.title = notification.message.title;
     message.body = notification.message.body;
-    message.priority = notification.priority === 'high' ? 10 : 5;
+    message.payload.senderData = notification.message.data;
+    message.priority = notification.message.priority === constants.MESSAGE_PRIORITIES.HIGH ? APN_PRIORITIES.HIGH : APN_PRIORITIES.MEDIUM;
     // UNIX epoch time in seconds
-    // message.expiry = Math.floor(expiration.getTime()/1000);
+    if (notification.message.timeToLive) {
+      message.expiry = Math.floor(notification.message.timeToLive.getTime() / 1000);
+    }
     // Can be used to send silent notifications
     // message.contentAvailable = 1;
 

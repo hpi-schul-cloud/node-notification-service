@@ -2,83 +2,52 @@
 
 const errors = require('feathers-errors');
 const Util = require('../util');
-
+const Resolve = require('../resolve');
 
 class Authentication {
-  // see if service token is registered with schulcloud db
-  static verifyService(token) {
 
-    const mock = {
-      servicetoken1: 'serviceidfürservicetoken1',
-      servicetoken2: 'serviceidfürservicetoken2',
-      servicetoken3: 'serviceidfürservicetoken3',
-    };
-
-    return new Promise((resolve, reject) => {
-      if (mock[token])
-        resolve(mock[token]);
-      else
-        reject(new errors.BadRequest('service token not valid'));
-    });
-  }
-
-  static serviceAuthHook() {
+  static auth() {
 
     return function(hook) {
 
-      if (hook.data.token) {
+      // console.log('[AUTH] ' + JSON.stringify(hook));
 
-        return Authentication.verifyService(hook.data.token).then(serviceOrUserId => {
-          hook.data.initiatorId = serviceOrUserId;
+      let token;
+
+      if (hook.params.query && hook.params.query.token)
+        token = hook.params.query.token;
+
+      if (hook.data && hook.data.token)
+        token = hook.data.token;
+
+      if (token) {
+
+        return Resolve.verifyToken(token).then(response => {
+
+          if (Array.isArray(response.data))
+            response.data = response.data[0];
+
+          // console.log('[AUTHENTICATION] token is valid');
+          if (hook.data) hook.data.author = response.data;
+          if (hook.params) hook.params.author = response.data;
+          // console.log('[AUTHENTICATION] assigned ' + response.data.id + ' to request');
+
+          return Promise.resolve(hook);
+
+        })
+        .catch(err => {
+          // console.log(err);
+          return Promise.reject(new errors.NotAuthenticated('user or service token is invalid'));
         });
 
       } else {
-
-        return Promise.reject(new errors.BadRequest('user token missing'));
-
+        return Promise.reject(new errors.BadRequest('user or service token missing'));
       }
     }
-
-
-  }
-
-  // get User ID from schulcloud db by sso Token
-  static verifyUser(ssoToken) {
-
-    const mock = {
-      usertoken1: 'useridfürusertoken1',
-      usertoken2: 'useridfürusertoken2',
-      usertoken3: 'useridfürusertoken3',
-      usertokenwithmin16chars: 'useridfürusertoken4',
-    };
-
-    return new Promise((resolve, reject) => {
-      if (mock[ssoToken])
-        resolve(mock[ssoToken]);
-      else
-        reject(new errors.Forbidden('user token not valid'));
-    });
-
-  }
-
-  static userAuthHook() {
-
-    return function(hook) {
-
-      if (hook.data.user_token) {
-
-        return Authentication.verifyUser(hook.data.user_token).then(schulcloudId => {
-          hook.data.schulcloudId = schulcloudId;
-        });
-
-      } else {
-
-        return Promise.reject(new errors.BadRequest('user token missing'));
-
-      }
-    }
-
   }
 }
+
+
+
 
 module.exports = Authentication;
