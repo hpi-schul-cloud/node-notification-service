@@ -16,32 +16,26 @@ As API framework, we use [Feathers](http://feathersjs.com).
 
 1. Make sure you have [NodeJS](https://nodejs.org/) and [npm](https://www.npmjs.com/) and [mongodb](https://www.mongodb.com/) installed.
 
-2. Install nodemon
-
-    ```
-    npm install nodemon -g
-    ```
-
-3. Install your dependencies
+2. Install your dependencies
 
     ```
     cd path/to/node-notification-service; npm install
     ```
 
-4. If not already done, start mongodb (`mongod`). Make sure you created the `/data/db` directory and have permissions to write to it.  
+3. If not already done, start mongodb (`mongod`). Make sure you created the `/data/db` directory and have permissions to write to it.  
    
     You can also specify a local path:
     ```
     mongod --dbpath=data/db
     ```
 
-5. Create private `config.json`
+4. Create private `config.json`
 
     ```
     cp src/services/sendInterface/adapters/config.sample.json src/services/sendInterface/adapters/config.json
     ```
 
-6. Start your app
+5. Start your app
 
     ```
     npm start

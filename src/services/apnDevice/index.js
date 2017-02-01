@@ -5,8 +5,9 @@ const crypto = require('crypto');
 const error = require('feathers-errors');
 const fs = require('fs');
 
+const config = require('../../../secure/config.json').sendServices.apn;
 const publicPath = __dirname + '/../../../public';
-const websitePushID = 'web.org.schul-cloud';
+const websitePushID =  config.pushId;
 
 class Service {
 

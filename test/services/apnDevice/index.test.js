@@ -67,7 +67,7 @@ describe('apnDevice service', function() {
   it('fails on missing userToken', () => {
     return requestPromise({
       method: 'POST',
-      uri: host + '/v1/pushPackages/web.org.schul-cloud',
+      uri: host + '/v1/pushPackages/' + config.pushId,
       json: true,
       resolveWithFullResponse: true
     })
@@ -82,7 +82,7 @@ describe('apnDevice service', function() {
   it('fails on wrong userToken', () => {
     return requestPromise({
       method: 'POST',
-      uri: host + '/v1/pushPackages/web.org.schul-cloud',
+      uri: host + '/v1/pushPackages/' + config.pushId,
       body: {
         userToken: 'usertokenwithmax16chars'
       },
