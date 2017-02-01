@@ -25,9 +25,7 @@ describe('message service', function() {
     });
   });
 
-
-  // TODO add user(s) if not present in db
-  it.skip('sends a message', () => {
+  it('sends a message to not existing user', () => {
     return app.service('messages').create({
       title: 'New Notification',
       body: 'You have a new Notification',
@@ -35,12 +33,8 @@ describe('message service', function() {
       scopeIds: [
         '316866a2-41c3-444b-b82c-274697c546a0'
       ]
-    })
-    .then(res => {
-      assert.equal(res.code, 201);
     });
   });
-
 
   it('sends a message to an existing user', () => {
     let newUser = new User({
