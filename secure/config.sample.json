@@ -1,7 +1,4 @@
 {
-  "certificates": {
-    "password": "123456"
-  },
   "sendServices": {
     "apn": {
       "pushId": "web.com.domain",
