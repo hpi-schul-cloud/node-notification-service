@@ -10,7 +10,7 @@ class Authentication {
 
     return function(hook) {
 
-      console.log('[AUTH] ' + JSON.stringify(hook));
+      // console.log('[AUTH] ' + JSON.stringify(hook));
 
       let token;
 
