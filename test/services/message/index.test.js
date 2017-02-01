@@ -3,6 +3,8 @@
 const assert = require('assert');
 const app = require('../../../src/app');
 
+const User = require('../../../src/services/user/user-model');
+
 describe('message service', function() {
   it('registered the messages service', () => {
     assert.ok(app.service('messages'));
@@ -37,6 +39,27 @@ describe('message service', function() {
     .then(res => {
       assert.equal(res.code, 201);
     });
+  });
+
+
+  it('sends a message to an existing user', () => {
+    let newUser = new User({
+      applicationId: '373fd11a-4c42-48ac-b245-0aa922bc1cc9',
+      devices: []
+    });
+
+    return newUser
+      .save()
+      .then(user => {
+        return app.service('messages').create({
+          title: 'New Notification',
+          body: 'You have a new Notification',
+          token: 'teacher1_1',
+          scopeIds: [
+            '373fd11a-4c42-48ac-b245-0aa922bc1cc9'
+          ]
+        })
+      });
   });
 
   it('rejects title longer than 140 characters', () => {
