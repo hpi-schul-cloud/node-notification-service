@@ -56,6 +56,36 @@ describe('message service', function() {
       });
   });
 
+  it('gets a message', () => {
+
+    let newUser = new User({
+      applicationId: '373fd11a-4c42-48ac-b245-0aa922bc1cc9',
+      devices: []
+    });
+
+    return newUser
+      .save()
+      .then(user => {
+        return app.service('messages').create({
+          title: 'New Notification',
+          body: 'You have a new Notification',
+          token: 'teacher1_1',
+          scopeIds: [
+            '373fd11a-4c42-48ac-b245-0aa922bc1cc9'
+          ]
+        }).then(message => {
+          app.service('messages').get(message._id,{
+            query: {
+              token: 'student1_1'
+            }
+          }).then(res => {
+            // TODO add res.code
+            assert.ok(res);
+          })
+        })
+      });
+  });
+
   it('rejects title longer than 140 characters', () => {
     return app.service('messages').create({
       title: 'New Notification with very very very very very very very very very very very very very very very very very very very very very very long title',
