@@ -37,8 +37,9 @@ const userModel = mongoose.model('user', userSchema);
 
 userModel.typename = 'user';
 userModel.attributes = {
-  id: 'schulcloudId',
+  id: '_id',
   attributes: [
+    'applicationId',
     'createdAt',
     'updatedAt',
     'devices'
