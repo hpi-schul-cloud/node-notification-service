@@ -69,5 +69,33 @@
          "description": "internal error try again later."
        }
      }
+   },
+   "get": {
+     "summary": "Get a Message by ID",
+     "description": "Get a Message by ID",
+     "parameters": [{
+       "name": "token",
+       "in": "query",
+       "type": "string",
+       "description": "SSO Token",
+       "required": true
+     },{
+       "name": "id",
+       "in": "path",
+       "type": "string",
+       "description": "ID of message",
+       "required": true
+     }],
+     "responses": {
+       "200": {
+         "description": "OK"
+       },
+       "404": {
+         "description": "Notifications with given ID does not exist"
+       },
+       "500": {
+         "description": "internal error try again later."
+       }
+     }
    }
  }
