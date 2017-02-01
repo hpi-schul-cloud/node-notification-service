@@ -5,6 +5,7 @@ const sinon = require('sinon');
 const constants = require('../../../../src/services/constants');
 const apn = require('../../../../src/services/sendInterface/adapters/apn');
 const apnMock = require('apn/mock');
+const apnReal = require('apn');
 
 describe('apn service adapter', function() {
 
@@ -13,10 +14,16 @@ describe('apn service adapter', function() {
   });
 
   it('create apnProvider on first send', () => {
+    let stub = sinon.stub(apnReal, 'Provider', config => {
+      return config;
+    });
+
     apn
       .send([], [])
       .catch(err => {
         assert(err);
+        assert(stub.called);
+        apnReal.Provider.restore();
       })
   });
 
