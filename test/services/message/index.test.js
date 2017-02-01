@@ -54,7 +54,7 @@ describe('message service', function () {
           ]
         }).then(message => {
           id = message.data.id;
-          return app.service('messages').get(id);
+          return app.service('messages').get(id, {query: {token: 'student1_1'}});
         }).then(message => {
           assert.equal(message.data.id, id);
         });
@@ -99,7 +99,7 @@ describe('message service', function () {
             '373fd11a-4c42-48ac-b245-0aa922bc1cc9'
           ]
         }).then(message => {
-          app.service('messages').get(message._id,{
+          app.service('messages').get(message._id, {
             query: {
               token: 'student1_1'
             }
@@ -129,7 +129,7 @@ describe('message service', function () {
             '373fd11a-4c42-48ac-b245-0aa922bc1cc9'
           ]
         }).then(message => {
-          app.service('messages').get(message._id,{
+          app.service('messages').get(message._id, {
             query: {
               token: 'student999'
             }
