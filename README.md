@@ -53,20 +53,22 @@ Safari requires specific endpoints to register with your service. One of them ha
 
 1. Make sure you have openssl 0.9.8 installed.
 
-2. Copy your p12-certificate into the generate-pushPackage folder and name it `cert.p12`.
+2. Copy your p12-certificate to `generate-pushPackage/cert.p12`.
 
 3. Copy your icons as defined in the [documentation](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/NotificationProgrammingGuideForWebsites/PushNotifications/PushNotifications.html#//apple_ref/doc/uid/TP40013225-CH3-SW5) to `generate-pushPackage/icon.iconset`.
 
-3. Run the script with your certificate's password: 
+4. Setup the `generate-pushPackage/website.json` according to your needs, as defined in the [documentation](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/NotificationProgrammingGuideForWebsites/PushNotifications/PushNotifications.html#//apple_ref/doc/uid/TP40013225-CH3-SW4).
+
+5. Run the script with your certificate's password: 
 
   ```
   cd path/to/generate-pushPackage
   php createPushPackage.php <password>
   ```
 
-4. You should find the pushPackage.zip in `secure/`.
+6. You should find the pushPackage.zip in `secure/` from where it will be served.
 
-For more information refer to the official documentations from [Apple](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/NotificationProgrammingGuideForWebsites/PushNotifications/PushNotifications.html) or [apn-node](https://github.com/node-apn/node-apn/blob/master/README.md).
+For more information refer to the official documentations from [Apple](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/NotificationProgrammingGuideForWebsites/PushNotifications/PushNotifications.html) and [apn-node](https://github.com/node-apn/node-apn/blob/master/README.md).
 
 ### Firebase Notifications
 
