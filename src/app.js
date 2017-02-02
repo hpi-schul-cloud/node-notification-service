@@ -11,6 +11,8 @@ const hooks = require('feathers-hooks');
 const rest = require('feathers-rest');
 const bodyParser = require('body-parser');
 const middleware = require('./middleware');
+const header = require('./middleware/header');
+
 const services = require('./services');
 const swagger = require('feathers-swagger');
 
@@ -27,11 +29,19 @@ app.use(compress())
   .use(bodyParser.urlencoded({ extended: true }))
   .configure(hooks())
   .configure(rest())
+  .use(header())
   .configure(swagger({
     docsPath: '/docs',
     uiIndex: path.join(__dirname, 'docs.html'),
     schemes: ['https', 'http'],
     basePath: '/',
+    securityDefinitions: {
+      ssoToken: {
+        type: 'apiKey',
+        in: 'header',
+        name: 'token'
+      }
+    },
     info: {
       title: 'Notification API Docs',
       description: '',
