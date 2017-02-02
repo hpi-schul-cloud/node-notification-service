@@ -36,7 +36,6 @@ describe('device service', () => {
     });
 
     it('call with valid data', () => {
-
       return app.service('devices').create(validPayload)
         .then(function (result) {
           assert(result.included[0].id);
@@ -46,8 +45,7 @@ describe('device service', () => {
         });
     });
 
-    // TODO investigate duplicate key error
-    it.skip('call with valid data and existing user', () => {
+    it('call with valid data and existing user', () => {
       let newUser = new User({
         applicationId: 'useridfürusertoken2',
         devices: []
