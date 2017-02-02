@@ -1,3 +1,5 @@
+'use strict';
+
 // This is not a test
 const Message = require('../src/services/message/message-model');
 const Notification = require('../src/services/notification/notification-model');

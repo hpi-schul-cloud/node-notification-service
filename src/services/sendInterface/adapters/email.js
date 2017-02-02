@@ -1,3 +1,5 @@
+'use strict';
+
 class EmailAdapter {
 
   // just a mocked response so far, emails will be sent by application
