@@ -57,7 +57,7 @@ Safari requires specific endpoints to register with your service. One of them ha
 
 3. Copy your icons as defined in the [documentation](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/NotificationProgrammingGuideForWebsites/PushNotifications/PushNotifications.html#//apple_ref/doc/uid/TP40013225-CH3-SW5) to `generate-pushPackage/icon.iconset`.
 
-4. Setup the `generate-pushPackage/website.json` according to your needs, as defined in the [documentation](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/NotificationProgrammingGuideForWebsites/PushNotifications/PushNotifications.html#//apple_ref/doc/uid/TP40013225-CH3-SW4).
+4. Setup the `generate-pushPackage/website.json` according to your needs, as defined in the [documentation](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/NotificationProgrammingGuideForWebsites/PushNotifications/PushNotifications.html#//apple_ref/doc/uid/TP40013225-CH3-SW4). *Because we currently do not rely on the authentication token. You can choose an arbitrary value with at least 16 characters.*
 
 5. Run the script with your certificate's password: 
 
