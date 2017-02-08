@@ -31,7 +31,7 @@ const checkMessageConstraints = options => {
 exports.before = {
   all: [],
   find: [],
-  get: [],
+  get: [Authentication.auth()],
   create: [Authentication.auth(),Authorization.canSend(),checkMessageConstraints()],
   update: [],
   patch: [],

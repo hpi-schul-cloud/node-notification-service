@@ -15,7 +15,7 @@ const Constants = require('../constants');
 const Util = require('../util');
 
 const deviceSchema = new Schema({
-  token: { type: String, required: true, unique: true },
+  token: { type: String, required: true }, // this should be unique, but users with no devices violate this constraint
   type: { type: String, enum: Util.getEnumValues(Constants.DEVICE_TYPES), required: true },
   service: { type: String, enum: Util.getEnumValues(Constants.SEND_SERVICES), required: true },
   OS: { type: String, required: true},
@@ -34,5 +34,31 @@ const userSchema = new Schema({
 });
 
 const userModel = mongoose.model('user', userSchema);
+
+userModel.typenameDevice = 'device';
+userModel.attributesDevice = {
+  id: '_id',
+  attributes: [
+    'token',
+    'service',
+    'state'
+  ]
+}
+
+userModel.typename = 'user';
+userModel.attributes = {
+  id: '_id',
+  attributes: [
+    'applicationId',
+    'createdAt',
+    'updatedAt',
+    'devices'
+  ],
+  devices: {
+    ref: '_id',
+    include: true,
+    attributes: userModel.attributesDevice.attributes
+  }
+};
 
 module.exports = userModel;

@@ -50,6 +50,6 @@ module.exports = {
     ],
     "no-undef": 2,
     "no-unused-vars": 0,
-    "strict": 0
+    "strict": 1
   }
 }

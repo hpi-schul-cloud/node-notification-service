@@ -42,7 +42,8 @@
     "mongoose": "4.7.8",
     "node-gcm": "^0.14.4",
     "serve-favicon": "^2.3.0",
-    "winston": "^2.3.0"
+    "winston": "^2.3.0",
+    "jsonapi-serializer": "^3.4.2"
   },
   "devDependencies": {
     "cross-env": "^3.1.4",

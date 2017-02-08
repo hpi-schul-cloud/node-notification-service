@@ -2,12 +2,15 @@
 
 const Mongoose = require('mongoose');
 const service = require('feathers-mongoose');
+const serializer = require('jsonapi-serializer').Serializer;
 const Message = require('./message-model');
 const hooks = require('./hooks');
 const errors = require('feathers-errors');
+const Util = require('../util');
 const Resolve = require('../resolve');
 const Orchestration = require('../orchestration');
 const Notification = require('../notification/notification-model');
+const User = require('../user/user-model');
 const Constants = require('../constants');
 
 const docs = require('./docs.json')
@@ -20,6 +23,14 @@ class Service {
   }
 
   get(id, params) {
+    console.log('[INFO] get message ' + id);
+    return Message.findOne({_id: id})
+      .then(message => {
+        return new serializer(Message.typename, Message.attributes).serialize(message)
+      });
+  }
+
+  /*get2(id, params) {
     console.log('[INFO] get message ' + id);
     return Notification
       .find({'message._id': new Mongoose.Types.ObjectId(id)})
@@ -41,7 +52,7 @@ class Service {
         // will be thrown on wrong id format
         return new errors.GeneralError(err);
       });
-  }
+  }*/
 
   create(data, params) {
     let message = new Message({
@@ -51,12 +62,30 @@ class Service {
       applicationId: data.author.id
     });
 
-    // let message = new Message(data);
     return Resolve
       .resolveScope(message.scopeIds).then(userIds => {
-        // set resolved userIds
-        message.userIds = userIds;
-        return message.save()
+        // create users for unknown ids
+        let createdUsers = [];
+        userIds.forEach((id) => {
+          createdUsers.push(
+            User.findOne({ applicationId: id })
+            .then((user) => {
+              if (user !== null) {
+                return Promise.resolve(user);
+              } else {
+                let newUser = new User({ applicationId: id, devices: [] });
+                return newUser.save();
+              }
+            })
+          );
+        });
+
+        return Promise.all(createdUsers)
+          .then(() => {
+            // set resolved userIds
+            message.userIds = userIds;
+            return message.save();
+          })
       })
       .then(message => {
         // create notification for each user
@@ -79,12 +108,12 @@ class Service {
         return Orchestration.orchestrate(notifications);
       })
       .then(()=> {
-        return message; // TODO remove unnecessary data from model
-      });
+        return Promise.resolve(new serializer(Message.typename, Message.attributes).serialize(message));
+      })
   }
 }
 
-module.exports = function () {
+module.exports = function() {
   const app = this;
 
   // Initialize our service with any options it requires
