@@ -45,27 +45,22 @@
         </tr>
         <tr>
           <td>Title</td>
-          <td>{{response.data.title}}</td>
+          <td>{{response.data.data.attributes.title}}</td>
         </tr>
         <tr>
           <td>Body</td>
-          <td>{{response.data.body}}</td>
+          <td>{{response.data.data.attributes.body}}</td>
         </tr>
         <tr>
           <td>id</td>
-          <td>{{response.data._id}}</td>
+          <td>{{response.data.data.id}}</td>
         </tr>
-        <tr>
-          <td>Updated At</td>
-          <td>{{response.data.updatedAt}}</td>
-        </tr>
-        <tr>
           <td>Created At</td>
-          <td>{{response.data.createdAt}}</td>
+          <td>{{response.data.data.attributes.created-at}}</td>
         </tr>
         <tr>
           <td>user Ids</td>
-          <td>{{response.data.userIds}}</td>
+          <td>{{response.data.data.attributes.userIds}}</td>
         </tr>
       </table>
       <br>

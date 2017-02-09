@@ -22,7 +22,7 @@ class Service {
     this.docs = docs;
   }
 
-  get(id, params) {
+get(id, params) {
     console.log('[INFO] get message ' + id);
     return Message.findOne({_id: id})
       .then(message => {
@@ -30,7 +30,7 @@ class Service {
       });
   }
 
-  /*get2(id, params) {
+ /* get(id, params) {
     console.log('[INFO] get message ' + id);
     return Notification
       .find({'message._id': new Mongoose.Types.ObjectId(id)})
