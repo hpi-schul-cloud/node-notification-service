@@ -5,8 +5,9 @@ const crypto = require('crypto');
 const error = require('feathers-errors');
 const fs = require('fs');
 
-const config = require('../../../secure/config.json').sendServices.apn;
+const securePath = __dirname + '/../../../secure';
 const publicPath = __dirname + '/../../../public';
+const config = require(securePath + '/config.json').sendServices.apn;
 const websitePushID =  config.pushId;
 
 class Service {
@@ -37,7 +38,7 @@ class Service {
         'Content-Type': 'application/zip',
         'Content-Disposition': 'attachment; filename=pushPackage.zip'
       });
-      fs.createReadStream(__dirname + '/pushPackage.zip').pipe(res);
+      fs.createReadStream(securePath + '/pushPackage.zip').pipe(res);
       return;
     }
 
