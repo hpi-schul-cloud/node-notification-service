@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html ng-app="sendApp">
+<head>
+    <meta charset="UTF-8">
+    <title>Send Interface</title>
+  <link rel="stylesheet" type="text/css" href="css/Style.css">
+</head>
+<body ng-controller="sendCtrl">
+
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+<script src="javascript/send.js"> </script>
+
+<div id="wrapper">
+
+  <div class="send">
+
+  <h2>Send a message to clients</h2>
+  <form id="send-request">
+    <label for="sender">Sender:
+      <input id="sender" name="sender" ng-model="data.initiatorId">
+    </label>
+    <br>
+    <label for="target">Target:
+      <input id="target" name="target" ng-model="data.scopeIds">
+    </label>
+    <br>
+    <label for="title">Title:
+      <input id="title" name="title" ng-model="data.title">
+    </label>
+    <br> <br>
+    <textarea maxlength="160" rows="4" cols="50" ng-model="data.body">This is a generic sample message so we don't have to type one for every test.
+    </textarea>
+    <br>
+    <button type="button" name="Submit" ng-click="sendRequest()">Send message</button>
+  </form>
+
+  <div ng-if="error">
+  {{response}}</div>
+  <div ng-else>
+    <div ng-hide="hide">
+      <table>
+        <tr>
+          <th>Name</th>
+          <th>Value</th>
+        </tr>
+        <tr>
+          <td>Title</td>
+          <td>{{response.data.data.attributes.title}}</td>
+        </tr>
+        <tr>
+          <td>Body</td>
+          <td>{{response.data.data.attributes.body}}</td>
+        </tr>
+        <tr>
+          <td>id</td>
+          <td>{{response.data.data.id}}</td>
+        </tr>
+          <td>Created At</td>
+          <td>{{response.data.data.attributes.created-at}}</td>
+        </tr>
+        <tr>
+          <td>user Ids</td>
+          <td>{{response.data.data.attributes.userIds}}</td>
+        </tr>
+      </table>
+      <br>
+      {{response}}
+    </div>
+  </div>
+  </div>
+
+
+  <div class="research">
+    <h2>Research a message</h2>
+    <form id="search-request">
+      <label for="messageId">Message Id: <br>
+        <input id="messageId" name="messageId" type="text" ng-model="receivedId">
+      </label>
+      <button type="submit" name="Submit" ng-click="researchID()">Research Id</button>
+    </form>
+
+    <div ng-if="idResponse.status == 200">
+
+      {{idResponse}}
+      {{range}}
+      <table>
+        <tr>
+          <th>User</th>
+          <th>Status</th>
+        </tr>
+          <!-- Todo devices per user -->
+          <tr ng-repeat="notification in idResponse.data">
+            <td>{{notification.user}}</td>
+            <td ng-style="notification.clicked.toString() === 'true' ? {  background:'green' } : { background: 'red' }">{{notification.clicked}}</td>
+        </tr>
+      </table>
+    </div>
+
+
+    <div ng-show="idResponse" ng-if="idResponse.status != 200">
+      Message Error.
+    </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

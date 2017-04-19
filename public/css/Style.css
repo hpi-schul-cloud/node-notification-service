@@ -1,6 +1,6 @@
 * {
   margin: 5pt;
-  padding: 5pt;
+  padding: 3pt;
   box-sizing: border-box;
 }
 
@@ -9,6 +9,7 @@ html, body {
   font-weight: 400;
   font-size: 16px;
   color: #333;
+  background-color: lightgrey;
 }
 
 .center-text {
@@ -60,3 +61,23 @@ a:focus {
   color: #31D8A0;
 }
 
+
+.send, .research {
+  float: left;
+  min-height: 550px;
+  color: white;
+}
+.send {
+  width: 50%;
+  position: fixed;
+  padding-right: 10em;
+}
+.research {
+  width: 50%;
+  float: right;
+}
+
+#wrapper {
+  width: 100%;
+  margin: 0 auto;
+}

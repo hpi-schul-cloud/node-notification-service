@@ -4,15 +4,18 @@
 
 angular.module('sendApp', [])
   .controller("sendCtrl", function ($scope, $http) {
+
     $scope.data = {
-      title: "dlasjd",
+      title: "Sample Message",
       body: "the long message",
-      token: "servicetoken2",
+      token: "teacher1_1",
+      initiatorId: "1",
       scopeIds: [
-        "userIdOrScopeId", "testScopeId"
+        "316866a2-41c3-444b-b82c-274697c546a0"
       ]
     };
-    $scope.id;
+
+
     $scope.hide = true;
 
     $scope.sendRequest = function () {
@@ -23,7 +26,8 @@ angular.module('sendApp', [])
         ContentType: "application/json"
       }).then(function success(response) {
         $scope.response = response;
-        $scope.id = response.data._id;
+        $scope.id = response.data.id;
+        $scope.receivedId = response.data.id;
         $scope.error = false;
         $scope.hide = false;
 
@@ -34,14 +38,34 @@ angular.module('sendApp', [])
 
     };
 
+
     $scope.researchID = function () {
+      var messageId = $scope.receivedId;
 
+      $scope.messageAttributes = {
+        token: "teacher1_1",
+        initiatorId: "1",
+        id: messageId,
+        token: "teacher1_1",
+        scopeIds: [
+          "316866a2-41c3-444b-b82c-274697c546a0"
+        ]
+      };
       return $http({
-
-        method: "GET",
-        url: "//localhost:3030/messages/" + $scope.id
+        method: "POST",
+        url: "//localhost:3030/messages/" + messageId,
+        data: $scope.messageAttributes,
+        ContentType: "application/json"
+        // method: "GET",
+        // url: "//localhost:3030/messages/" + messageId
       }).then(function success(response) {
         $scope.idResponse = response;
+        $scope.user = response.data.length;
+        var range = [];
+        for(var i=0;i<$scope.user;i++) {
+          range.push(i);
+        }
+        $scope.range = range;
 
       }, function error(response) {
         $scope.idResponse = response;

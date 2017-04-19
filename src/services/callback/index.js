@@ -18,11 +18,25 @@ class Service {
 
   create(data, params) {
 
-    if (!util.isSet(data.notificationId))
+    console.log("Data", data);
+
+    data.notificationId += "-test";
+
+    let delimiter = "-";
+    let ids = data.notificationId.split(delimiter);
+    let notificationId = ids[0];
+    let deviceToken = ids[1];
+
+    console.log("Device Token", deviceToken);
+
+    // TODO
+    // Look up user token and return user ID
+
+    if (!util.isSet(notificationId))
       return Promise.reject(new errors.BadRequest('Notification Id Missing'));
 
     return new Promise((resolve, reject) => {
-      notification.findOne({ _id: data.notificationId })
+      notification.findOne({ _id: notificationId })
         .then(foundNotification => {
 
           foundNotification.callbacks.push({ type: data.type });

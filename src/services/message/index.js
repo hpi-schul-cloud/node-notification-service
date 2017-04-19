@@ -1,5 +1,6 @@
 'use strict';
 
+const Mongoose = require('mongoose');
 const service = require('feathers-mongoose');
 const serializer = require('jsonapi-serializer').Serializer;
 const Message = require('./message-model');
@@ -10,7 +11,7 @@ const Resolve = require('../resolve');
 const Orchestration = require('../orchestration');
 const Notification = require('../notification/notification-model');
 const User = require('../user/user-model');
-
+const Constants = require('../constants');
 
 const docs = require('./docs.json')
 
@@ -21,13 +22,37 @@ class Service {
     this.docs = docs;
   }
 
-  get(id, params) {
+get(id, params) {
     console.log('[INFO] get message ' + id);
     return Message.findOne({_id: id})
       .then(message => {
         return new serializer(Message.typename, Message.attributes).serialize(message)
       });
   }
+
+ /* get(id, params) {
+    console.log('[INFO] get message ' + id);
+    return Notification
+      .find({'message._id': new Mongoose.Types.ObjectId(id)})
+      .then(notifications => {
+        console.log(' - ' + notifications.length + ' Notifications found...');
+        if (notifications.length === 0) {
+          return new errors.NotFound('Unknown id.');
+        }
+        let result = notifications.map(function (notification) {
+          return { // create some stats about which user has notifications clicked
+            user: notification.user,
+            clicked: notification.state === Constants.NOTIFICATION_STATES.CLICKED,
+            devices: notification.devices
+          };
+        });
+        return result;
+      })
+      .catch(err => {
+        // will be thrown on wrong id format
+        return new errors.GeneralError(err);
+      });
+  }*/
 
   create(data, params) {
     let message = new Message({
@@ -66,12 +91,17 @@ class Service {
         // create notification for each user
         let notifications = message.userIds.reduce((notifications, userId) => {
           let notification = new Notification({
-            message: message,
+            message: { // copy required content only
+              _id: message._id,
+              title: message.title,
+              body: message.body,
+              action: message.action,
+              priority: message.priority
+            },
             user: userId
           }).save();
           return notifications.concat(notification);
         }, []);
-
         return Promise.all(notifications);
       })
       .then(notifications => {
