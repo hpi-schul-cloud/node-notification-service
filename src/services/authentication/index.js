@@ -34,9 +34,13 @@ class Authentication {
           if (Array.isArray(response.data))
             response.data = response.data[0];
 
+          if (response.displayName)
+            response.type = "user";
+
           // console.log('[AUTHENTICATION] token is valid');
-          if (hook.data) hook.data.author = response.data;
-          hook.params.author = response.data;
+          if (hook.data) hook.data.author = response.data || response;
+          hook.params.author = response.data || response;
+
           // console.log('[AUTHENTICATION] assigned ' + response.data.id + ' to request');
 
           return Promise.resolve(hook);
