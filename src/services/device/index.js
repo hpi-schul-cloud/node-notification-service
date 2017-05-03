@@ -33,7 +33,7 @@ class Service {
     };
 
     let newUser = new User({
-      applicationId: data.author._id || data.author._id,
+      applicationId: data.author.id || data.author._id,
       devices: [newDevice]
     });
 
