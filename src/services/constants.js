@@ -4,15 +4,17 @@ class Constants {
 
   constructor() {
 
+    let BASE_PATH = process.env.BASE_PATH || 'https://schulcloud-api-mock.herokuapp.com';
+
     this.CONFIG = {
-      AUTHENTICATION_API_ENDPOINT : 'https://schulcloud-api-mock.herokuapp.com/api/user/',
-      AUTHORIZATION_API_ENDPOINT  : 'https://schulcloud-api-mock.herokuapp.com/api/all_scopes/',
-      RESOLVE_API_ENDPOINT        : 'https://schulcloud-api-mock.herokuapp.com/api/all_users/'
-    }
+      AUTHENTICATION_API_ENDPOINT : BASE_PATH + process.env.AUTHENTICATION_API_ENDPOINT || '/api/user/',
+      AUTHORIZATION_API_ENDPOINT  : BASE_PATH + process.env.AUTHORIZATION_API_ENDPOINT || '/api/all_scopes/',
+      RESOLVE_API_ENDPOINT        : BASE_PATH + process.env.RESOLVE_API_ENDPOINT || '/api/all_users/'
+    };
 
     this.AUTHORITIES = {
       CAN_SEND_NOTIFICATIONS : 'can-send-notifications'
-    }
+    };
 
     this.CALLBACK_TYPES = {
       RECEIVED: 'received',
@@ -52,7 +54,7 @@ class Constants {
       APN: 'apn',
       EMAIL: 'email',
       FIREBASE: 'firebase'
-    }
+    };
 
     this.SERIALIZE = {
       options: {
