@@ -8,7 +8,7 @@ const Authorization = require('../../authorization');
 exports.before = {
   all: [],
   find: [],
-  get: [],
+  get: [Authentication.auth()],
   create: [Authentication.auth(),Authorization.isUser()],
   update: [],
   patch: [],

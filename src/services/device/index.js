@@ -18,6 +18,14 @@ class Service {
     this.docs = docs;
   }
 
+  // Returns all devices for a given id
+  get(id, params) {
+    return User.findOne({applicationId: id})
+      .then(user => {
+      return user.devices;
+    });
+  }
+
   // Adds a device for a user to the database
   create(data, params) {
     console.log('[DEVICE] ' + JSON.stringify(data));
@@ -36,7 +44,6 @@ class Service {
       applicationId: data.author.id || data.author._id,
       devices: [newDevice]
     });
-
 
     // Insert data into DB
     return User.findOne({applicationId: data.author.id || data.author._id})

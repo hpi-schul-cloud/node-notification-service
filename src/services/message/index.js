@@ -41,14 +41,14 @@ class Service {
       .resolveScope(message.scopeIds).then(userIds => {
         // create users for unknown ids
         let createdUsers = [];
-        userIds.forEach((_id) => {
+        userIds.forEach((id) => {
           createdUsers.push(
-            User.findOne({ applicationId: _id })
+            User.findOne({ applicationId: id })
             .then((user) => {
               if (user !== null) {
                 return Promise.resolve(user);
               } else {
-                let newUser = new User({ applicationId: _id, devices: [] });
+                let newUser = new User({ applicationId: id, devices: [] });
                 return newUser.save();
               }
             })
@@ -59,8 +59,8 @@ class Service {
           .then(() => {
             // set resolved userIds
             message.userIds = userIds;
-            // set applicationId to author _id
-            message.applicationId = data.author._id;
+            // set applicationId to author id
+            message.applicationId = data.author.id;
 
             return message.save();
           })
