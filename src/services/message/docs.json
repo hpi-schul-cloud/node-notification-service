@@ -23,6 +23,10 @@
            "type": "string",
            "description": "Action to be done when the user clicks the notification"
          },
+         "serviceUrl": {
+           "type": "string",
+           "description": "Url of notification service needed for background callbacks"
+         },
          "data": {
            "type": "object",
            "description": "additional JSON data, that can be send with the notification"

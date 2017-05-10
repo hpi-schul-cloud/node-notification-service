@@ -34,7 +34,9 @@ class Service {
       title: data.title,
       body: data.body,
       scopeIds: data.scopeIds,
-      applicationId: data.author.id
+      applicationId: data.author.id,
+      action: data.action,
+      serviceUrl: data.serviceUrl
     });
 
     return Resolve

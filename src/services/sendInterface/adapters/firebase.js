@@ -63,7 +63,10 @@ class FirebaseAdapter {
         title: notification.message.title,
         body: notification.message.body,
         img: notification.message.image
-      }
+      },
+
+      action: notification.message.action,
+      serviceUrl: notification.message.serviceUrl
     };
 
     // additional data

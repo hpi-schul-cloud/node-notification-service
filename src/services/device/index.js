@@ -67,7 +67,7 @@ class Service {
   remove(data, params) {
     console.log('[DEVICE REMOVE]' + JSON.stringify(params));
     // TODO: move auth in hooks
-    // TODO: find better way then passing token as query param
+    // TODO: find better way than passing token as query param
     let device = {};
     return User.findOne({applicationId: params.author.id || params.author._id})
       .then(user => {

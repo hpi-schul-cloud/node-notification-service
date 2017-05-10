@@ -18,7 +18,8 @@ class Constants {
 
     this.CALLBACK_TYPES = {
       RECEIVED: 'received',
-      CLICKED: 'clicked'
+      CLICKED: 'clicked',
+      READ: 'read'
     };
 
     this.NOTIFICATION_STATES = {

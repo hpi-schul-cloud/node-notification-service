@@ -15,6 +15,7 @@ const messageSchema = new Schema({
   title: {type: String, required: true},
   body: {type: String, required: true},
   action: {type: String, required: false},
+  serviceUrl: {type: String, required: false},
   image: {type: String, required: false},
   priority: {
     type: String,
@@ -40,6 +41,7 @@ messageModel.attributes = Object.assign({}, Constants.SERIALIZE, {
     'title',
     'body',
     'action',
+    'serviceUrl',
     'image',
     'priority',
     'initiatorId',

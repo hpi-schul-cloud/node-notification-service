@@ -11,7 +11,7 @@ const Constants = require('../constants');
 const Util = require('../util');
 
 const callbackSchema = new Schema({
-  type: { type: String, enum:['received','clicked'], required: true},  //
+  type: { type: String, enum:['received','clicked','read'], required: true},  //
   createdAt: { type: Date, 'default': Date.now }
 });
 
