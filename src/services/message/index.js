@@ -36,6 +36,7 @@ class Service {
       scopeIds: data.scopeIds,
       applicationId: data.author.id,
       action: data.action,
+      priority: data.priority,
       serviceUrl: data.serviceUrl
     });
 
