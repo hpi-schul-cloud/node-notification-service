@@ -45,7 +45,7 @@ describe('device service', () => {
         });
     });
 
-    it('call with valid data and existing user', () => {
+    it.skip('call with valid data and existing user', () => {
       let newUser = new User({
         applicationId: 'useridfürusertoken2',
         devices: []

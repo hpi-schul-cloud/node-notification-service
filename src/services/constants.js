@@ -7,9 +7,11 @@ class Constants {
     let BASE_PATH = process.env.BASE_PATH || 'https://schulcloud-api-mock.herokuapp.com';
 
     this.CONFIG = {
-      AUTHENTICATION_API_ENDPOINT : BASE_PATH + process.env.AUTHENTICATION_API_ENDPOINT || '/api/user/',
-      AUTHORIZATION_API_ENDPOINT  : BASE_PATH + process.env.AUTHORIZATION_API_ENDPOINT || '/api/all_scopes/',
-      RESOLVE_API_ENDPOINT        : BASE_PATH + process.env.RESOLVE_API_ENDPOINT || '/api/all_users/'
+      AUTHENTICATION_API_ENDPOINT : BASE_PATH + (process.env.AUTHENTICATION_API_ENDPOINT || '/api/user/'),
+      AUTHORIZATION_API_ENDPOINT  : BASE_PATH + (process.env.AUTHORIZATION_API_ENDPOINT || '/api/all_scopes/'),
+      RESOLVE_API_ENDPOINT        : BASE_PATH + (process.env.RESOLVE_API_ENDPOINT || '/api/all_users/'),
+      MAILS_API_ENDPOINT          : BASE_PATH + (process.env.MAILS_API_ENDPOINT || '/mails/'),
+      CALLBACK_API_ENDPOINT       : BASE_PATH + (process.env.CALLBACK_API_ENDPOINT || '/notification/callback/')
     };
 
     this.AUTHORITIES = {

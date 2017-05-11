@@ -35,7 +35,7 @@ class Authentication {
             response.data = response.data[0];
 
           if (response.displayName)
-            response.type = "user";
+            response.type = 'user';
 
           // console.log('[AUTHENTICATION] token is valid');
           if (hook.data) hook.data.author = response.data || response;

@@ -22,8 +22,8 @@ class Service {
   get(id, params) {
     return User.findOne({applicationId: id})
       .then(user => {
-      return user.devices;
-    });
+        return user.devices;
+      });
   }
 
   // Adds a device for a user to the database
