@@ -50,6 +50,8 @@ class FirebaseAdapter {
     //   body: notification.message.body,
     // };
 
+    message.content_available = true;
+
     message.data = {
 
       // handle message in the background on Android Phonegap
