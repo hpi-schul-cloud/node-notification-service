@@ -56,10 +56,12 @@ class SendInterface {
 
   _groupByService(notifications, devices) {
     return devices.reduce((groupsByService, device, index) => {
-      groupsByService[device.service] = {
-        notifications: [],
-        devices: []
-      };
+      if (!groupsByService[device.service]) {
+        groupsByService[device.service] = {
+          notifications: [],
+          devices: []
+        };
+      }
 
       groupsByService[device.service].notifications.push(notifications[index]);
       groupsByService[device.service].devices.push(device);
