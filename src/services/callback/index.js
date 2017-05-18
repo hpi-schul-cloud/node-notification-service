@@ -27,6 +27,8 @@ class Service {
 
           foundNotification.callbacks.push({ type: data.type });
 
+          foundNotification.state = constants.NOTIFICATION_STATES.ESCAlATED;
+
           if (data.type === constants.CALLBACK_TYPES.CLICKED)
             foundNotification.state = constants.CALLBACK_TYPES.CLICKED;
 

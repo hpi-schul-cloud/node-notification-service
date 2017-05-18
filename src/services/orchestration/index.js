@@ -39,6 +39,7 @@ class Orchestration {
     this.logger.info('[SCHEDULED ESCALATION] starts...');
     if (this.reescalationRunning === true) {
       this.logger.info('- await last reescalate finished...');
+      this.reescalationRunning = false;
       return Promise.resolve(true);
     }
     this.reescalationRunning = true;
