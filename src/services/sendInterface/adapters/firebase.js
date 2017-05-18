@@ -52,18 +52,19 @@ class FirebaseAdapter {
 
     message.content_available = true;
 
-    message.data = {
+    // iOS
+    message.notification = {
+        title: notification.message.title,
+        body: notification.message.body
+    };
 
-      // handle message in the background on Android Phonegap
-      // https://github.com/phonegap/phonegap-plugin-push/blob/master/docs/PAYLOAD.md#use-of-content-available-true
+    message.data = {
       'content-available': '1',
 
       notificationId: notification._id,
-
-      // we can not call this attribute 'notification' - phonegap will fail
       news: {
-        title: notification.message.title,
-        body: notification.message.body,
+      title: notification.message.title,
+      body: notification.message.body,
         img: notification.message.image
       },
 
