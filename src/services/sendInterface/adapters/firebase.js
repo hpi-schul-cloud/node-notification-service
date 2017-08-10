@@ -7,11 +7,11 @@ const errors = require('feathers-errors');
 const FIREBASE_PRIORITIES = {
   HIGH: 'high',
   MEDIUM: 'normal'
-}
+};
 
 class FirebaseAdapter {
   constructor() {
-    this.firebaseSender = new firebase.Sender(config.serverToken);
+    this.firebaseSender = new firebase.Sender(process.env.FIREBASE_TOKEN || config.serverToken);
   }
 
   send(notifications, devices) {
