@@ -11,7 +11,8 @@ class Constants {
       AUTHORIZATION_API_ENDPOINT  : BASE_PATH + (process.env.AUTHORIZATION_API_ENDPOINT || '/api/all_scopes/'),
       RESOLVE_API_ENDPOINT        : BASE_PATH + (process.env.RESOLVE_API_ENDPOINT || '/api/all_users/'),
       MAILS_API_ENDPOINT          : BASE_PATH + (process.env.MAILS_API_ENDPOINT || '/mails/'),
-      CALLBACK_API_ENDPOINT       : BASE_PATH + (process.env.CALLBACK_API_ENDPOINT || '/notification/callback/')
+      CALLBACK_API_ENDPOINT       : BASE_PATH + (process.env.CALLBACK_API_ENDPOINT || '/notification/callback/'),
+      API_KEY                     : (process.env.API_KEY || 'example')
     };
 
     this.AUTHORITIES = {

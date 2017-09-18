@@ -25,7 +25,8 @@
     "testing": "nodemon --inspect src/ --exec \"npm test  || true\"",
     "coverage": "cross-env NODE_ENV=testing ./node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha ./test/**/*.test.js",
     "eslint": "eslint src/. test/. ",
-    "jshint": "jshint src/. test/. --config"
+    "jshint": "jshint src/. test/. --config",
+    "startd": "BASE_PATH=http://localhost:3030 AUTHENTICATION_API_ENDPOINT=/resolve/users/ AUTHORIZATION_API_ENDPOINT=/resolve/scopes/ RESOLVE_API_ENDPOINT=/resolve/users/ nodemon --inspect src/"
   },
   "dependencies": {
     "apn": "^2.1.2",
