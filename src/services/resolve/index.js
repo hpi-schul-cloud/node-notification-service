@@ -20,7 +20,10 @@ class Resolve {
 
       let options = {
         uri: constants.CONFIG.RESOLVE_API_ENDPOINT + id,
-        json: true
+        json: true,
+        headers: {
+          "x-api-key": constants.CONFIG.API_KEY
+        }
       };
 
       return rp(options);
@@ -47,7 +50,10 @@ class Resolve {
 
     let options = {
       uri: constants.CONFIG.AUTHENTICATION_API_ENDPOINT + token,
-      json: true
+      json: true,
+      headers: {
+        "x-api-key": constants.CONFIG.API_KEY
+      }
     };
 
     return rp(options);
@@ -59,7 +65,10 @@ class Resolve {
 
     let options = {
       uri: constants.CONFIG.AUTHORIZATION_API_ENDPOINT + token,
-      json: true
+      json: true,
+      headers: {
+        "x-api-key": constants.CONFIG.API_KEY
+      }
     };
 
     return rp(options);
