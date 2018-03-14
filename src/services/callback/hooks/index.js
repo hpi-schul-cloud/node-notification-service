@@ -1,7 +1,5 @@
 'use strict';
 
-const hooks = require('feathers-hooks');
-
 
 exports.before = {
   all: [],

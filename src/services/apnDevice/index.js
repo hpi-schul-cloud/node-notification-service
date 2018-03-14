@@ -2,7 +2,7 @@
 
 const constants = require('../constants');
 const crypto = require('crypto');
-const error = require('feathers-errors');
+const error = require('@feathersjs/errors');
 const fs = require('fs');
 
 const config = require('../../../secure/config.json').sendServices.apn;

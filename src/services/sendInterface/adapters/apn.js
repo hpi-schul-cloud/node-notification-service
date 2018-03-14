@@ -3,7 +3,7 @@
 const config = require('../../../../secure/config.json').sendServices.apn;
 const constants = require('../../constants');
 const apn = require('apn');
-const errors = require('feathers-errors');
+const errors = require('@feathersjs/errors');
 
 const APN_PRIORITIES = {
   HIGH: 10,
