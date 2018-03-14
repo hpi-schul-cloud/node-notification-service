@@ -5,7 +5,7 @@ const util = require('../util');
 const constants = require('../constants');
 const mongoose = require('mongoose');
 const notification = require('../notification/notification-model');
-const errors = require('feathers-errors');
+const errors = require('@feathersjs/errors');
 
 const docs = require('./docs.json');
 
