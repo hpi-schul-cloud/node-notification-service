@@ -1,7 +1,7 @@
 'use strict';
 
 const path = require('path');
-const serveStatic = require('@feathersjs/feathers').static;
+const serveStatic = require('serve-static');
 const express = require('@feathersjs/express');
 const favicon = require('serve-favicon');
 const compress = require('compression');
