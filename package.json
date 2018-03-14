@@ -37,7 +37,7 @@
     "compression": "^1.6.2",
     "cors": "^2.8.1",
     "feathers-mongoose": "^3.6.1",
-    "feathers-swagger": "^0.3.1",
+    "feathers-swagger": "^0.5.0",
     "jsonapi-serializer": "^3.4.2",
     "mongoose": "4.7.8",
     "node-gcm": "^0.14.4",
