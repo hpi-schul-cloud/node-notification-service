@@ -13,6 +13,8 @@ const Util = require('../util');
 const callbackSchema = new Schema({
   type: { type: String, enum:['received','clicked'], required: true},  //
   createdAt: { type: Date, 'default': Date.now }
+}, {
+  usePushEach: true
 });
 
 // TODO notification model for db
@@ -24,6 +26,8 @@ const notificationSchema = new Schema({
   callbacks: [callbackSchema],
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
+}, {
+  usePushEach: true
 });
 
 notificationSchema.methods.changeState = function changeState(newState) {

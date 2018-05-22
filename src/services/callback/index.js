@@ -5,7 +5,7 @@ const util = require('../util');
 const constants = require('../constants');
 const mongoose = require('mongoose');
 const notification = require('../notification/notification-model');
-const errors = require('feathers-errors');
+const errors = require('@feathersjs/errors');
 
 const docs = require('./docs.json');
 
@@ -50,14 +50,11 @@ module.exports = function() {
   // Initialize our service with any options it requires
   app.use('/callback', new Service());
 
-  // Get our initialize service to that we can bind hooks
-  const callbackService = app.service('/callback');
-
-  // Set up our before hooks
-  callbackService.before(hooks.before);
-
-  // Set up our after hooks
-  callbackService.after(hooks.after);
+  // Set up our before and after hooks
+  app.service('/callback').hooks({
+    before: hooks.before,
+    after: hooks.after
+  });
 };
 
 module.exports.Service = Service;

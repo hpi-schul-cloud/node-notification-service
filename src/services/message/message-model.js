@@ -30,6 +30,8 @@ const messageSchema = new Schema({
   createdAt: {type: Date, 'default': Date.now},
   updatedAt: {type: Date, 'default': Date.now}
 
+}, {
+  usePushEach: true
 });
 
 const messageModel = mongoose.model('message', messageSchema);

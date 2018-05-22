@@ -2,7 +2,7 @@
 const config = require('../../../../secure/config.json').sendServices.firebase;
 const constants = require('../../constants');
 const firebase = require('node-gcm');
-const errors = require('feathers-errors');
+const errors = require('@feathersjs/errors');
 
 const FIREBASE_PRIORITIES = {
   HIGH: 'high',

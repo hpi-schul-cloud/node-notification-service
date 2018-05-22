@@ -3,7 +3,7 @@
 const hooks = require('./hooks');
 const User = require('../user/user-model');
 const Resolve = require('../resolve');
-const errors = require('feathers-errors');
+const errors = require('@feathersjs/errors');
 const Authentication = require('../authentication');
 const Serializer = require('jsonapi-serializer').Serializer;
 const Constants = require('../constants');
@@ -94,14 +94,11 @@ module.exports = function () {
   // Initialize our service with any options it requires
   app.use('/devices', new Service());
 
-  // Get our initialize service to that we can bind hooks
-  const deviceService = app.service('/devices');
-
-  // Set up our before hooks
-  deviceService.before(hooks.before);
-
-  // Set up our after hooks
-  deviceService.after(hooks.after);
+  // Set up our before and after hooks
+  app.service('/devices').hooks({
+    before: hooks.before,
+    after: hooks.after
+  });
 };
 
 module.exports.Service = Service;
