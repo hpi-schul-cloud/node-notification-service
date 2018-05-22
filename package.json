@@ -28,22 +28,21 @@
     "jshint": "jshint src/. test/. --config"
   },
   "dependencies": {
+    "@feathersjs/configuration": "^1.0.2",
+    "@feathersjs/errors": "^3.3.0",
+    "@feathersjs/express": "^1.2.2",
+    "@feathersjs/feathers": "^3.1.5",
     "apn": "^2.1.2",
     "body-parser": "^1.15.2",
     "compression": "^1.6.2",
     "cors": "^2.8.1",
-    "feathers": "^2.0.2",
-    "feathers-configuration": "^0.3.3",
-    "feathers-errors": "^2.5.0",
-    "feathers-hooks": "^1.6.1",
     "feathers-mongoose": "^3.6.1",
-    "feathers-rest": "^1.5.2",
-    "feathers-swagger": "^0.3.1",
+    "feathers-swagger": "0.6.0",
+    "jsonapi-serializer": "^3.4.2",
     "mongoose": "4.7.8",
     "node-gcm": "^0.14.4",
     "serve-favicon": "^2.3.0",
-    "winston": "^2.3.0",
-    "jsonapi-serializer": "^3.4.2"
+    "winston": "^2.3.0"
   },
   "devDependencies": {
     "cross-env": "^3.1.4",

@@ -4,7 +4,7 @@ const service = require('feathers-mongoose');
 const serializer = require('jsonapi-serializer').Serializer;
 const Message = require('./message-model');
 const hooks = require('./hooks');
-const errors = require('feathers-errors');
+const errors = require('@feathersjs/errors');
 const Util = require('../util');
 const Resolve = require('../resolve');
 const Orchestration = require('../orchestration');
@@ -89,14 +89,11 @@ module.exports = function() {
   // Initialize our service with any options it requires
   app.use('/messages', new Service());
 
-  // Get our initialize service to that we can bind hooks
-  const messageService = app.service('/messages');
-
-  // Set up our before hooks
-  messageService.before(hooks.before);
-
-  // Set up our after hooks
-  messageService.after(hooks.after);
+  // Set up our before and after hooks
+  app.service('/messages').hooks({
+    before: hooks.before,
+    after: hooks.after
+  });
 };
 
 module.exports.Service = Service;

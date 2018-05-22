@@ -1,7 +1,5 @@
 'use strict';
 
-const hooks = require('feathers-hooks');
-
 const Authentication = require('../../authentication');
 const Authorization = require('../../authorization');
 
