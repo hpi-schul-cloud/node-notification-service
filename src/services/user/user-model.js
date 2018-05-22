@@ -24,6 +24,8 @@ const deviceSchema = new Schema({
   active: { type: Boolean, default: false }, // Active device at the moment
   createdAt: { type: Date, 'default': Date.now },
   updatedAt: { type: Date, 'default': Date.now }
+}, {
+  usePushEach: true
 });
 
 const userSchema = new Schema({
@@ -31,6 +33,8 @@ const userSchema = new Schema({
   devices: { type: [deviceSchema], required: false },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
+}, {
+  usePushEach: true
 });
 
 const userModel = mongoose.model('user', userSchema);

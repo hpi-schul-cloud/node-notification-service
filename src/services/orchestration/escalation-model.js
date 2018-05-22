@@ -22,6 +22,8 @@ const escalationSchema = new Schema({
   nextEscalationDue: {type: Date, 'default': Date.now},
   createdAt: {type: Date, 'default': Date.now},
   updatedAt: {type: Date, 'default': Date.now}
+}, {
+  usePushEach: true
 });
 
 const escalationModel = mongoose.model('escalation', escalationSchema);
