@@ -7,7 +7,7 @@
     "start": "npm run development",
     "development": "concurrently \"npm run ts-watch\" \"npm run nodemon\"",
     "ts-watch": "tsc --watch",
-    "nodemon": "nodemon build/server.js",
+    "nodemon": "nodemon --inspect ./build/server.js --watch build",
     "build": "tsc",
     "server": "node build/server.js"
   },
