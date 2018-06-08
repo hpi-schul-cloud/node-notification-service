@@ -6,10 +6,11 @@
   "scripts": {
     "start": "npm run development",
     "development": "concurrently \"npm run ts-watch\" \"npm run nodemon\"",
+    "init": "",
     "ts-watch": "tsc --watch",
-    "nodemon": "nodemon --inspect ./build/server.js --watch build",
+    "nodemon": "nodemon --inspect ./build/app.js --watch build",
     "build": "tsc",
-    "server": "node build/server.js"
+    "server": "node build/app.js"
   },
   "repository": {
     "type": "git",
