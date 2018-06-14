@@ -1,6 +1,6 @@
 import nodeMailer from 'nodemailer';
 import Mail from '@/interfaces/Mail';
-import PlatformTransporter from '@/interfaces/PlatformTransporter';
+import PlatformMailTransporter from '@/interfaces/PlatformMailTransporter';
 
 export default class MailService {
   // region public static methods
@@ -14,7 +14,7 @@ export default class MailService {
 
   // region private members
 
-  private readonly _transporters: PlatformTransporter[] = [];
+  private readonly _transporters: PlatformMailTransporter[] = [];
 
   // endregion
 
@@ -39,17 +39,17 @@ export default class MailService {
   private createTransporter(platformId: string): nodeMailer.Transporter {
     const config = require(`../../platforms/${platformId}/config.json`);
     const transporter = nodeMailer.createTransport(config.mail.options, config.mail.defaults);
-    const platformTransporter = {
+    const platformMailTransporter = {
       platformId,
       transporter
     }
-    this._transporters.push(platformTransporter);
+    this._transporters.push(platformMailTransporter);
     return transporter;
   }
 
   private getTransporter(platformId: string): nodeMailer.Transporter {
-    const currentTransporter: PlatformTransporter | undefined = this._transporters.find(
-      (transporter: PlatformTransporter) => {
+    const currentTransporter: PlatformMailTransporter | undefined = this._transporters.find(
+      (transporter: PlatformMailTransporter) => {
         return transporter.platformId === platformId;
       }
     );
