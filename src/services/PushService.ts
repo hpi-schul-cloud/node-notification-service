@@ -1,5 +1,6 @@
 import firebaseAdmin from 'firebase-admin';
 import PlatformPushTransporter from '@/interfaces/PlatformPushTransporter';
+import Utils from '@/utils';
 
 export default class PushService {
   // region public static methods
@@ -22,7 +23,7 @@ export default class PushService {
 
   // region public methods
 
-  public async send(platformId: string, push: firebaseAdmin.messaging.Message): Promise<any> {
+  public async send(platformId: string, push: firebaseAdmin.messaging.Message): Promise<string | void> {
     try {
       const transporter = this.getTransporter(platformId);
       return transporter.messaging().send(push);
@@ -36,7 +37,7 @@ export default class PushService {
   // region private methods
 
   private createTransporter(platformId: string): firebaseAdmin.app.App {
-    const config = require(`../../platforms/${platformId}/config.json`);
+    const config = Utils.getPlatformConfig(platformId);
     const transporter = firebaseAdmin.initializeApp({
       credential: firebaseAdmin.credential.cert(config.push.service_account_object),
       databaseURL: config.push.database_url

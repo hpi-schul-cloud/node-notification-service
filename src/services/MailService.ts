@@ -1,6 +1,7 @@
-import nodeMailer from 'nodemailer';
+import nodeMailer, { SentMessageInfo } from 'nodemailer';
 import Mail from '@/interfaces/Mail';
 import PlatformMailTransporter from '@/interfaces/PlatformMailTransporter';
+import Utils from '@/utils';
 
 export default class MailService {
   // region public static methods
@@ -23,7 +24,7 @@ export default class MailService {
 
   // region public methods
 
-  public async send(platformId: string, mail: Mail): Promise<any> {
+  public async send(platformId: string, mail: Mail): Promise<SentMessageInfo | void> {
     try {
       const transporter = this.getTransporter(platformId);
       return transporter.sendMail(mail);
@@ -37,7 +38,7 @@ export default class MailService {
   // region private methods
 
   private createTransporter(platformId: string): nodeMailer.Transporter {
-    const config = require(`../../platforms/${platformId}/config.json`);
+    const config = Utils.getPlatformConfig(platformId);
     const transporter = nodeMailer.createTransport(config.mail.options, config.mail.defaults);
     const platformMailTransporter = {
       platformId,
