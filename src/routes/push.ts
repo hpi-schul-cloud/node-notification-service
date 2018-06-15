@@ -1,4 +1,4 @@
-import admin from 'firebase-admin';
+import firebaseAdmin from 'firebase-admin';
 import express from 'express';
 import PushService from '../services/PushService';
 
@@ -6,7 +6,7 @@ const router: express.Router = express.Router();
 const pushService: PushService = new PushService();
 
 router.post('/', (req, res) => {
-  const push: admin.messaging.Message = {
+  const push: firebaseAdmin.messaging.Message = {
     token: req.body.token,
     data: req.body.data,
     notification: req.body.notification,

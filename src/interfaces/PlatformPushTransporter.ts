@@ -1,6 +1,6 @@
-import admin from 'firebase-admin';
+import firebaseAdmin from 'firebase-admin';
 
 export default interface PlatformPushTransporter {
   platformId: string;
-  transporter: admin.app.App;
+  transporter: firebaseAdmin.app.App;
 }
