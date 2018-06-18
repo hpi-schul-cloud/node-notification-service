@@ -1,8 +1,7 @@
-import firebaseAdmin from 'firebase-admin';
-import PlatformPushTransporter from '@/interfaces/PlatformPushTransporter';
-import Utils from '@/utils';
+import firebaseAdmin, { messaging as firebaseMessaging } from 'firebase-admin';
+import BaseService from '../services/BaseService';
 
-export default class PushService {
+export default class PushService extends BaseService {
   // region public static methods
   // endregion
 
@@ -13,56 +12,26 @@ export default class PushService {
   // endregion
 
   // region private members
-
-  private readonly _transporters: PlatformPushTransporter[] = [];
-
   // endregion
 
   // region constructor
   // endregion
 
   // region public methods
+  
+  public _send(transporter: firebaseMessaging.Messaging, push: firebaseMessaging.Message): Promise<String> {
+    return transporter.send(push);
+  }
 
-  public async send(platformId: string, push: firebaseAdmin.messaging.Message): Promise<string | void> {
-    try {
-      const transporter = this.getTransporter(platformId);
-      return transporter.messaging().send(push);
-    } catch (e) {
-      return Promise.reject(new Error('Invalid platformId. Platform config not found.'));
-    }
+  public _createTransporter(config: any): firebaseMessaging.Messaging {
+    return firebaseAdmin.initializeApp({
+      credential: firebaseAdmin.credential.cert(config.push.service_account_object),
+      databaseURL: config.push.database_url
+    }).messaging();
   }
 
   // endregion
 
   // region private methods
-
-  private createTransporter(platformId: string): firebaseAdmin.app.App {
-    const config = Utils.getPlatformConfig(platformId);
-    const transporter = firebaseAdmin.initializeApp({
-      credential: firebaseAdmin.credential.cert(config.push.service_account_object),
-      databaseURL: config.push.database_url
-    });
-    const platformPushTransporter = {
-      platformId,
-      transporter
-    }
-    this._transporters.push(platformPushTransporter);
-    return transporter;
-  }
-
-  private getTransporter(platformId: string): firebaseAdmin.app.App {
-    const currentTransporter: PlatformPushTransporter | undefined = this._transporters.find(
-      (transporter: PlatformPushTransporter) => {
-        return transporter.platformId === platformId;
-      }
-    );
-
-    if (currentTransporter) {
-      return currentTransporter.transporter;
-    }
-
-    return this.createTransporter(platformId);
-  }
-
   // endregion
 }
