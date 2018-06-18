@@ -1,9 +1,8 @@
 import nodeMailer, { SentMessageInfo } from 'nodemailer';
+import BaseService from '../services/BaseService';
 import Mail from '@/interfaces/Mail';
-import PlatformMailTransporter from '@/interfaces/PlatformMailTransporter';
-import Utils from '@/utils';
 
-export default class MailService {
+export default class MailService extends BaseService {
   // region public static methods
   // endregion
 
@@ -14,53 +13,23 @@ export default class MailService {
   // endregion
 
   // region private members
-
-  private readonly _transporters: PlatformMailTransporter[] = [];
-
   // endregion
 
   // region constructor
   // endregion
 
   // region public methods
+  
+  public _send(transporter: nodeMailer.Transporter, mail: Mail): Promise<SentMessageInfo> {
+    return transporter.sendMail(mail);
+  }
 
-  public async send(platformId: string, mail: Mail): Promise<SentMessageInfo | void> {
-    try {
-      const transporter = this.getTransporter(platformId);
-      return transporter.sendMail(mail);
-    } catch (e) {
-      return Promise.reject(new Error('Invalid platformId. Platform config not found.'));
-    }
+  public _createTransporter(config: any): nodeMailer.Transporter {
+    return nodeMailer.createTransport(config.mail.options, config.mail.defaults);
   }
 
   // endregion
 
   // region private methods
-
-  private createTransporter(platformId: string): nodeMailer.Transporter {
-    const config = Utils.getPlatformConfig(platformId);
-    const transporter = nodeMailer.createTransport(config.mail.options, config.mail.defaults);
-    const platformMailTransporter = {
-      platformId,
-      transporter
-    }
-    this._transporters.push(platformMailTransporter);
-    return transporter;
-  }
-
-  private getTransporter(platformId: string): nodeMailer.Transporter {
-    const currentTransporter: PlatformMailTransporter | undefined = this._transporters.find(
-      (transporter: PlatformMailTransporter) => {
-        return transporter.platformId === platformId;
-      }
-    );
-
-    if (currentTransporter) {
-      return currentTransporter.transporter;
-    }
-
-    return this.createTransporter(platformId);
-  }
-
   // endregion
 }
