@@ -13,12 +13,12 @@ export default abstract class BaseService {
   // endregion
 
   // region public members
-
-  public readonly _transporters: any[] = [];
-
   // endregion
 
   // region private members
+
+  private readonly _transporters: any[] = [];
+
   // endregion
 
   // region constructor
@@ -39,7 +39,11 @@ export default abstract class BaseService {
     }
   }
 
-  public createTransporter(platformId: string): nodeMailer.Transporter | firebaseMessaging.Messaging {
+  // endregion
+
+  // region private methods
+
+  private createTransporter(platformId: string): nodeMailer.Transporter | firebaseMessaging.Messaging {
     const config = Utils.getPlatformConfig(platformId);
     const transporter = this._createTransporter(config)
     const platformPushTransporter = {
@@ -50,7 +54,7 @@ export default abstract class BaseService {
     return transporter;
   }
 
-  public getTransporter(platformId: string): nodeMailer.Transporter | firebaseMessaging.Messaging {
+  private getTransporter(platformId: string): nodeMailer.Transporter | firebaseMessaging.Messaging {
     const currentTransporter: PlatformMailTransporter | PlatformPushTransporter | undefined = this._transporters.find(
       (transporter: PlatformMailTransporter | PlatformPushTransporter) => {
         return transporter.platformId === platformId;
@@ -63,9 +67,6 @@ export default abstract class BaseService {
 
     return this.createTransporter(platformId);
   }
-
-  // endregion
-
-  // region private methods
+  
   // endregion
 }
