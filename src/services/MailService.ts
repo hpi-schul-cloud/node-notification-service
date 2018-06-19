@@ -19,12 +19,12 @@ export default class MailService extends BaseService {
   // endregion
 
   // region public methods
-  
-  public _send(transporter: nodeMailer.Transporter, mail: Mail): Promise<SentMessageInfo> {
+
+  protected _send(transporter: nodeMailer.Transporter, mail: Mail): Promise<SentMessageInfo> {
     return transporter.sendMail(mail);
   }
 
-  public _createTransporter(config: any): nodeMailer.Transporter {
+  protected _createTransporter(config: any): nodeMailer.Transporter {
     return nodeMailer.createTransport(config.mail.options, config.mail.defaults);
   }
 

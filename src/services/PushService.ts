@@ -18,12 +18,12 @@ export default class PushService extends BaseService {
   // endregion
 
   // region public methods
-  
-  public _send(transporter: firebaseMessaging.Messaging, push: firebaseMessaging.Message): Promise<String> {
+
+  protected _send(transporter: firebaseMessaging.Messaging, push: firebaseMessaging.Message): Promise<String> {
     return transporter.send(push);
   }
 
-  public _createTransporter(config: any): firebaseMessaging.Messaging {
+  protected _createTransporter(config: any): firebaseMessaging.Messaging {
     return firebaseAdmin.initializeApp({
       credential: firebaseAdmin.credential.cert(config.push.service_account_object),
       databaseURL: config.push.database_url
