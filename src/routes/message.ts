@@ -20,6 +20,8 @@ router.post('/', (req, res) => {
   if (typeof req.body.trackLinks === 'boolean') {
     message.trackLinks = req.body.trackLinks;
   }
+
+  messageService.send(message);
 });
 
 export default router;
