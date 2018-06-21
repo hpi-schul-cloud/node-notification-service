@@ -1,4 +1,4 @@
-export default class EscalationLogic{
+export default class EscalationLogic {
   // region public static methods
   // endregion
 
