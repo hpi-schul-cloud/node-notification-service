@@ -1,5 +1,6 @@
 export default interface UserRessource {
   name: string;
   mail: string;
-  payload: Map<string, string>
+  payload: any;
+  languageId: string;
 }
