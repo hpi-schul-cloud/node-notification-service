@@ -31,7 +31,7 @@ export default class EscalationLogic {
 
   // region public methods
 
-  public escalate(messageId: number) {
+  public escalate(messageId: string) {
     // const MessageModel = mongoose.model('Message', messageSchema);
     // MessageModel.findById(messageId, (err, message) => {
       // message ...

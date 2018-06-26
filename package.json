@@ -1,16 +1,13 @@
 {
   "name": "notification-service",
   "version": "1.0.0",
-  "description": "## Getting Started",
-  "main": "src/server.js",
+  "description": "A notification service for mails and push notifications build with Typescript on top of Node and Express.js.",
+  "main": "src/app.ts",
   "scripts": {
-    "start": "npm run development",
-    "development": "concurrently \"npm run ts-watch\" \"npm run nodemon\"",
+    "start": "nodemon",
     "lint": "tslint -p tsconfig.json",
-    "ts-watch": "tsc --watch",
-    "nodemon": "nodemon --inspect ./build/app.js --watch build",
-    "build": "tsc",
-    "server": "node build/app.js"
+    "server": "ts-node src/app.ts",
+    "dev": "npm run lint && npm run server"
   },
   "repository": {
     "type": "git",
@@ -21,7 +18,7 @@
   "bugs": {
     "url": "https://github.com/schul-cloud/node-notification-service/issues"
   },
-  "homepage": "https://github.com/schul-cloud/node-notification-service#readme",
+  "homepage": "https://github.com/schul-cloud/node-notification-service",
   "dependencies": {
     "axios": "^0.18.0",
     "body-parser": "^1.18.3",
@@ -29,6 +26,7 @@
     "firebase-admin": "^5.12.1",
     "mongoose": "^5.1.6",
     "nodemailer": "^4.6.5",
+    "ts-node": "^7.0.0",
     "winston": "^3.0.0"
   },
   "devDependencies": {
