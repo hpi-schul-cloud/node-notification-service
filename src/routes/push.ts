@@ -1,3 +1,4 @@
+import winston from 'winston';
 import { messaging as firebaseMessaging } from 'firebase-admin';
 import express from 'express';
 import PushService from '../services/PushService';
@@ -17,13 +18,13 @@ router.post('/', (req, res) => {
 
   pushService.send(req.body.platformId, push)
     .then((response: any) => {
-      console.log(response);
+      winston.info(response);
     })
     .catch((e: Error) => {
-      console.log('Error: ' + e);
+      winston.error(e);
     });
 
-    res.send('Push queued.');
+  res.send('Push queued.');
 });
 
 export default router;

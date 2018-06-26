@@ -1,3 +1,4 @@
+import winston from 'winston';
 import express from 'express';
 import MailService from '../services/MailService';
 import Mail from '@/interfaces/Mail';
@@ -19,10 +20,10 @@ router.post('/', (req, res) => {
 
   mailService.send(req.body.platformId, mail)
     .then((response: any) => {
-      console.log(response);
+      winston.info(response);
     })
     .catch((e: Error) => {
-      console.log('Error: ' + e);
+      winston.error(e);
     });
 
   res.send('Mail queued.');
