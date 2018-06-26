@@ -1,5 +1,5 @@
 import express from 'express';
-import MessageService from '@/services/MessageService';
+import MessageService from '../services/MessageService';
 import Message from '@/interfaces/Message';
 
 const router: express.Router = express.Router();
@@ -22,6 +22,8 @@ router.post('/', (req, res) => {
   }
 
   messageService.send(message);
+
+  res.send('Message queued.');
 });
 
 export default router;
