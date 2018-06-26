@@ -10,7 +10,7 @@ router.post('/', (req, res) => {
     to: req.body.to,
     subject: req.body.subject,
     text: req.body.text,
-    html: req.body.html
+    html: req.body.html,
   };
 
   if (req.body.from) {
@@ -25,7 +25,7 @@ router.post('/', (req, res) => {
       console.log('Error: ' + e);
     });
 
-    res.send('Mail queued.');
+  res.send('Mail queued.');
 });
 
 export default router;

@@ -1,6 +1,6 @@
-import EscalationLogic from "../services/EscalationLogic";
-import Message from "@/interfaces/Message";
-import MessageModel from "../models/message";
+import EscalationLogic from '../services/EscalationLogic';
+import Message from '@/interfaces/Message';
+import MessageModel from '../models/message';
 import axios from 'axios';
 
 export default class MessageService {
@@ -8,6 +8,48 @@ export default class MessageService {
   // endregion
 
   // region private static methods
+  private static async save(message: Message): Promise<string> {
+
+    const messageModel = new MessageModel({
+      platform: message.platform,
+      template: message.template,
+      sender: {
+        name: message.sender ? message.sender.name : '',
+        mail: message.sender ? message.sender.mail : '',
+      },
+      payload: message.payload,
+      receivers: typeof message.receivers === 'string' ? [] : message.receivers,
+      trackLinks: message.trackLinks ? message.trackLinks : true,
+    });
+
+    const savedMessage = await messageModel.save();
+
+    if (typeof message.receivers === 'string') {
+      await MessageService.updateReceivers(savedMessage.id, message.receivers);
+    }
+
+    return savedMessage.id;
+  }
+
+  private static async updateReceivers(messageId: string, url: string) {
+    let pageUrl: string = url;
+
+    do {
+      const response = await axios.get(pageUrl);
+      if (!response.data.data) {
+        return;
+      }
+
+      await MessageModel.findOneAndUpdate(
+        { _id: messageId },
+        { $addToSet: { receivers: { $each: response.data.data } } },
+        { upsert: true },
+      );
+
+      pageUrl = response.data.links.next;
+
+    } while (pageUrl);
+  }
   // endregion
 
   // region public members
@@ -25,48 +67,11 @@ export default class MessageService {
 
   // region public methods
   public async send(message: Message) {
-
-    const databaseMessage = new MessageModel({
-      platform: message.platform,
-      template: message.template,
-      sender: {
-        name: message.sender ? message.sender.name : '',
-        mail: message.sender ? message.sender.mail : '',
-      },
-      payload: message.payload,
-      receivers: typeof message.receivers === 'string' ? [] : message.receivers,
-      trackLinks: message.trackLinks ? message.trackLinks : true,
-    });
-
-
-    const savedMessage = await databaseMessage.save();
-
-    if (typeof message.receivers === 'string') {
-      await this.writeReceiversToDatabase(savedMessage.id, message.receivers);
-    }
-
-    // this.escalationLogic.escalate(savedMessage.id);
+    const messageId = await MessageService.save(message);
+    this.escalationLogic.escalate(messageId);
   }
   // endregion
 
   // region private methods
-  private async writeReceiversToDatabase(messageId: string, url: string) {
-    console.log('fetching users');
-    let pageUrl: string = url;
-    do {
-      const response = await axios.get(pageUrl);
-      if (!response.data.data) {
-        return;
-      }
-
-      await MessageModel.findOneAndUpdate(
-        { _id: messageId },
-        { '$addToSet': { 'receivers': { '$each': response.data.data } } },
-        { 'upsert': true },
-      );
-
-      pageUrl = response.data.links.next;
-    } while (pageUrl);
-  }
   // endregion
 }

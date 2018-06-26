@@ -12,7 +12,7 @@ router.post('/', (req, res) => {
     notification: req.body.notification,
     android: req.body.android,
     webpush: req.body.webpush,
-    apns: req.body.apns
+    apns: req.body.apns,
   };
 
   pushService.send(req.body.platformId, push)

@@ -8,10 +8,12 @@ const messageScema = new mongoose.Schema({
     name: String,
     mail: String,
   },
-  payload:[{
-    language: String,
-    payload: Object,
-  }],
+  payload: [
+    {
+      language: String,
+      payload: Object,
+    },
+  ],
   receivers: [ userRessource ],
   trackLinks: Boolean,
 });
