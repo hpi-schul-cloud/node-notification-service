@@ -1,6 +1,6 @@
-import TemplatingService from "@/services/TemplatingService";
-import MailService from "@/services/MailService";
-import PushService from "@/services/PushService";
+import TemplatingService from "../services/TemplatingService";
+import MailService from "../services/MailService";
+import PushService from "../services/PushService";
 import Message from "@/interfaces/Message";
 
 export default class EscalationLogic {
@@ -38,7 +38,7 @@ export default class EscalationLogic {
     // });
 
     const message: Message = { platform: '', template: '', content: {}, payload: [], receivers: [] };
-    
+
     // TODO: Move this check to somewehere else
     if (typeof message.receivers === 'string') {
       message.receivers = [];

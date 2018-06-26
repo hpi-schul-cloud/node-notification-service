@@ -1,13 +1,13 @@
 import { messaging as firebaseMessaging } from 'firebase-admin';
 import Mail from '@/interfaces/Mail';
-import Template, { MessageTypes } from '@/interfaces/Template';
+import Template, { MessageTypes } from '../interfaces/Template';
 import UserRessource from '@/interfaces/UserRessource';
-import Utils from '@/utils';
+import Utils from '../utils';
 
 export default class TemplatingService {
   // region public static methods
   // endregion
-  
+
   // region private static methods
 
   private static insertMessagePayload(template: any, payload: any): any {
@@ -23,16 +23,16 @@ export default class TemplatingService {
   }
 
   // endregion
-  
+
   // region public members
   // endregion
-  
+
   // region private members
 
   private readonly _localizedTemplates: Template[] = [];
 
   // endregion
-  
+
   // region constructor
 
   public constructor(platformId: string, templateId: string, payload: any, content: any) {
@@ -40,7 +40,7 @@ export default class TemplatingService {
   }
 
   // endregion
-  
+
   // region public methods
 
   public createMailMessage(user: UserRessource): Mail {
@@ -69,14 +69,14 @@ export default class TemplatingService {
   }
 
   // endregion
-  
+
   // region private methods
 
   private generateTemplates(platformId: string, templateId: string, payload: any, content: any) {
     for (const type in MessageTypes) {
       // Step 1: Load base template
       let baseTemplate = Utils.getTemplate(platformId, templateId, type);
-      
+
       // Step 2: Insert payload into base template
       baseTemplate = TemplatingService.insertMessagePayload(baseTemplate, payload);
 
