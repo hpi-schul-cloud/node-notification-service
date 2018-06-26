@@ -1,6 +1,7 @@
-import EscalationLogic from "@/services/EscalationLogic";
+import EscalationLogic from "../services/EscalationLogic";
 import Message from "@/interfaces/Message";
-import UserRessource from "@/interfaces/UserRessource";
+import MessageModel from "../models/message";
+import axios from 'axios';
 
 export default class MessageService {
   // region public static methods
@@ -23,26 +24,49 @@ export default class MessageService {
   // endregion
 
   // region public methods
-  public send(message: Message) {
-    let databaseMessage: Message = message;
+  public async send(message: Message) {
+
+    const databaseMessage = new MessageModel({
+      platform: message.platform,
+      template: message.template,
+      sender: {
+        name: message.sender ? message.sender.name : '',
+        mail: message.sender ? message.sender.mail : '',
+      },
+      payload: message.payload,
+      receivers: typeof message.receivers === 'string' ? [] : message.receivers,
+      trackLinks: message.trackLinks ? message.trackLinks : true,
+    });
+
+
+    const savedMessage = await databaseMessage.save();
+
     if (typeof message.receivers === 'string') {
-      databaseMessage.receivers = [];
+      await this.writeReceiversToDatabase(savedMessage.id, message.receivers);
     }
 
-    // TODO: Write message to database
-
-    if (typeof message.receivers === 'string') {
-      // TODO: Use write receivers function.
-    }
-
-    // TODO: Call escalation logic
+    // this.escalationLogic.escalate(savedMessage.id);
   }
   // endregion
 
   // region private methods
-  private writeReceiversToDatabase(messageId: string, url: string) {
-    // TODO: Fetch users
-    // TODO: Write batches of users to database
+  private async writeReceiversToDatabase(messageId: string, url: string) {
+    console.log('fetching users');
+    let pageUrl: string = url;
+    do {
+      const response = await axios.get(pageUrl);
+      if (!response.data.data) {
+        return;
+      }
+
+      await MessageModel.findOneAndUpdate(
+        { _id: messageId },
+        { '$addToSet': { 'receivers': { '$each': response.data.data } } },
+        { 'upsert': true },
+      );
+
+      pageUrl = response.data.links.next;
+    } while (pageUrl);
   }
   // endregion
 }
