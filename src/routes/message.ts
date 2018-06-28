@@ -26,4 +26,20 @@ router.post('/', (req, res) => {
   res.send('Message queued.');
 });
 
+router.post('/:messageId/seen', async (req, res) => {
+  if (!req.params.messageId) {
+    res.status(400).send('Missing url parameter: messageId.');
+  }
+  if (!req.body.userId) {
+    res.status(400).send('Missing body parameter: userId.');
+  }
+
+  try {
+    await messageService.seen(req.params.messageId, req.body.userId);
+    res.send('The message has been marked as seen.');
+  } catch (e) {
+    res.status(400).send(e.message);
+  }
+});
+
 export default router;
