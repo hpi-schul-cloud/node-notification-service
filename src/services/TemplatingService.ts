@@ -1,8 +1,12 @@
 import { messaging as firebaseMessaging } from 'firebase-admin';
 import Mail from '@/interfaces/Mail';
-import Template, { MessageTypes } from '../interfaces/Template';
+import Template from '../interfaces/Template';
+import TemplatePayload from '@/interfaces/TemplatePayload';
 import UserRessource from '@/interfaces/UserRessource';
 import Utils from '../utils';
+
+const MAIL_MESSAGE = 'MAIL';
+const PUSH_MESSAGE = 'PUSH';
 
 export default class TemplatingService {
   // region public static methods
@@ -10,16 +14,43 @@ export default class TemplatingService {
 
   // region private static methods
 
-  private static insertMessagePayload(template: any, payload: any): any {
-    throw new Error("Method not implemented.");
+  private static insertMessagePayload(template: any, payload: any, platformId: string): any {
+    const config = Utils.getPlatformConfig(platformId);
+    return {
+      from: config.mail.defaults.from,
+      data: template.data,
+    };
   }
 
-  private static insertContent(template: any, content: any): any {
-    throw new Error("Method not implemented.");
+  private static insertLanguagePayload(template: any, payload: any): any {
+    // TODO: Insert message content into template
+    return Object.assign(template, {
+      subject: payload.title,
+      text: payload.body,
+      html: payload.body,
+      notification: {
+        title: payload.title,
+        body: payload.body,
+      },
+      android: template.android,
+      webpush: template.webpush,
+      apns: {
+        payload: {
+          aps: {
+            title: payload.title,
+            body: payload.body,
+          },
+        },
+      },
+    });
   }
 
-  private static insertUserPayload(template: any, payload: any): any {
-    throw new Error("Method not implemented.");
+  private static insertUserPayload(template: any, user: UserRessource): any {
+    // TODO: Access deviceId of User
+    return Object.assign(template, {
+      to: `${user.name} <${user.mail}>`,
+      token: 'user.deviceToken',
+    });
   }
 
   // endregion
@@ -29,14 +60,14 @@ export default class TemplatingService {
 
   // region private members
 
-  private readonly _localizedTemplates: Template[] = [];
+  private readonly localizedTemplates: Template[] = [];
 
   // endregion
 
   // region constructor
 
-  public constructor(platformId: string, templateId: string, payload: any, content: any) {
-    this.generateTemplates(platformId, templateId, payload, content);
+  public constructor(platformId: string, templateId: string, payload: any) {
+    this.generateTemplates(platformId, templateId, payload);
   }
 
   // endregion
@@ -44,27 +75,27 @@ export default class TemplatingService {
   // region public methods
 
   public createMailMessage(user: UserRessource): Mail {
-    const template = this.getTemplateForUser(user, MessageTypes.Mail);
+    const template = this.getTemplateForUser(user, MAIL_MESSAGE);
     const mail = {
       from: template.from,
       to: user.mail,
       subject: template.subject,
       text: template.text,
-      html: template.html
-    }
+      html: template.html,
+    };
     return mail;
   }
 
   public createPushMessage(user: UserRessource): firebaseMessaging.Message {
-    const template = this.getTemplateForUser(user, MessageTypes.Push);
+    const template = this.getTemplateForUser(user, PUSH_MESSAGE);
     const push = {
-      token: 'user.deviceId',
+      token: template.token,
       data: template.data,
       notification: template.notification,
       android: template.android,
       webpush: template.webpush,
-      apns: template.apns
-    }
+      apns: template.apns,
+    };
     return push;
   }
 
@@ -72,45 +103,46 @@ export default class TemplatingService {
 
   // region private methods
 
-  private generateTemplates(platformId: string, templateId: string, payload: any, content: any) {
-    for (const type in MessageTypes) {
+  private generateTemplates(platformId: string, templateId: string, payload: TemplatePayload[]) {
+    for (const type of [MAIL_MESSAGE, PUSH_MESSAGE]) {
       // Step 1: Load base template
       let baseTemplate = Utils.getTemplate(platformId, templateId, type);
 
-      // Step 2: Insert payload into base template
-      baseTemplate = TemplatingService.insertMessagePayload(baseTemplate, payload);
+      // Step 2: Insert general payload into base template
+      // TODO: Pass general message payload (with e.g. unique language identifier)
+      baseTemplate = TemplatingService.insertMessagePayload(baseTemplate, {}, platformId);
 
-      // Step 3: Insert content into base template for every language
-      for (const languageId in content) {
-        const template = TemplatingService.insertContent(baseTemplate, content[languageId]);
+      // Step 3: Insert language specific payload into base template for every language
+      for (const languagePayload of payload) {
+        const template = TemplatingService.insertLanguagePayload(baseTemplate, languagePayload.payload);
+        const languageId = languagePayload.language;
         const localizedTemplate = {
           languageId,
           type,
-          template
+          template,
         };
-        this._localizedTemplates.push(localizedTemplate);
+        this.localizedTemplates.push(localizedTemplate);
       }
     }
   }
 
   private getTemplate(languageId: string, type: string): any {
-    const currentTemplate: Template | undefined = this._localizedTemplates.find(
+    const currentTemplate: Template | undefined = this.localizedTemplates.find(
       (template: Template) => {
         return (template.languageId === languageId) && (template.type === type);
-      }
+      },
     );
 
     if (currentTemplate) {
       return currentTemplate.template;
     } else {
-      console.log('Invalid languageId or type. Template not found.');
-      return '';
+      return Promise.reject(new Error('Invalid languageId or type. Template not found.'));
     }
   }
 
   private getTemplateForUser(user: UserRessource, type: string): any {
-    let template = this.getTemplate(user.languageId, type);
-    template = TemplatingService.insertUserPayload(template, user.payload);
+    let template = this.getTemplate(user.language, type);
+    template = TemplatingService.insertUserPayload(template, user);
     return template;
   }
 
