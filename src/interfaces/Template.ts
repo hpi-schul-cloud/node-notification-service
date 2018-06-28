@@ -1,10 +1,5 @@
-export enum MessageTypes {
-  Mail = 'MAIL',
-  Push = 'PUSH',
-}
-
 export default interface Template {
   languageId: string;
-  type: MessageTypes;
+  type: string;
   template: any;
 }
