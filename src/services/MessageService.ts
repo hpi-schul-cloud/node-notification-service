@@ -2,6 +2,7 @@ import EscalationLogic from '../services/EscalationLogic';
 import Message from '@/interfaces/Message';
 import MessageModel from '../models/message';
 import axios from 'axios';
+import winston from 'winston';
 
 export default class MessageService {
   // region public static methods
@@ -50,6 +51,25 @@ export default class MessageService {
 
     } while (pageUrl);
   }
+
+  private static async unregisterNotification(messageId: string, userId: string) {
+    const message = await MessageModel.findById(messageId);
+    if (!message) {
+      const errorMessage = `Could not unregister Notification: Message (id: ${messageId}) not found.`;
+      winston.error(errorMessage);
+      throw new Error(errorMessage);
+    }
+
+    const user = message.receivers.find((receiver) => receiver._id.toString() === userId);
+    if (!user) {
+      const errorMessage = `Could not unregister Notification: User (id: ${userId}) not found in Message (id: ${messageId}).`;
+      winston.error(errorMessage);
+      throw new Error(errorMessage);
+    }
+
+    message.receivers.pull(user._id);
+    await message.save();
+  }
   // endregion
 
   // region public members
@@ -69,6 +89,10 @@ export default class MessageService {
   public async send(message: Message) {
     const messageId = await MessageService.save(message);
     this.escalationLogic.escalate(messageId);
+  }
+
+  public async seen(messageId: string, userId: string) {
+    return await MessageService.unregisterNotification(messageId, userId);
   }
   // endregion
 
