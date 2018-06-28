@@ -1,7 +1,8 @@
-import TemplatingService from "../services/TemplatingService";
-import MailService from "../services/MailService";
-import PushService from "../services/PushService";
-import Message from "@/interfaces/Message";
+import MailService from '../services/MailService';
+import PushService from '../services/PushService';
+import TemplatingService from '../services/TemplatingService';
+import MessageModel from '../models/message';
+import Message from '@/interfaces/Message';
 
 export default class EscalationLogic {
   // region public static methods
@@ -32,34 +33,38 @@ export default class EscalationLogic {
   // region public methods
 
   public escalate(messageId: string) {
-    // const MessageModel = mongoose.model('Message', messageSchema);
-    // MessageModel.findById(messageId, (err, message) => {
-      // message ...
-    // });
+    MessageModel.findById(messageId, (err, message: Message) => {
+      // Construct Templating Service
+      const templatingService: TemplatingService = new TemplatingService(message.platform, message.template,
+         message.payload);
 
-    const message: Message = { platform: '', template: '', content: {}, payload: [], receivers: [] };
+      // Send push messages
+      for (const receiver of message.receivers) {
+        const pushMessage = templatingService.createPushMessage(receiver);
+        this.pushService.send(message.platform, pushMessage);
+      }
 
-    // TODO: Move this check to somewehere else
-    if (typeof message.receivers === 'string') {
-      message.receivers = [];
-    }
-
-    // Construct Templating Service
-    const templatingService: TemplatingService = new TemplatingService(message.platform, message.template, message.payload, message.content);
-
-    // Construct message for every single User
-    for (const receiver of message.receivers) {
-      const pushMessage = templatingService.createPushMessage(receiver);
-      this.pushService.send(message.platform, pushMessage);
-
-      // TODO: Send Mail Message after Timeout depending on notification settings
-      const mailMessage = templatingService.createMailMessage(receiver);
-      this.mailService.send(message.platform, mailMessage);
-    }
+      // Schedule mail messages
+      this.scheduleMailMessages(messageId, templatingService);
+    });
   }
 
   // endregion
 
   // region private methods
+
+  private scheduleMailMessages(messageId: string, templatingService: TemplatingService) {
+    // Send mail messages after 4 hours delay
+    setTimeout(() => {
+      // Fetch message again to get updated list of receivers
+      MessageModel.findById(messageId, (err, message: Message) => {
+        for (const receiver of message.receivers) {
+          const mailMessage = templatingService.createMailMessage(receiver);
+          this.mailService.send(message.platform, mailMessage);
+        }
+      });
+    }, 144000);
+  }
+
   // endregion
 }
