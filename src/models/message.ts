@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import userRessource from '../models/userRessource';
 
-const messageScema = new mongoose.Schema({
+const messageSchema = new mongoose.Schema({
   platform: String,
   template: String,
   sender: {
@@ -18,4 +18,4 @@ const messageScema = new mongoose.Schema({
   trackLinks: Boolean,
 });
 
-export default mongoose.model('Message', messageScema);
+export default mongoose.model('Message', messageSchema);
