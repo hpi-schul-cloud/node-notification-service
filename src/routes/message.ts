@@ -1,12 +1,12 @@
 import express from 'express';
 import MessageService from '../services/MessageService';
-import Message from '@/interfaces/Message';
+import RequestMessage from '@/interfaces/RequestMessage';
 
 const router: express.Router = express.Router();
 const messageService: MessageService = new MessageService();
 
 router.post('/', (req, res) => {
-  const message: Message = {
+  const message: RequestMessage = {
     platform: req.body.platform,
     template: req.body.template,
     payload: req.body.payload,

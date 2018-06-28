@@ -1,5 +1,5 @@
 import EscalationLogic from '../services/EscalationLogic';
-import Message from '@/interfaces/Message';
+import RequestMessage from '@/interfaces/RequestMessage';
 import MessageModel from '../models/message';
 import axios from 'axios';
 
@@ -8,7 +8,7 @@ export default class MessageService {
   // endregion
 
   // region private static methods
-  private static async save(message: Message): Promise<string> {
+  private static async save(message: RequestMessage): Promise<string> {
 
     const messageModel = new MessageModel({
       platform: message.platform,
@@ -66,7 +66,7 @@ export default class MessageService {
   // endregion
 
   // region public methods
-  public async send(message: Message) {
+  public async send(message: RequestMessage) {
     const messageId = await MessageService.save(message);
     this.escalationLogic.escalate(messageId);
   }

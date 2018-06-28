@@ -2,7 +2,7 @@ import UserRessource from '@/interfaces/UserRessource';
 import TemplatePayload from '@/interfaces/TemplatePayload';
 
 
-export default interface Message {
+export default interface RequestMessage {
   platform: string;
   template: string;
   sender?: {
@@ -10,6 +10,6 @@ export default interface Message {
     mail: string;
   };
   payload: TemplatePayload[];
-  receivers: UserRessource[];
+  receivers: UserRessource[] | string;
   trackLinks?: boolean;
 }
