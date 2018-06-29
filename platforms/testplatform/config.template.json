@@ -10,7 +10,8 @@
       }
     },
     "defaults": {
-      "from": "Sample Service <sample@sample.org>"
+      "from": "Sample Service <sample@sample.org>",
+      "delay": 144000
     }
   }
 }

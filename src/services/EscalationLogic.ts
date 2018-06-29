@@ -3,6 +3,7 @@ import PushService from '../services/PushService';
 import TemplatingService from '../services/TemplatingService';
 import MessageModel from '../models/message';
 import Message from '@/interfaces/Message';
+import Utils from '../utils';
 
 export default class EscalationLogic {
   // region public static methods
@@ -45,7 +46,8 @@ export default class EscalationLogic {
       }
 
       // Send mail messages after 4 hours delay
-      setTimeout(this.sendMailMessages(messageId, templatingService), 144000);
+      const config = Utils.getPlatformConfig(message.platform);
+      setTimeout(this.sendMailMessages.bind(messageId, templatingService), config.mail.defaults.delay);
     });
   }
 
