@@ -88,7 +88,7 @@ export default class MessageService {
   // region public methods
   public async send(message: RequestMessage) {
     const messageId = await MessageService.save(message);
-    this.escalationLogic.escalate(messageId);
+    await this.escalationLogic.escalate(messageId);
   }
 
   public async seen(messageId: string, userId: string) {
