@@ -140,7 +140,7 @@ export default class TemplatingService {
     if (currentTemplate) {
       return currentTemplate.template;
     } else {
-      return Promise.reject(new Error('Invalid languageId or type. Template not found.'));
+      return new Error('Invalid languageId or type. Template not found.');
     }
   }
 
