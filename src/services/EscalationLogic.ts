@@ -32,8 +32,8 @@ export default class EscalationLogic {
 
   // region public methods
 
-  public escalate(messageId: string) {
-    MessageModel.findById(messageId, (err, message: Message) => {
+  public async escalate(messageId: string) {
+    await MessageModel.findById(messageId, (err, message: Message) => {
       // Construct Templating Service
       const templatingService: TemplatingService = new TemplatingService(message.platform, message.template,
          message.payload);
@@ -44,8 +44,8 @@ export default class EscalationLogic {
         this.pushService.send(message.platform, pushMessage);
       }
 
-      // Schedule mail messages
-      this.scheduleMailMessages(messageId, templatingService);
+      // Send mail messages after 4 hours delay
+      setTimeout(this.sendMailMessages(messageId, templatingService), 144000);
     });
   }
 
@@ -53,17 +53,14 @@ export default class EscalationLogic {
 
   // region private methods
 
-  private scheduleMailMessages(messageId: string, templatingService: TemplatingService) {
-    // Send mail messages after 4 hours delay
-    setTimeout(() => {
-      // Fetch message again to get updated list of receivers
-      MessageModel.findById(messageId, (err, message: Message) => {
-        for (const receiver of message.receivers) {
-          const mailMessage = templatingService.createMailMessage(receiver);
-          this.mailService.send(message.platform, mailMessage);
-        }
-      });
-    }, 144000);
+  private sendMailMessages(messageId: string, templatingService: TemplatingService) {
+    // Fetch message again to get updated list of receivers
+    MessageModel.findById(messageId, (err, message: Message) => {
+      for (const receiver of message.receivers) {
+        const mailMessage = templatingService.createMailMessage(receiver);
+        this.mailService.send(message.platform, mailMessage);
+      }
+    });
   }
 
   // endregion
