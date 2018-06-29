@@ -113,16 +113,20 @@ export default class TemplatingService {
       baseTemplate = TemplatingService.insertMessagePayload(baseTemplate, {}, platformId);
 
       // Step 3: Insert language specific payload into base template for every language
-      for (const languagePayload of payload) {
-        const template = TemplatingService.insertLanguagePayload(baseTemplate, languagePayload.payload);
-        const languageId = languagePayload.language;
-        const localizedTemplate = {
-          languageId,
-          type,
-          template,
-        };
-        this.localizedTemplates.push(localizedTemplate);
-      }
+      this.generateLanguagePayloads(payload, baseTemplate, type);
+    }
+  }
+
+  private generateLanguagePayloads(payload: TemplatePayload[], baseTemplate: any, type: string): any {
+    for (const languagePayload of payload) {
+      const template = TemplatingService.insertLanguagePayload(baseTemplate, languagePayload.payload);
+      const languageId = languagePayload.language;
+      const localizedTemplate = {
+        languageId,
+        type,
+        template,
+      };
+      this.localizedTemplates.push(localizedTemplate);
     }
   }
 
