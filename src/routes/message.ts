@@ -6,6 +6,19 @@ const router: express.Router = express.Router();
 const messageService: MessageService = new MessageService();
 
 router.post('/', (req, res) => {
+  if (!req.body.platform) {
+    res.status(400).send('Missing body parameter: platform.');
+  }
+  if (!req.body.template) {
+    res.status(400).send('Missing body parameter: template.');
+  }
+  if (!req.body.payload) {
+    res.status(400).send('Missing body parameter: payload.');
+  }
+  if (!req.body.receivers) {
+    res.status(400).send('Missing body parameter: receivers.');
+  }
+
   const message: RequestMessage = {
     platform: req.body.platform,
     template: req.body.template,
