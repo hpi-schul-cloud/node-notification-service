@@ -60,14 +60,14 @@ export default class MessageService {
       throw new Error(errorMessage);
     }
 
-    const user = message.receivers.find((receiver) => receiver._id.toString() === userId);
+    const user = message._receivers.find((receiver) => receiver._id.toString() === userId);
     if (!user) {
       const errorMessage = `Could not unregister Notification: User (id: ${userId}) not found in Message (id: ${messageId}).`;
       winston.error(errorMessage);
       throw new Error(errorMessage);
     }
 
-    message.receivers.pull(user._id);
+    message._receivers.pull(user._id);
     await message.save();
   }
   // endregion
