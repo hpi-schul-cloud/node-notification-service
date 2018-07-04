@@ -2,10 +2,10 @@ import mongoose from 'mongoose';
 import Message from '@/interfaces/Message';
 
 export interface IUserRessourceModel extends mongoose.Types.Subdocument {
-    name: string,
-    mail: string,
-    language: string,
-    payload: any,
+  name: string;
+  mail: string;
+  language: string;
+  payload: any;
 };
 
 export interface IMessageModel extends Message, mongoose.Document {
