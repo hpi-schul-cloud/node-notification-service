@@ -1,8 +1,15 @@
 import mongoose from 'mongoose';
 import Message from '@/interfaces/Message';
 
+export interface IUserRessourceModel extends mongoose.Types.Subdocument {
+    name: string,
+    mail: string,
+    language: string,
+    payload: any,
+};
+
 export interface IMessageModel extends Message, mongoose.Document {
-  _receivers: mongoose.Types.DocumentArray<mongoose.Types.Subdocument>;
+  _receivers: mongoose.Types.DocumentArray<IUserRessourceModel>;
 }
 
 export const userRessourceSchema = new mongoose.Schema({
