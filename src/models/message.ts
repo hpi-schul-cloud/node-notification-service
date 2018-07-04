@@ -1,11 +1,17 @@
 import mongoose from 'mongoose';
-import userRessource from '../models/userRessource';
 
 export interface IMessageModel extends mongoose.Document {
   receivers: mongoose.Types.DocumentArray<mongoose.Types.Subdocument>;
 }
 
-const messageSchema = new mongoose.Schema({
+export const userRessourceSchema = new mongoose.Schema({
+  name: String,
+  mail: String,
+  language: String,
+  payload: Object,
+});
+
+export const messageSchema = new mongoose.Schema({
   platform: String,
   template: String,
   sender: {
@@ -18,10 +24,10 @@ const messageSchema = new mongoose.Schema({
       payload: Object,
     },
   ],
-  receivers: [ userRessource ],
+  receivers: [ userRessourceSchema ],
   trackLinks: Boolean,
 });
 
-const model: mongoose.Model<IMessageModel> = mongoose.model('Message', messageSchema);
+const messageModel: mongoose.Model<IMessageModel> = mongoose.model('Message', messageSchema);
 
-export default model;
+export default messageModel;
