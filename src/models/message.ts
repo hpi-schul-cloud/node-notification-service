@@ -6,7 +6,7 @@ export interface IUserRessourceModel extends mongoose.Types.Subdocument {
   mail: string;
   language: string;
   payload: any;
-};
+}
 
 export interface IMessageModel extends Message, mongoose.Document {
   _receivers: mongoose.Types.DocumentArray<IUserRessourceModel>;
