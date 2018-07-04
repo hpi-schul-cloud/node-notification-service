@@ -46,10 +46,8 @@ export default class TemplatingService {
   }
 
   private static insertUserPayload(template: any, user: UserRessource): any {
-    // TODO: Access deviceId of User
     return Object.assign(template, {
       to: `${user.name} <${user.mail}>`,
-      token: 'user.deviceToken',
     });
   }
 
@@ -86,10 +84,10 @@ export default class TemplatingService {
     return mail;
   }
 
-  public createPushMessage(user: UserRessource): firebaseMessaging.Message {
+  public createPushMessage(user: UserRessource, device: string): firebaseMessaging.Message {
     const template = this.getTemplateForUser(user, PUSH_MESSAGE);
     const push = {
-      token: template.token,
+      token: device,
       data: template.data,
       notification: template.notification,
       android: template.android,
