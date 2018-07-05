@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import express from 'express';
 import bodyParser from 'body-parser';
+import swaggerUi from 'swagger-ui-express';
 import mailRouter from './routes/mail';
 import pushRouter from './routes/push';
 import messageRouter from './routes/message';
@@ -19,6 +20,8 @@ function startApiServer() {
   app.get('/', (req, res) => {
     res.send('hello world!');
   });
+
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(require('../swagger.json')));
 
   // Test Endpoint for user pagination
   app.get('/users', (req, res) => {

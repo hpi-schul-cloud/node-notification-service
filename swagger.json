@@ -1,0 +1,170 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Node Notification Service",
+    "description": "This app can be used as central notification service for existing applications.",
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "host": "localhost:3000",
+  "tags": [{
+      "name": "Mail",
+      "description": "API to send mails"
+    },
+    {
+      "name": "Push",
+      "description": "API to send push notifications"
+    }
+  ],
+  "schemes": [
+    "http"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/mails": {
+      "post": {
+        "tags": [
+          "Mail"
+        ],
+        "description": "Send a mail",
+        "parameters": [{
+          "name": "mail",
+          "in": "body",
+          "description": "Mail to send",
+          "required": true,
+          "schema": {
+            "$ref": "#/definitions/Mail"
+          }
+        }],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Mail queued."
+          }
+        }
+      }
+    },
+    "/push": {
+      "post": {
+        "tags": [
+          "Push"
+        ],
+        "description": "Send a push",
+        "parameters": [{
+          "name": "push",
+          "in": "body",
+          "description": "Push notification to send",
+          "required": true,
+          "schema": {
+            "$ref": "#/definitions/Push"
+          }
+        }],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Push queued."
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Mail": {
+      "required": [
+        "platformId",
+        "to",
+        "subject",
+        "text",
+        "html"
+      ],
+      "properties": {
+        "platformId": {
+          "type": "string",
+          "description": "The id of the platform"
+        },
+        "to": {
+          "type": "string",
+          "description": "Mail address of receiver"
+        },
+        "subject": {
+          "type": "string",
+          "description": "Subject of mail"
+        },
+        "text": {
+          "type": "string",
+          "description": "Text content of mail"
+        },
+        "html": {
+          "type": "string",
+          "description": "HTML content of mail"
+        }
+      },
+      "example": {
+        "platformId": "testplatform",
+        "to": "sample@sample.org",
+        "subject": "New foo bar available",
+        "text": "Order our new foo bar for only $42.",
+        "html": "<html>Order our new foo bar for only $42.</html>"
+      }
+    },
+    "Push": {
+      "required": [
+        "platformId",
+        "token",
+        "subject",
+        "text",
+        "html"
+      ],
+      "properties": {
+        "platformId": {
+          "type": "string",
+          "description": "The id of the platform"
+        },
+        "token": {
+          "type": "string",
+          "description": "Device token of receiver"
+        },
+        "notification": {
+          "$ref": "#/definitions/FirebaseNotificationObject",
+          "description": "Firebase notification object"
+        }
+      },
+      "example": {
+        "platformId": "testplatform",
+        "token": "nms76vghyXGFa652chgagvhy56c1zc7vxghSWq",
+        "notification": {
+          "title": "New foo bar available",
+          "body": "Order our new foo bar for only $42."
+        }
+      }
+    },
+    "FirebaseNotificationObject": {
+      "required": [
+        "title",
+        "body"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Title of push notification"
+        },
+        "body": {
+          "type": "string",
+          "description": "Body of push notification"
+        }
+      }
+    }
+  }
+}
