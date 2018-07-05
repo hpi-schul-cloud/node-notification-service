@@ -5,7 +5,7 @@ import UserRessource from '@/interfaces/UserRessource';
 export interface UserRessourceModel extends UserRessource, mongoose.Types.Subdocument {}
 
 export interface MessageModel extends Message, mongoose.Document {
-  _receivers: mongoose.Types.DocumentArray<UserRessourceModel>;
+  receivers: mongoose.Types.DocumentArray<UserRessourceModel>;
 }
 
 export const userRessourceSchema = new mongoose.Schema({
