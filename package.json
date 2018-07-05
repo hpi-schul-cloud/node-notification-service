@@ -27,6 +27,7 @@
     "express": "^4.16.3",
     "firebase-admin": "^5.12.1",
     "mongoose": "^5.1.6",
+    "mustache": "^2.3.0",
     "nodemailer": "^4.6.5",
     "swagger-ui-express": "^3.0.10",
     "winston": "^3.0.0"
