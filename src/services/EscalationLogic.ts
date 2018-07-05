@@ -56,8 +56,7 @@ export default class EscalationLogic {
 
     // Send mail messages after 4 hours delay
     const config = Utils.getPlatformConfig(message.platform);
-    const self = this;
-    setTimeout(() => { self.sendMailMessages(messageId, templatingService); }, config.mail.defaults.delay);
+    setTimeout(() => { this.sendMailMessages(messageId, templatingService); }, config.mail.defaults.delay);
   }
   // endregion
 
