@@ -10,9 +10,8 @@ export default {
       secure: true,
       auth: {
         user: '',
-        pass: ''
-      }
-    }
-  }
-}
-
+        pass: '',
+      },
+    },
+  },
+};

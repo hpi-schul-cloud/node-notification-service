@@ -1,3 +1,4 @@
+import winston from 'winston';
 import express from 'express';
 import MailService from '../services/MailService';
 import Mail from '@/interfaces/Mail';
@@ -10,7 +11,7 @@ router.post('/', (req, res) => {
     to: req.body.to,
     subject: req.body.subject,
     text: req.body.text,
-    html: req.body.html
+    html: req.body.html,
   };
 
   if (req.body.from) {
@@ -19,13 +20,13 @@ router.post('/', (req, res) => {
 
   mailService.send(req.body.platformId, mail)
     .then((response: any) => {
-      console.log(response);
+      winston.info(response);
     })
     .catch((e: Error) => {
-      console.log('Error: ' + e);
+      winston.error(e);
     });
 
-    res.send('Mail queued.');
+  res.send('Mail queued.');
 });
 
 export default router;
