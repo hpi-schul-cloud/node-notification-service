@@ -1,9 +1,10 @@
+import winston from 'winston';
 import MailService from '../services/MailService';
 import PushService from '../services/PushService';
 import TemplatingService from '../services/TemplatingService';
 import MessageModel from '../models/message';
-import Message from '@/interfaces/Message';
 import Utils from '../utils';
+import DeviceService from '../services/DeviceService';
 
 export default class EscalationLogic {
   // region public static methods
@@ -32,38 +33,42 @@ export default class EscalationLogic {
   // endregion
 
   // region public methods
-
   public async escalate(messageId: string) {
     const message = await MessageModel.findById(messageId);
-
     if (!message) {
-      throw new Error('Message not found in Database.');
+      const errorMessage = `Could not escalate Message: Message (id: ${messageId}) not found.`;
+      winston.error(errorMessage);
+      throw new Error(errorMessage);
     }
 
     // Construct Templating Service
-    const templatingService = new TemplatingService(message.platform, message.template, message.payload);
+    const templatingService: TemplatingService = new TemplatingService(message.platform, message.template,
+      message.payload);
 
     // Send push messages
     for (const receiver of message.receivers) {
-      const pushMessage = templatingService.createPushMessage(receiver);
-      this.pushService.send(message.platform, pushMessage);
+      const receiverDevices = await DeviceService.getDevices(receiver.mail);
+      for (const device of receiverDevices) {
+        const pushMessage = templatingService.createPushMessage(receiver, device);
+        this.pushService.send(message.platform, pushMessage);
+      }
     }
 
     // Send mail messages after 4 hours delay
     const config = Utils.getPlatformConfig(message.platform);
-    setTimeout(this.sendMailMessages.bind(messageId, templatingService), config.mail.defaults.delay);
+    setTimeout(() => { this.sendMailMessages(messageId, templatingService); }, config.mail.defaults.delay);
   }
-
   // endregion
 
   // region private methods
-
   private async sendMailMessages(messageId: string, templatingService: TemplatingService) {
     // Fetch message again to get updated list of receivers
-    const message = await MessageModel.findById(messageId);
+    const message =  await MessageModel.findById(messageId);
 
     if (!message) {
-      throw new Error('Message not found in Database.');
+      const errorMessage = `Could not send mail messages: Message (id: ${messageId}) not found.`;
+      winston.error(errorMessage);
+      throw new Error(errorMessage);
     }
 
     for (const receiver of message.receivers) {
@@ -71,6 +76,5 @@ export default class EscalationLogic {
       this.mailService.send(message.platform, mailMessage);
     }
   }
-
   // endregion
 }

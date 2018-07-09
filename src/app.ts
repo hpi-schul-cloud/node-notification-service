@@ -5,6 +5,7 @@ import swaggerUi from 'swagger-ui-express';
 import mailRouter from './routes/mail';
 import pushRouter from './routes/push';
 import messageRouter from './routes/message';
+import deviceRouter from './routes/device';
 
 function startApiServer() {
   const app: express.Application = express();
@@ -16,6 +17,7 @@ function startApiServer() {
   app.use('/mails', mailRouter);
   app.use('/push', pushRouter);
   app.use('/messages', messageRouter);
+  app.use('/devices', deviceRouter);
 
   app.get('/', (req, res) => {
     res.send('hello world!');

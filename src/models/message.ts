@@ -1,27 +1,11 @@
 import mongoose from 'mongoose';
+import Message from '@/interfaces/Message';
+import UserRessource from '@/interfaces/UserRessource';
 
-export interface IUserRessourceModel extends mongoose.Types.Subdocument {
-  name: string;
-  mail: string;
-  language: string;
-  payload: any;
-}
+export interface UserRessourceModel extends UserRessource, mongoose.Types.Subdocument {}
 
-export interface IMessageModel extends mongoose.Document {
-  platform: string;
-  template: string;
-  sender: {
-    name: string;
-    mail: string;
-  };
-  payload: [
-    {
-      language: string;
-      payload: any;
-    }
-  ];
-  receivers: mongoose.Types.DocumentArray<IUserRessourceModel>;
-  trackLinks: boolean;
+export interface MessageModel extends Message, mongoose.Document {
+  receivers: mongoose.Types.DocumentArray<UserRessourceModel>;
 }
 
 export const userRessourceSchema = new mongoose.Schema({
@@ -48,6 +32,6 @@ export const messageSchema = new mongoose.Schema({
   trackLinks: Boolean,
 });
 
-const messageModel: mongoose.Model<IMessageModel> = mongoose.model('Message', messageSchema);
+const messageModel: mongoose.Model<MessageModel> = mongoose.model('Message', messageSchema);
 
 export default messageModel;
