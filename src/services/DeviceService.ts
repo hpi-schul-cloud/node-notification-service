@@ -6,7 +6,11 @@ export default class DeviceService {
   public static async addDevice(mail: string, token: string) {
     let device = await DeviceModel.findOne({ mail });
     if (!device) {
-      device = await DeviceService.save(mail);
+      device = new DeviceModel({
+        mail,
+        tokens: [],
+      });
+      await device.save();
     }
 
     if (device.tokens.indexOf(token) !== -1) {
@@ -32,15 +36,6 @@ export default class DeviceService {
   // endregion
 
   // region private static methods
-  private static async save(mail: string) {
-
-    const deviceModel = new DeviceModel({
-      mail,
-      tokens: [],
-    });
-
-    return await deviceModel.save();
-  }
   // endregion
 
   // region public members
