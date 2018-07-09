@@ -51,8 +51,8 @@ export default class TemplatingService {
         language: languagePayload.payload,
         user: {},
       };
-      });
-    }
+    });
+  }
   // endregion
 
   // region public members
@@ -77,19 +77,25 @@ export default class TemplatingService {
   // region public methods
 
   public createMailMessage(user: UserRessource): Mail {
-    const template = this.getTemplateForUser(user, MAIL_MESSAGE);
+    const template = this.getTemplate(MAIL_MESSAGE);
+    const payload = this.getUserPayload(user);
+    const renderedTemplate = TemplatingService.renderMessageTemplate(template, payload);
+
     const mail = {
-      from: template.from,
+      from: renderedTemplate.from,
       to: user.mail,
-      subject: template.subject,
-      text: template.text,
-      html: template.html,
+      subject: renderedTemplate.subject,
+      text: renderedTemplate.text,
+      html: renderedTemplate.html,
     };
     return mail;
   }
 
   public createPushMessage(user: UserRessource, device: string): firebaseMessaging.Message {
-    const template = this.getTemplateForUser(user, PUSH_MESSAGE);
+
+    const template = this.getTemplate(MAIL_MESSAGE);
+    const payload = this.getUserPayload(user);
+    const renderedTemplate = TemplatingService.renderMessageTemplate(template, payload);
     const push = {
       token: device,
       data: template.data,
@@ -104,55 +110,31 @@ export default class TemplatingService {
   // endregion
 
   // region private methods
+  private getTemplate(type: string): Template {
+    const parsedMessageTemplate = this.parsedMessageTemplates.find( (template) => {
+      return template.type === type;
+    } );
 
-  private compileMessageTemplates(platformId: string, templateId: string, payload: {}) {
-    const messageTemplates = [];
-
-    for (const type of [MAIL_MESSAGE, PUSH_MESSAGE]) {
-      // Step 1: Load base template
-      const baseTemplate = Utils.getTemplate(platformId, templateId, type);
-      console.log(baseTemplate);
-
-      // Step 2: Insert general payload into base template
-      const messageTemplate = TemplatingService.insertMessagePayload(baseTemplate, payload, platformId);
-      messageTemplates.push(messageTemplate);
+    if (!parsedMessageTemplate) {
+      const errorMessage = `Could not find message template for type ${type}`;
+      winston.error(errorMessage);
+      throw new Error(errorMessage);
     }
 
-    return messageTemplates;
+    return parsedMessageTemplate;
   }
 
-  private compileLanguageTemplates(type: string, messageTemplate: any, payload: LanguagePayload[]): any {
-    for (const languagePayload of payload) {
-      const template = TemplatingService.insertLanguagePayload(messageTemplate, languagePayload.payload);
-      const languageId = languagePayload.language;
-      const localizedTemplate = {
-        languageId,
-        type,
-        template,
-      };
-      this.localizedTemplates.push(localizedTemplate);
+  private getUserPayload(user: UserRessource): Payload {
+    const messagePayload = this.messagePayloads.find( (payload) => payload.languageId === user.language );
+
+    if (!messagePayload) {
+      const errorMessage = `Could not find message payload for language ${user.language}`;
+      winston.error(errorMessage);
+      throw new Error(errorMessage);
     }
+
+    messagePayload.user = user.payload;
+    return messagePayload;
   }
-
-  private getTemplate(languageId: string, type: string): any {
-    const currentTemplate: Template | undefined = this.localizedTemplates.find(
-      (template: Template) => {
-        return (template.languageId === languageId) && (template.type === type);
-      },
-    );
-
-    if (currentTemplate) {
-      return currentTemplate.template;
-    } else {
-      return new Error('Invalid languageId or type. Template not found.');
-    }
-  }
-
-  private getTemplateForUser(user: UserRessource, type: string): any {
-    let template = this.getTemplate(user.language, type);
-    template = TemplatingService.insertUserPayload(template, user);
-    return template;
-  }
-
   // endregion
 }
