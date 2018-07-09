@@ -5,6 +5,7 @@ import TemplatingService from '../services/TemplatingService';
 import MessageModel from '../models/message';
 import Utils from '../utils';
 import DeviceService from '../services/DeviceService';
+import Message from '@/interfaces/Message';
 
 export default class EscalationLogic {
   // region public static methods
@@ -34,16 +35,18 @@ export default class EscalationLogic {
 
   // region public methods
   public async escalate(messageId: string) {
-    const message = await MessageModel.findById(messageId);
-    if (!message) {
+    const databaseMessage = await MessageModel.findById(messageId);
+    if (!databaseMessage) {
       const errorMessage = `Could not escalate Message: Message (id: ${messageId}) not found.`;
       winston.error(errorMessage);
       throw new Error(errorMessage);
     }
 
+    const message: Message = databaseMessage.toObject();
+
     // Construct Templating Service
     const templatingService: TemplatingService = new TemplatingService(message.platform, message.template,
-      message.payload);
+      message.payload, message.languagePayloads);
 
     // Send push messages
     for (const receiver of message.receivers) {
