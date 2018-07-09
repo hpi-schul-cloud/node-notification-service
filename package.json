@@ -23,6 +23,7 @@
   "homepage": "https://github.com/schul-cloud/node-notification-service",
   "dependencies": {
     "@types/js-yaml": "^3.11.2",
+    "@types/mustache": "^0.8.31",
     "axios": "^0.18.0",
     "body-parser": "^1.18.3",
     "express": "^4.16.3",
