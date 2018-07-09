@@ -19,6 +19,7 @@ export default class MessageService {
         mail: message.sender ? message.sender.mail : '',
       },
       payload: message.payload,
+      languagePayloads: message.languagePayloads,
       receivers: typeof message.receivers === 'string' ? [] : message.receivers,
       trackLinks: message.trackLinks ? message.trackLinks : true,
     });

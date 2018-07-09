@@ -13,44 +13,30 @@ export default class TemplatingService {
   // endregion
 
   // region private static methods
-
-  private static insertMessagePayload(template: any, payload: any, platformId: string): any {
-    // TODO: Use Mustache here.
-    const config = Utils.getPlatformConfig(platformId);
-    return {
-      from: config.mail.defaults.from,
-      data: template.data,
-    };
+  private static initializeMessageTemplates(platformId: string, templateId: string): Template[] {
+    return [MAIL_MESSAGE, PUSH_MESSAGE].map((type) => {
+      const messageTemplate = Utils.loadTemplate(platformId, templateId, type);
+      TemplatingService.parseMessageTemplate(messageTemplate);
+      return messageTemplate;
+    });
   }
 
-  private static insertLanguagePayload(template: any, payload: any): any {
-    // TODO: Insert message content into template
-    return Object.assign(template, {
-      subject: payload.title,
-      text: payload.body,
-      html: payload.body,
-      notification: {
-        title: payload.title,
-        body: payload.body,
-      },
-      android: template.android,
-      webpush: template.webpush,
-      apns: {
-        payload: {
-          aps: {
-            title: payload.title,
-            body: payload.body,
-          },
-        },
-      },
-    });
+  private static parseMessageTemplate(template: Template) {
+    for (const key in template) {
+      // && typeof template[key] === 'string'
+      if (template.hasOwnProperty(key) && key !== 'type') {
+        Mustache.parse(template[key]);
+      }
+    }
+  }
+
   }
 
   private static insertUserPayload(template: any, user: UserRessource): any {
     return Object.assign(template, {
       to: `${user.name} <${user.mail}>`,
-    });
-  }
+      });
+    }
 
   // endregion
 
@@ -66,10 +52,7 @@ export default class TemplatingService {
   // region constructor
 
   public constructor(platformId: string, templateId: string, payload: {}, languagePayloads: LanguagePayload[]) {
-    const messageTemplates = this.compileMessageTemplates(platformId, templateId, payload);
-    for (const messageTemplate of messageTemplates) {
-      this.compileLanguageTemplates('MAIL', messageTemplate, languagePayloads);
-    }
+    this.parsedMessageTemplates = TemplatingService.initializeMessageTemplates(platformId, templateId);
   }
 
   // endregion
