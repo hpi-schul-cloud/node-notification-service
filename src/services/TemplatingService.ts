@@ -33,6 +33,14 @@ export default class TemplatingService {
     }
   }
 
+  private static renderMessageTemplate(template: Template, payload: Payload): Template {
+    const compiledTemplate: Template = template;
+    for (const key in template) {
+      if (template.hasOwnProperty(key) && key !== 'type') {
+        compiledTemplate[key] = Mustache.render(template[key], payload);
+      }
+    }
+    return compiledTemplate;
   }
 
   private static initializeMessagePayloads(payload: any, languagePayloads: LanguagePayload[]): Payload[] {
