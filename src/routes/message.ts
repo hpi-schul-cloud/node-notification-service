@@ -15,6 +15,9 @@ router.post('/', (req, res) => {
   if (!req.body.payload) {
     res.status(400).send('Missing body parameter: payload.');
   }
+  if (!req.body.languagePayloads) {
+    res.status(400).send('Missing body parameter: languagePayloads.');
+  }
   if (!req.body.receivers) {
     res.status(400).send('Missing body parameter: receivers.');
   }
@@ -23,6 +26,7 @@ router.post('/', (req, res) => {
     platform: req.body.platform,
     template: req.body.template,
     payload: req.body.payload,
+    languagePayloads: req.body.languagePayloads,
     receivers: req.body.receivers,
   };
 

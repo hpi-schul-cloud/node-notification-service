@@ -22,7 +22,8 @@ export const messageSchema = new mongoose.Schema({
     name: String,
     mail: String,
   },
-  payload: [
+  payload: Object,
+  languagePayloads: [
     {
       language: String,
       payload: Object,
