@@ -1,9 +1,12 @@
 import { messaging as firebaseMessaging } from 'firebase-admin';
+import Mustache from 'mustache';
+import winston from 'winston';
 import Mail from '@/interfaces/Mail';
 import Template from '../interfaces/Template';
 import LanguagePayload from '@/interfaces/LanguagePayload';
 import UserRessource from '@/interfaces/UserRessource';
 import Utils from '../utils';
+import Payload from '@/interfaces/Payload';
 
 const MAIL_MESSAGE = 'MAIL';
 const PUSH_MESSAGE = 'PUSH';
@@ -32,12 +35,16 @@ export default class TemplatingService {
 
   }
 
-  private static insertUserPayload(template: any, user: UserRessource): any {
-    return Object.assign(template, {
-      to: `${user.name} <${user.mail}>`,
+  private static initializeMessagePayloads(payload: any, languagePayloads: LanguagePayload[]): Payload[] {
+    return languagePayloads.map((languagePayload: LanguagePayload): Payload => {
+      return {
+        message: payload,
+        languageId: languagePayload.language,
+        language: languagePayload.payload,
+        user: {},
+      };
       });
     }
-
   // endregion
 
   // region public members
@@ -45,7 +52,8 @@ export default class TemplatingService {
 
   // region private members
 
-  private readonly localizedTemplates: Template[] = [];
+  private parsedMessageTemplates: Template[];
+  private messagePayloads: Payload[];
 
   // endregion
 
@@ -53,6 +61,7 @@ export default class TemplatingService {
 
   public constructor(platformId: string, templateId: string, payload: {}, languagePayloads: LanguagePayload[]) {
     this.parsedMessageTemplates = TemplatingService.initializeMessageTemplates(platformId, templateId);
+    this.messagePayloads = TemplatingService.initializeMessagePayloads(payload, languagePayloads);
   }
 
   // endregion
