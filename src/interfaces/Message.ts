@@ -1,5 +1,5 @@
 import UserRessource from '@/interfaces/UserRessource';
-import TemplatePayload from '@/interfaces/TemplatePayload';
+import LanguagePayload from '@/interfaces/LanguagePayload';
 
 
 export default interface Message {
@@ -9,7 +9,8 @@ export default interface Message {
     name: string;
     mail: string;
   };
-  payload: TemplatePayload[];
+  payload: {};
+  languagePayloads: LanguagePayload[];
   receivers: UserRessource[];
   trackLinks?: boolean;
 }

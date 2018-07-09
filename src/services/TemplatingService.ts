@@ -1,7 +1,7 @@
 import { messaging as firebaseMessaging } from 'firebase-admin';
 import Mail from '@/interfaces/Mail';
 import Template from '../interfaces/Template';
-import TemplatePayload from '@/interfaces/TemplatePayload';
+import LanguagePayload from '@/interfaces/LanguagePayload';
 import UserRessource from '@/interfaces/UserRessource';
 import Utils from '../utils';
 
@@ -15,6 +15,7 @@ export default class TemplatingService {
   // region private static methods
 
   private static insertMessagePayload(template: any, payload: any, platformId: string): any {
+    // TODO: Use Mustache here.
     const config = Utils.getPlatformConfig(platformId);
     return {
       from: config.mail.defaults.from,
@@ -64,8 +65,11 @@ export default class TemplatingService {
 
   // region constructor
 
-  public constructor(platformId: string, templateId: string, payload: any) {
-    this.generateTemplates(platformId, templateId, payload);
+  public constructor(platformId: string, templateId: string, payload: {}, languagePayloads: LanguagePayload[]) {
+    const messageTemplates = this.compileMessageTemplates(platformId, templateId, payload);
+    for (const messageTemplate of messageTemplates) {
+      this.compileLanguageTemplates('MAIL', messageTemplate, languagePayloads);
+    }
   }
 
   // endregion
@@ -101,23 +105,25 @@ export default class TemplatingService {
 
   // region private methods
 
-  private generateTemplates(platformId: string, templateId: string, payload: TemplatePayload[]) {
+  private compileMessageTemplates(platformId: string, templateId: string, payload: {}) {
+    const messageTemplates = [];
+
     for (const type of [MAIL_MESSAGE, PUSH_MESSAGE]) {
       // Step 1: Load base template
-      let baseTemplate = Utils.getTemplate(platformId, templateId, type);
+      const baseTemplate = Utils.getTemplate(platformId, templateId, type);
+      console.log(baseTemplate);
 
       // Step 2: Insert general payload into base template
-      // TODO: Pass general message payload (with e.g. unique language identifier)
-      baseTemplate = TemplatingService.insertMessagePayload(baseTemplate, {}, platformId);
-
-      // Step 3: Insert language specific payload into base template for every language
-      this.generateLanguagePayloads(payload, baseTemplate, type);
+      const messageTemplate = TemplatingService.insertMessagePayload(baseTemplate, payload, platformId);
+      messageTemplates.push(messageTemplate);
     }
+
+    return messageTemplates;
   }
 
-  private generateLanguagePayloads(payload: TemplatePayload[], baseTemplate: any, type: string): any {
+  private compileLanguageTemplates(type: string, messageTemplate: any, payload: LanguagePayload[]): any {
     for (const languagePayload of payload) {
-      const template = TemplatingService.insertLanguagePayload(baseTemplate, languagePayload.payload);
+      const template = TemplatingService.insertLanguagePayload(messageTemplate, languagePayload.payload);
       const languageId = languagePayload.language;
       const localizedTemplate = {
         languageId,
