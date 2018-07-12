@@ -26,7 +26,6 @@ export default class TemplatingService {
 
   private static parseMessageTemplate(template: Template) {
     for (const key in template) {
-      // && typeof template[key] === 'string'
       if (template.hasOwnProperty(key) && key !== 'type') {
         Mustache.parse(template[key]);
       }
