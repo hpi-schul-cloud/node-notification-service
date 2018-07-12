@@ -97,11 +97,11 @@ export default class TemplatingService {
     const renderedTemplate = TemplatingService.renderMessageTemplate(template, payload);
     const push = {
       token: device,
-      data: template.data,
-      notification: template.notification,
-      android: template.android,
-      webpush: template.webpush,
-      apns: template.apns,
+      data: renderedTemplate.data,
+      notification: renderedTemplate.notification,
+      android: renderedTemplate.android,
+      webpush: renderedTemplate.webpush,
+      apns: renderedTemplate.apns,
     };
     return push;
   }
