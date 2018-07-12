@@ -5,6 +5,7 @@ export interface IDeviceModel extends Device, Document {
 }
 
 const deviceSchema = new Schema({
+  platform: String,
   mail: String,
   tokens: [ String ],
 });
