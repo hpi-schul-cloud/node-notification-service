@@ -1,0 +1,12 @@
+version: '3'
+services:
+  notification-service:
+    image: friedow/notification-service:latest
+    ports:
+      - 3000:3000
+    links:
+      - mongo:mongodb
+    volumes:
+      - /home/user/platforms:/usr/src/notification-service/platforms
+  mongo:
+    image: mongo:3
