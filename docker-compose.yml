@@ -5,7 +5,9 @@ services:
     ports:
       - 3000:3000
     links:
-      - mongo:mongodb
+      - mongo:mongo
+    environment:
+      - MONGO_HOST=mongo
     volumes:
       - /home/user/platforms:/usr/src/notification-service/platforms
   mongo:

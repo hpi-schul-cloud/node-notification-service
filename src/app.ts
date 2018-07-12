@@ -79,4 +79,4 @@ const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', startApiServer);
 
-mongoose.connect('mongodb://localhost/notification-service');
+mongoose.connect(`mongodb://${process.env.MONGO_HOST || 'localhost'}/notification-service`);
