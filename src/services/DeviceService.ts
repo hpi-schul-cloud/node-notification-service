@@ -3,10 +3,11 @@ import DeviceModel from '../models/device';
 
 export default class DeviceService {
   // region public static methods
-  public static async addDevice(mail: string, token: string) {
-    let device = await DeviceModel.findOne({ mail });
+  public static async addDevice(platform: string, mail: string, token: string) {
+    let device = await DeviceModel.findOne({ platform, mail });
     if (!device) {
       device = new DeviceModel({
+        platform,
         mail,
         tokens: [],
       });
@@ -14,7 +15,8 @@ export default class DeviceService {
     }
 
     if (device.tokens.indexOf(token) !== -1) {
-      const errorMessage = `Could not add Device: Device (mail: ${mail}, token: ${token}) already exists.`;
+      const errorMessage = `Could not add Device: Device (platform: ${platform}, mail: ${mail},
+         token: ${token}) already exists.`;
       winston.error(errorMessage);
       throw new Error(errorMessage);
     }
@@ -23,8 +25,8 @@ export default class DeviceService {
     await device.save();
   }
 
-  public static async getDevices(mail: string): Promise<string[]> {
-    const device = await DeviceModel.findOne({ mail });
+  public static async getDevices(platform: string, mail: string): Promise<string[]> {
+    const device = await DeviceModel.findOne({ platform, mail });
     if (!device) {
       const errorMessage = `Could not find Device: Device (mail: ${mail}) does not exists.`;
       winston.error(errorMessage);
