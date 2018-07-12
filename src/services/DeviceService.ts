@@ -28,9 +28,7 @@ export default class DeviceService {
   public static async getDevices(platform: string, mail: string): Promise<string[]> {
     const device = await DeviceModel.findOne({ platform, mail });
     if (!device) {
-      return new Promise<string[]>((resolve) => {
-        resolve([]);
-      });
+      return [];
     }
 
     return device.tokens;
