@@ -28,9 +28,9 @@ export default class DeviceService {
   public static async getDevices(platform: string, mail: string): Promise<string[]> {
     const device = await DeviceModel.findOne({ platform, mail });
     if (!device) {
-      const errorMessage = `Could not find Device: Device (mail: ${mail}) does not exists.`;
-      winston.error(errorMessage);
-      throw new Error(errorMessage);
+      return new Promise<string[]>((resolve) => {
+        resolve([]);
+      });
     }
 
     return device.tokens;
