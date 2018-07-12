@@ -1,14 +1,14 @@
-subject:  "{{ title }}"
-text: "Hello from Postman"
+subject:  "{{ message.title }}"
+text: "Greetings {{ user.name }}!"
 html: |
   <!DOCTYPE html>
   <html>
     <head>
       <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
-      <title>openHPI</title>
+      <title>HTML Mail</title>
     </head>
     <body>
-      <h1>{{ title }}</h1>
+      <h1>{{ message.title }}</h1>
       <span>{{ language.description }}</span>
       <p>Greetings {{ user.name }}!</p>
     </body>
