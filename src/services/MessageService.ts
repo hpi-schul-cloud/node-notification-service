@@ -63,7 +63,8 @@ export default class MessageService {
 
     const user = message.receivers.find((receiver) => receiver._id.toString() === userId);
     if (!user) {
-      const errorMessage = `Could not unregister Notification: User (id: ${userId}) not found in Message (id: ${messageId}).`;
+      const errorMessage =
+        `Could not unregister Notification: User (id: ${userId}) not found in Message (id: ${messageId}).`;
       winston.error(errorMessage);
       throw new Error(errorMessage);
     }

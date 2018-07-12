@@ -9,7 +9,8 @@ export default class Utils {
   }
 
   public static loadTemplate(platformId: string, templateId: string, type: string): Template {
-    const templatePath = path.join(__dirname, '..', 'platforms', platformId, 'templates', templateId, `${type}.mustache`);
+    const templatePath =
+      path.join(__dirname, '..', 'platforms', platformId, 'templates', templateId, `${type}.mustache`);
     const template = yaml.safeLoad(fs.readFileSync(templatePath, 'utf8'));
     template.type = type;
     return template;
