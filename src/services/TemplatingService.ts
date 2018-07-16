@@ -26,17 +26,17 @@ export default class TemplatingService {
 
   private static parseMessageTemplate(template: Template) {
     for (const key in template) {
-      if (template.hasOwnProperty(key) && key !== 'type') {
+      if (template.hasOwnProperty(key)) {
         Mustache.parse(template[key]);
       }
     }
   }
 
   private static renderMessageTemplate(template: Template, payload: Payload): Template {
-    const compiledTemplate: Template = template;
+    const compiledTemplate = Object.assign({}, template);
     for (const key in template) {
-      if (template.hasOwnProperty(key) && key !== 'type') {
-        compiledTemplate[key] = Mustache.render(template[key], payload);
+      if (template.hasOwnProperty(key)) {
+        compiledTemplate[key] = Mustache.render(compiledTemplate[key], payload);
       }
     }
     return compiledTemplate;
