@@ -92,7 +92,7 @@ export default class TemplatingService {
 
   public createPushMessage(user: UserRessource, device: string): firebaseMessaging.Message {
 
-    const template = this.getTemplate(MAIL_MESSAGE);
+    const template = this.getTemplate(PUSH_MESSAGE);
     const payload = this.getUserPayload(user);
     const renderedTemplate = TemplatingService.renderMessageTemplate(template, payload);
     const push = {
