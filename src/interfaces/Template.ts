@@ -1,5 +1,4 @@
 export default interface Template {
-  languageId: string;
+  [key: string]: any;
   type: string;
-  template: any;
 }
