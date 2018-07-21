@@ -1,5 +1,5 @@
 import winston from 'winston';
-import DeviceModel from '../models/device';
+import DeviceModel from '@/models/device';
 
 export default class DeviceService {
   // region public static methods

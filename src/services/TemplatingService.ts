@@ -2,10 +2,10 @@ import { messaging as firebaseMessaging } from 'firebase-admin';
 import Mustache from 'mustache';
 import winston from 'winston';
 import Mail from '@/interfaces/Mail';
-import Template from '../interfaces/Template';
+import Template from '@/interfaces/Template';
 import LanguagePayload from '@/interfaces/LanguagePayload';
 import UserRessource from '@/interfaces/UserRessource';
-import Utils from '../utils';
+import Utils from '@/utils';
 import Payload from '@/interfaces/Payload';
 
 const MAIL_MESSAGE = 'MAIL';

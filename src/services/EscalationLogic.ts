@@ -1,10 +1,10 @@
 import winston from 'winston';
-import MailService from '../services/MailService';
-import PushService from '../services/PushService';
-import TemplatingService from '../services/TemplatingService';
-import MessageModel from '../models/message';
-import Utils from '../utils';
-import DeviceService from '../services/DeviceService';
+import MailService from '@/services/MailService';
+import PushService from '@/services/PushService';
+import TemplatingService from '@/services/TemplatingService';
+import MessageModel from '@/models/message';
+import Utils from '@/utils';
+import DeviceService from '@/services/DeviceService';
 import Message from '@/interfaces/Message';
 
 export default class EscalationLogic {

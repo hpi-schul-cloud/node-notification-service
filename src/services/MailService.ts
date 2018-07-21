@@ -1,5 +1,5 @@
 import nodeMailer, { SentMessageInfo } from 'nodemailer';
-import BaseService from '../services/BaseService';
+import BaseService from '@/services/BaseService';
 import Mail from '@/interfaces/Mail';
 
 export default class MailService extends BaseService {

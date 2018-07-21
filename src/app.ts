@@ -2,10 +2,10 @@ import mongoose from 'mongoose';
 import express from 'express';
 import bodyParser from 'body-parser';
 import swaggerUi from 'swagger-ui-express';
-import mailRouter from './routes/mail';
-import pushRouter from './routes/push';
-import messageRouter from './routes/message';
-import deviceRouter from './routes/device';
+import mailRouter from '@/routes/mail';
+import pushRouter from '@/routes/push';
+import messageRouter from '@/routes/message';
+import deviceRouter from '@/routes/device';
 
 function startApiServer() {
   const app: express.Application = express();

@@ -1,5 +1,5 @@
 import firebaseAdmin, { messaging as firebaseMessaging } from 'firebase-admin';
-import BaseService from '../services/BaseService';
+import BaseService from '@/services/BaseService';
 
 export default class PushService extends BaseService {
   // region public static methods
