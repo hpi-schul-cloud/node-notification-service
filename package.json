@@ -6,10 +6,10 @@
   "scripts": {
     "start": "nodemon",
     "lint": "tslint -p tsconfig.json",
-    "server": "ts-node src/app.ts",
+    "server": "ts-node -r tsconfig-paths/register src/app.ts",
     "dev": "npm run lint && npm run server",
     "build": "tsc",
-    "production": "node build/app.js"
+    "production": "node -r tsconfig-paths/register build/app.js"
   },
   "repository": {
     "type": "git",
@@ -42,6 +42,7 @@
     "@types/swagger-ui-express": "^3.0.0",
     "ts-node": "^7.0.0",
     "nodemon": "^1.17.5",
+    "tsconfig-paths": "^3.4.2",
     "tslint": "^5.10.0",
     "typescript": "^2.8.3"
   }
