@@ -1,6 +1,6 @@
-import EscalationLogic from '../services/EscalationLogic';
+import EscalationLogic from '@/services/EscalationLogic';
 import RequestMessage from '@/interfaces/RequestMessage';
-import MessageModel from '../models/message';
+import MessageModel from '@/models/message';
 import axios from 'axios';
 import winston from 'winston';
 

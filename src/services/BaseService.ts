@@ -3,7 +3,7 @@ import { messaging as firebaseMessaging } from 'firebase-admin';
 import Mail from '@/interfaces/Mail';
 import PlatformMailTransporter from '@/interfaces/PlatformMailTransporter';
 import PlatformPushTransporter from '@/interfaces/PlatformPushTransporter';
-import Utils from '../utils';
+import Utils from '@/utils';
 
 export default abstract class BaseService {
   // region public static methods

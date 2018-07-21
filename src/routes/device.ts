@@ -1,5 +1,5 @@
 import express from 'express';
-import DeviceService from '../services/DeviceService';
+import DeviceService from '@/services/DeviceService';
 
 const router: express.Router = express.Router();
 

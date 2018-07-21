@@ -1,6 +1,6 @@
 import winston from 'winston';
 import express from 'express';
-import MailService from '../services/MailService';
+import MailService from '@/services/MailService';
 import Mail from '@/interfaces/Mail';
 
 const router: express.Router = express.Router();

@@ -1,7 +1,7 @@
 import winston from 'winston';
 import { messaging as firebaseMessaging } from 'firebase-admin';
 import express from 'express';
-import PushService from '../services/PushService';
+import PushService from '@/services/PushService';
 
 const router: express.Router = express.Router();
 const pushService: PushService = new PushService();

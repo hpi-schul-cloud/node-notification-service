@@ -1,5 +1,5 @@
 import express from 'express';
-import MessageService from '../services/MessageService';
+import MessageService from '@/services/MessageService';
 import RequestMessage from '@/interfaces/RequestMessage';
 
 const router: express.Router = express.Router();
