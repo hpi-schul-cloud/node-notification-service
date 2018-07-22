@@ -88,9 +88,10 @@ export default class MessageService {
   // endregion
 
   // region public methods
-  public async send(message: RequestMessage) {
+  public async send(message: RequestMessage): Promise<string> {
     const messageId = await MessageService.save(message);
     await this.escalationLogic.escalate(messageId);
+    return messageId;
   }
 
   public async seen(messageId: string, userId: string) {
