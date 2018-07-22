@@ -81,4 +81,8 @@ describe('MessageService.send function', () => {
       .to.containSubset(message);
   });
 
+  after('should close the database connection',  () => {
+    mongoose.disconnect();
+  });
+
 });
