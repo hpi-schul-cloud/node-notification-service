@@ -1,20 +1,11 @@
-import 'mocha';
-import { expect } from 'chai';
-import nodeMailer from 'nodemailer';
 import MailService from '@/services/MailService';
-import Mail from '@/interfaces/Mail';
+import mail from '@test/data/mail';
+import message from '@test/data/message';
+import { expect } from 'chai';
+import 'mocha';
+import nodeMailer from 'nodemailer';
 
-// Define constants
-const platformId: string = 'testplatform';
-const mail: Mail = {
-  from: 'sender@test.test',
-  to: 'receiver@test.test',
-  subject: 'Test Subject',
-  text: 'Test Plaintext',
-  html: '<html>Test HTML</html>',
-};
-
-describe('MailService.send function', () => {
+describe('MailService.send', () => {
 
   // Instantiate the service
   const mailService = new MailService();
@@ -28,19 +19,19 @@ describe('MailService.send function', () => {
       port: 587,
       secure: false,
       auth: {
-          user: account.user,
-          pass: account.pass,
+        user: account.user,
+        pass: account.pass,
       },
     });
 
     // Add the custom transporter
     (mailService as any).transporters.push({
-      platformId,
+      platformId: message.platform,
       transporter,
     });
 
     // Send a mail
-    messageInfo = await mailService.send(platformId, mail);
+    messageInfo = await mailService.send(message.platform, mail);
   });
 
   it('should send an e-mail, accepted by the receiver.', async () => {

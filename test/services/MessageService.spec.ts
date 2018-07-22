@@ -1,52 +1,20 @@
-import 'mocha';
+import Message from '@/interfaces/Message';
+import MessageModel from '@/models/message';
+import MessageService from '@/services/MessageService';
+import message from '@test/data/message';
+import { AssertionError } from 'assert';
 import chai from 'chai';
 import spies from 'chai-spies';
 import subset from 'chai-subset';
+import 'mocha';
 import mongoose from 'mongoose';
-import MessageService from '@/services/MessageService';
-import MessageModel from '@/models/message';
-import RequestMessage from '@/interfaces/RequestMessage';
-import { AssertionError } from 'assert';
-import Message from '@/interfaces/Message';
 
 // Add extensions to chai
 chai.use(spies);
 chai.use(subset);
 const expect = chai.expect;
 
-// Define constants
-const platformId: string = 'testplatform';
-const message: RequestMessage = {
-  platform: 'test-platform',
-  template: 'test-template',
-  sender: {
-    name: 'Test Sender',
-    mail: 'sender@test.test',
-  },
-  payload: {
-    testKey: 'test-value',
-  },
-  languagePayloads: [
-    {
-      language: 'en',
-      payload: {
-        testLanguageKey: 'test-language-value',
-      },
-    },
-  ],
-  receivers: [
-    {
-      name: 'Test Receiver',
-      mail: 'receiver@test.test',
-      payload: {
-        testUserKey: 'test-user-value',
-      },
-      language: 'en',
-    },
-  ],
-};
-
-describe('MessageService.send function', () => {
+describe('MessageService.send', () => {
 
   // Instantiate the service
   const messageService = new MessageService();
@@ -73,7 +41,7 @@ describe('MessageService.send function', () => {
     const messageId = await messageService.send(message);
     const databaseMessageModel = await MessageModel.findById(messageId);
     if (!databaseMessageModel) {
-      throw new AssertionError({ message: 'Could not find message in database.'});
+      throw new AssertionError({ message: 'Could not find message in database.' });
     }
     const databaseMessage: Message = databaseMessageModel.toObject();
 
@@ -81,7 +49,7 @@ describe('MessageService.send function', () => {
       .to.containSubset(message);
   });
 
-  after('should close the database connection',  () => {
+  after('should close the database connection', () => {
     mongoose.disconnect();
   });
 
