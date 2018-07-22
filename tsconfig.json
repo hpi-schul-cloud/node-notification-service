@@ -8,7 +8,8 @@
     "sourceMap": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": [ "src/*", "build/*" ]
+      "@/*": [ "src/*", "build/*" ],
+      "@test/*": [ "test/*" ]
     },
     "lib": [
       "es2015"
