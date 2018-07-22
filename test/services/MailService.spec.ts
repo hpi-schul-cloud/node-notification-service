@@ -44,22 +44,22 @@ describe('MailService.send function', () => {
   });
 
   it('should send an e-mail, accepted by the receiver.', async () => {
-    expect(messageInfo.accepted.length)
-      .to.equal([ mail.to ].length)
-      .to.equal(1);
-
-    expect(messageInfo.accepted[0])
-      .to.equal(mail.to.toString());
+    expect(messageInfo.accepted)
+      .to.be.an('array')
+      .to.have.lengthOf(1)
+      .to.include(mail.to);
   });
 
   it('should send an e-mail, which is not rejected.', async () => {
-    expect(messageInfo.rejected.length)
-      .to.equal(0);
+    expect(messageInfo.rejected)
+      .to.be.an('array')
+      .that.is.empty
+      .to.not.include(mail.to);
   });
 
   it('should send an e-mail, from the given sender.', async () => {
-    expect(messageInfo.envelope.from)
-      .to.equal(mail.from);
+    expect(messageInfo.envelope)
+      .to.have.property('from', mail.from);
   });
 
 });
