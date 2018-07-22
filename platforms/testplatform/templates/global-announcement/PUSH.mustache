@@ -1,2 +1,8 @@
-title: "{{ message.title }}"
-description: "{{ language.description }}"
+notification:
+    title: "{{ message.title }}"
+    body: "{{ language.description }}"
+apns:
+    payload:
+        aps:
+            title: "{{ message.title }}"
+            body: "{{ language.description }}"
