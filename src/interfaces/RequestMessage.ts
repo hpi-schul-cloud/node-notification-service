@@ -9,7 +9,7 @@ export default interface RequestMessage {
     name: string;
     mail: string;
   };
-  payload: {};
+  payload: any;
   languagePayloads: LanguagePayload[];
   receivers: UserRessource[] | string;
   trackLinks?: boolean;
