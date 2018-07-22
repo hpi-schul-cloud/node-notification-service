@@ -9,7 +9,8 @@
     "server": "ts-node -r tsconfig-paths/register src/app.ts",
     "dev": "npm run lint && npm run server",
     "build": "tsc",
-    "production": "node -r tsconfig-paths/register build/app.js"
+    "production": "node -r tsconfig-paths/register build/app.js",
+    "test": "mocha -t 30000 -r tsconfig-paths/register -r ts-node/register test/**/*.spec.ts"
   },
   "repository": {
     "type": "git",
