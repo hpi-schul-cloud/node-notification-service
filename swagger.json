@@ -21,7 +21,7 @@
     },
     {
       "name": "Device",
-      "description": "API to a new device"
+      "description": "API to add a new device"
     }
   ],
   "schemes": [
