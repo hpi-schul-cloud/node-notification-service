@@ -112,6 +112,32 @@
           }
         }
       }
+    },
+    "/messages": {
+      "post": {
+        "tags": [
+          "Message"
+        ],
+        "description": "Send a message",
+        "parameters": [{
+          "name": "message",
+          "in": "body",
+          "description": "Message to send",
+          "required": true,
+          "schema": {
+            "$ref": "#/definitions/Message"
+          }
+        }],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Message queued."
+          }
+        }
+      }
+    },
     }
   },
   "definitions": {
