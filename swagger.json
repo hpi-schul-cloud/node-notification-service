@@ -225,6 +225,69 @@
         "mail": "sample@sample.org",
         "token": "nms76vghyXGFa652chgagvhy56c1zc7vxghSWq"
       }
+    },
+    "Message": {
+      "required": [
+        "platform",
+        "template",
+        "payload",
+        "languagePayloads"
+      ],
+      "properties": {
+        "platform": {
+          "type": "string",
+          "description": "The id of the platform"
+        },
+        "template": {
+          "type": "string",
+          "description": "The id of the message template"
+        },
+        "payload": {
+          "type": "object",
+          "description": "The generic message payload"
+        },
+        "languagePayloads": {
+          "type" : "array",
+          "items" : {
+            "$ref": "#/definitions/LanguagePayload",
+            "description": "The generic message payload"
+          }
+        },
+        "receivers": {
+          "type" : "array",
+          "items" : {
+            "$ref": "#/definitions/UserResource",
+          "description": "The array of user resources"
+          }
+        }
+      },
+      "example": {
+        "platform": "testplatform",
+        "template": "global-announcement",
+        "payload": {
+          "magicNumber": "42"
+        },
+        "languagePayloads": [
+          {
+            "language": "en",
+            "payload": {
+              "title": "New foo bar available",
+              "body": "Order our new foo bar for only $42."
+			      }
+          }
+        ],
+        "receivers": [
+          {
+            "name": "John Doe",
+            "mail": "sample@sample.org",
+            "language": "en",
+            "payload": {
+              "name": "John"
+            }
+          }
+        ]
+      }
+    },
     "LanguagePayload": {
       "required": [
         "language",
