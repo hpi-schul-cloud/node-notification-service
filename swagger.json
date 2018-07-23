@@ -225,6 +225,22 @@
         "mail": "sample@sample.org",
         "token": "nms76vghyXGFa652chgagvhy56c1zc7vxghSWq"
       }
+    "LanguagePayload": {
+      "required": [
+        "language",
+        "payload"
+      ],
+      "properties": {
+        "language": {
+          "type": "string",
+          "description": "The language of the language payload"
+        },
+        "payload": {
+          "type": "object",
+          "description": "The payload of the language payload"
+        }
+      }
+    },
     "UserResource": {
       "required": [
         "name",
