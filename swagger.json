@@ -22,6 +22,10 @@
     {
       "name": "Device",
       "description": "API to add a new device"
+    },
+    {
+      "name": "Message",
+      "description": "API to send messages and mark them as seen"
     }
   ],
   "schemes": [
