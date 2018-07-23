@@ -169,7 +169,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Message queued."
+            "description": "The message has been marked as seen."
           }
         }
       }
