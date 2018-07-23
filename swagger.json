@@ -10,13 +10,14 @@
     }
   },
   "host": "localhost:3000",
-  "tags": [{
+  "tags": [
+    {
       "name": "Mail",
-      "description": "API to send mails"
+      "description": "API to send mail messages"
     },
     {
       "name": "Push",
-      "description": "API to send push notifications"
+      "description": "API to send push messages"
     }
   ],
   "schemes": [
