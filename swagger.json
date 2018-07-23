@@ -225,6 +225,31 @@
         "mail": "sample@sample.org",
         "token": "nms76vghyXGFa652chgagvhy56c1zc7vxghSWq"
       }
+    "UserResource": {
+      "required": [
+        "name",
+        "mail",
+        "language",
+        "payload"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the user resource"
+        },
+        "mail": {
+          "type": "object",
+          "description": "The mail address of the user resource"
+        },
+        "language": {
+          "type": "string",
+          "description": "The language of the user resource"
+        },
+        "payload": {
+          "type": "object",
+          "description": "The payload of the user resource"
+        }
+      }
     }
   }
 }
