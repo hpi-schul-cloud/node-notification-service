@@ -83,6 +83,31 @@
           }
         }
       }
+    },
+    "/devices": {
+      "post": {
+        "tags": [
+          "Device"
+        ],
+        "description": "Add a new device",
+        "parameters": [{
+          "name": "device",
+          "in": "body",
+          "description": "Device to add",
+          "required": true,
+          "schema": {
+            "$ref": "#/definitions/Device"
+          }
+        }],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "The device has been added."
+          }
+        }
+      }
     }
   },
   "definitions": {
