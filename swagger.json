@@ -170,6 +170,32 @@
           "description": "Body of push notification"
         }
       }
+    },
+    "Device": {
+      "required": [
+        "platform",
+        "mail",
+        "token"
+      ],
+      "properties": {
+        "platform": {
+          "type": "string",
+          "description": "The id of the platform"
+        },
+        "mail": {
+          "type": "string",
+          "description": "Mail address of user resource"
+        },
+        "token": {
+          "type": "string",
+          "description": "Device token of user resource"
+        }
+      },
+      "example": {
+        "platform": "testplatform",
+        "mail": "sample@sample.org",
+        "token": "nms76vghyXGFa652chgagvhy56c1zc7vxghSWq"
+      }
     }
   }
 }
