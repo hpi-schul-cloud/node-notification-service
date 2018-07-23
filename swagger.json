@@ -138,6 +138,41 @@
         }
       }
     },
+    "/messages/{messageId}/seen": {
+      "post": {
+        "tags": [
+          "Message"
+        ],
+        "description": "Send a message",
+        "parameters": [
+          {
+            "name": "messageId",
+            "in": "path",
+            "description": "Message id to mark as seen",
+            "required": true,
+            "type": "string",
+            "example": "nms7652chgagvhy56c1zc7vh"
+          },
+          {
+            "name": "userId",
+            "in": "body",
+            "description": "User resource id",
+            "required": true,
+            "type": "string",
+            "example": {
+              "userId": "Fa652chgagvhy56c1zghSWq"
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Message queued."
+          }
+        }
+      }
     }
   },
   "definitions": {
