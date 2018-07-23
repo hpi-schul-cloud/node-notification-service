@@ -18,6 +18,10 @@
     {
       "name": "Push",
       "description": "API to send push messages"
+    },
+    {
+      "name": "Device",
+      "description": "API to a new device"
     }
   ],
   "schemes": [
