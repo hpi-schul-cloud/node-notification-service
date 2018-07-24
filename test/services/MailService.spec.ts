@@ -1,9 +1,9 @@
+import 'mocha';
+import { expect } from 'chai';
+import nodeMailer from 'nodemailer';
 import MailService from '@/services/MailService';
 import mail from '@test/data/mail';
 import message from '@test/data/message';
-import { expect } from 'chai';
-import 'mocha';
-import nodeMailer from 'nodemailer';
 
 describe('MailService.send', () => {
 
@@ -11,7 +11,7 @@ describe('MailService.send', () => {
   const mailService = new MailService();
   let messageInfo: any;
 
-  before('should send an e-mail.', async () => {
+  before('should send an mail.', async () => {
     // Create ethereal mail account
     const account = await nodeMailer.createTestAccount();
     const transporter = nodeMailer.createTransport({
@@ -34,21 +34,19 @@ describe('MailService.send', () => {
     messageInfo = await mailService.send(message.platform, mail);
   });
 
-  it('should send an e-mail, accepted by the receiver.', async () => {
+  it('should send an mail, accepted by the receiver.', async () => {
     expect(messageInfo.accepted)
       .to.be.an('array')
       .to.have.lengthOf(1)
       .to.include(mail.to);
-  });
 
-  it('should send an e-mail, which is not rejected.', async () => {
     expect(messageInfo.rejected)
       .to.be.an('array')
       .that.is.empty
       .to.not.include(mail.to);
   });
 
-  it('should send an e-mail, from the given sender.', async () => {
+  it('should send an mail, from the given sender.', async () => {
     expect(messageInfo.envelope)
       .to.have.property('from', mail.from);
   });

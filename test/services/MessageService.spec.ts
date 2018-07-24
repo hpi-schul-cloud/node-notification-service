@@ -1,13 +1,12 @@
+import 'mocha';
+import chai from 'chai';
+import spies from 'chai-spies';
+import subset from 'chai-subset';
+import mongoose from 'mongoose';
 import Message from '@/interfaces/Message';
 import MessageModel from '@/models/message';
 import MessageService from '@/services/MessageService';
 import message from '@test/data/message';
-import { AssertionError } from 'assert';
-import chai from 'chai';
-import spies from 'chai-spies';
-import subset from 'chai-subset';
-import 'mocha';
-import mongoose from 'mongoose';
 
 // Add extensions to chai
 chai.use(spies);
@@ -41,7 +40,8 @@ describe('MessageService.send', () => {
     const messageId = await messageService.send(message);
     const databaseMessageModel = await MessageModel.findById(messageId);
     if (!databaseMessageModel) {
-      throw new AssertionError({ message: 'Could not find message in database.' });
+      expect(databaseMessageModel, 'Could not find message in database.').not.to.be.null;
+      return;
     }
     const databaseMessage: Message = databaseMessageModel.toObject();
 

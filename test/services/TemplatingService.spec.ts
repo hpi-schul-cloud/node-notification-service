@@ -1,11 +1,10 @@
+import 'mocha';
+import { expect } from 'chai';
+import { messaging as firebaseMessaging } from 'firebase-admin';
 import Mail from '@/interfaces/Mail';
 import UserRessource from '@/interfaces/UserRessource';
 import TemplatingService from '@/services/TemplatingService';
 import message from '@test/data/message';
-import { AssertionError } from 'assert';
-import { expect } from 'chai';
-import { messaging as firebaseMessaging } from 'firebase-admin';
-import 'mocha';
 
 // Instantiate the service
 const templatingService =
@@ -20,7 +19,7 @@ describe('TemplatingService.createMailMessage', () => {
     mail = templatingService.createMailMessage(receiver);
   });
 
-  it('should create a valid e-mail.', () => {
+  it('should create a valid mail.', () => {
 
     expect(mail)
       .to.have.keys('from', 'to', 'subject', 'text', 'html');
@@ -72,7 +71,7 @@ describe('TemplatingService.createPushMessage', () => {
 
   let push: firebaseMessaging.Message;
 
-  beforeEach('create a mail message.', () => {
+  beforeEach('create a push message.', () => {
     push = templatingService.createPushMessage(receiver, 'test-device');
   });
 
@@ -86,7 +85,8 @@ describe('TemplatingService.createPushMessage', () => {
   it('should replace placeholders with payload values.', () => {
 
     if (!push.notification) {
-      throw new AssertionError({ message: 'Push template has no notification.' });
+      expect(push.notification, 'Push template has no notification.').not.to.be.undefined;
+      return;
     }
 
     expect(push.notification.title)
@@ -94,17 +94,6 @@ describe('TemplatingService.createPushMessage', () => {
 
     expect(push.notification.body)
       .to.equal(message.languagePayloads[0].payload.description);
-
-    if (!push.apns || !push.apns.payload) {
-      throw new AssertionError({ message: 'Push template has no apns or apns have payload.' });
-    }
-
-    expect(push.apns.payload.aps.title)
-      .to.equal(message.payload.title);
-
-    expect(push.apns.payload.aps.body)
-      .to.equal(message.languagePayloads[0].payload.description);
-
   });
 
 });
