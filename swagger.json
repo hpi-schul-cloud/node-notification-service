@@ -10,13 +10,22 @@
     }
   },
   "host": "localhost:3000",
-  "tags": [{
+  "tags": [
+    {
+      "name": "Message",
+      "description": "API to send and manage messages"
+    },
+    {
+      "name": "Device",
+      "description": "API to add new devices"
+    },
+    {
       "name": "Mail",
-      "description": "API to send mails"
+      "description": "API to send mail messages"
     },
     {
       "name": "Push",
-      "description": "API to send push notifications"
+      "description": "API to send push messages"
     }
   ],
   "schemes": [
@@ -34,11 +43,11 @@
         "tags": [
           "Mail"
         ],
-        "description": "Send a mail",
+        "description": "Send a mail message",
         "parameters": [{
           "name": "mail",
           "in": "body",
-          "description": "Mail to send",
+          "description": "Mail message to send",
           "required": true,
           "schema": {
             "$ref": "#/definitions/Mail"
@@ -59,11 +68,11 @@
         "tags": [
           "Push"
         ],
-        "description": "Send a push",
+        "description": "Send a push message",
         "parameters": [{
           "name": "push",
           "in": "body",
-          "description": "Push notification to send",
+          "description": "Push message to send",
           "required": true,
           "schema": {
             "$ref": "#/definitions/Push"
@@ -75,6 +84,92 @@
         "responses": {
           "200": {
             "description": "Push queued."
+          }
+        }
+      }
+    },
+    "/devices": {
+      "post": {
+        "tags": [
+          "Device"
+        ],
+        "description": "Add a new device",
+        "parameters": [{
+          "name": "device",
+          "in": "body",
+          "description": "Device to add",
+          "required": true,
+          "schema": {
+            "$ref": "#/definitions/Device"
+          }
+        }],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "The device has been added."
+          }
+        }
+      }
+    },
+    "/messages": {
+      "post": {
+        "tags": [
+          "Message"
+        ],
+        "description": "Send a message",
+        "parameters": [{
+          "name": "message",
+          "in": "body",
+          "description": "Message to send",
+          "required": true,
+          "schema": {
+            "$ref": "#/definitions/Message"
+          }
+        }],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Message queued."
+          }
+        }
+      }
+    },
+    "/messages/{messageId}/seen": {
+      "post": {
+        "tags": [
+          "Message"
+        ],
+        "description": "Mark a message as seen",
+        "parameters": [
+          {
+            "name": "messageId",
+            "in": "path",
+            "description": "Id of the message to mark as seen",
+            "required": true,
+            "type": "string",
+            "example": "nms7652chgagvhy56c1zc7vh"
+          },
+          {
+            "name": "userId",
+            "in": "body",
+            "description": "Id of the user that has seen the message",
+            "required": true,
+            "type": "string",
+            "example": {
+              "userId": "Fa652chgagvhy56c1zghSWq"
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "The message has been marked as seen."
           }
         }
       }
@@ -92,19 +187,19 @@
       "properties": {
         "platformId": {
           "type": "string",
-          "description": "The id of the platform"
+          "description": "Id of the platform"
         },
         "to": {
           "type": "string",
-          "description": "Mail address of receiver"
+          "description": "Mail address of the receiver"
         },
         "subject": {
           "type": "string",
-          "description": "Subject of mail"
+          "description": "Subject of the mail message"
         },
         "text": {
           "type": "string",
-          "description": "Text content of mail"
+          "description": "Plaintext content of mail"
         },
         "html": {
           "type": "string",
@@ -130,11 +225,11 @@
       "properties": {
         "platformId": {
           "type": "string",
-          "description": "The id of the platform"
+          "description": "Id of the platform"
         },
         "token": {
           "type": "string",
-          "description": "Device token of receiver"
+          "description": "Device token of the receiver"
         },
         "notification": {
           "$ref": "#/definitions/FirebaseNotificationObject",
@@ -158,11 +253,141 @@
       "properties": {
         "title": {
           "type": "string",
-          "description": "Title of push notification"
+          "description": "Title of the push message"
         },
         "body": {
           "type": "string",
-          "description": "Body of push notification"
+          "description": "Body of the push message"
+        }
+      }
+    },
+    "Device": {
+      "required": [
+        "platform",
+        "mail",
+        "token"
+      ],
+      "properties": {
+        "platform": {
+          "type": "string",
+          "description": "Id of the platform"
+        },
+        "mail": {
+          "type": "string",
+          "description": "Mail address of the user"
+        },
+        "token": {
+          "type": "string",
+          "description": "Device token of the user"
+        }
+      },
+      "example": {
+        "platform": "testplatform",
+        "mail": "sample@sample.org",
+        "token": "nms76vghyXGFa652chgagvhy56c1zc7vxghSWq"
+      }
+    },
+    "Message": {
+      "required": [
+        "platform",
+        "template",
+        "payload",
+        "languagePayloads"
+      ],
+      "properties": {
+        "platform": {
+          "type": "string",
+          "description": "Id of the platform"
+        },
+        "template": {
+          "type": "string",
+          "description": "Id of the message template"
+        },
+        "payload": {
+          "type": "object",
+          "description": "Generic message payload"
+        },
+        "languagePayloads": {
+          "type" : "array",
+          "items" : {
+            "$ref": "#/definitions/LanguagePayload",
+            "description": "Language specific message payload"
+          }
+        },
+        "receivers": {
+          "type" : "array",
+          "items" : {
+            "$ref": "#/definitions/UserResource",
+            "description": "Array of user resources"
+          }
+        }
+      },
+      "example": {
+        "platform": "testplatform",
+        "template": "global-announcement",
+        "payload": {
+          "magicNumber": "42"
+        },
+        "languagePayloads": [
+          {
+            "language": "en",
+            "payload": {
+              "title": "New foo bar available",
+              "body": "Order our new foo bar for only $42."
+			      }
+          }
+        ],
+        "receivers": [
+          {
+            "name": "John Doe",
+            "mail": "sample@sample.org",
+            "language": "en",
+            "payload": {
+              "name": "John"
+            }
+          }
+        ]
+      }
+    },
+    "LanguagePayload": {
+      "required": [
+        "language",
+        "payload"
+      ],
+      "properties": {
+        "language": {
+          "type": "string",
+          "description": "Language of the language payload"
+        },
+        "payload": {
+          "type": "object",
+          "description": "Language specific payload"
+        }
+      }
+    },
+    "UserResource": {
+      "required": [
+        "name",
+        "mail",
+        "language",
+        "payload"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the user"
+        },
+        "mail": {
+          "type": "string",
+          "description": "Mail address of the user"
+        },
+        "language": {
+          "type": "string",
+          "description": "Language of the user"
+        },
+        "payload": {
+          "type": "object",
+          "description": "User specific payload"
         }
       }
     }
