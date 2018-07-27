@@ -32,7 +32,7 @@ Simply run `npm test` and all your tests in the `test/` directory will be run.
 
 ## Architecture
 
-<img width="1092" alt="architecture" src="https://user-images.githubusercontent.com/12249969/43099259-e0b3221e-8ec1-11e8-9940-b785f6b08f76.png">
+![Architecture Diagram](https://user-images.githubusercontent.com/17351844/43318281-64d9d08e-91a0-11e8-94cd-519a17d933c6.png)
 
 To construct our notifications service, we structured our project in several different components from top to bottom. Aside from the high-level message service, a templating service, an escalation service, a device service and low level sending services are needed. For a more detailed insight, how these services collaborate, let us go through a small exemplary workflow:
 
