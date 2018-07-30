@@ -13,7 +13,7 @@ export const userResourceSchema = new mongoose.Schema({
   mail: String,
   payload: Object,
   language: String,
-  disabledPushMessages: { type: Boolean, default: false },
+  preferences: Object,
 });
 
 export const messageSchema = new mongoose.Schema({
