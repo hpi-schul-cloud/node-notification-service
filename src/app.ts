@@ -31,19 +31,27 @@ function startApiServer() {
       {
         name: 'Bob',
         mail: 'bob@bob.bob',
-        language: 'en',
         payload: {
           course: 'Bobs Course',
           week: 6,
+        },
+        language: 'en',
+        preferences: {
+          push: true,
+          mail: true,
         },
       },
       {
         name: 'Alice',
         mail: 'alice@alice.alice',
-        language: 'de',
         payload: {
           course: 'Alices Course',
           week: 4,
+        },
+        language: 'de',
+        preferences: {
+          push: true,
+          mail: true,
         },
       },
     ];
