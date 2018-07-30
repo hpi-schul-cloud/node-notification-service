@@ -50,7 +50,7 @@ export default class EscalationLogic {
 
     // Send push messages
     for (const receiver of message.receivers) {
-      if (receiver.disabledPushMessages) {
+      if (!receiver.preferences.push) {
         continue;
       }
 
@@ -79,6 +79,10 @@ export default class EscalationLogic {
     }
 
     for (const receiver of message.receivers) {
+      if (!receiver.preferences.mail) {
+        continue;
+      }
+
       const mailMessage = templatingService.createMailMessage(receiver);
       this.mailService.send(message.platform, mailMessage);
     }
