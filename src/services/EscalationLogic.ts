@@ -50,6 +50,10 @@ export default class EscalationLogic {
 
     // Send push messages
     for (const receiver of message.receivers) {
+      if (receiver.disabledPushMessages) {
+        continue;
+      }
+
       const receiverDevices = await DeviceService.getDevices(message.platform, receiver.mail);
       for (const device of receiverDevices) {
         const pushMessage = templatingService.createPushMessage(receiver, device);
