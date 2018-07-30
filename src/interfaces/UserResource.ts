@@ -3,5 +3,7 @@ export default interface UserResource {
   mail: string;
   payload: any;
   language: string;
-  disabledPushMessages?: boolean;
+  preferences: {
+    [key: string]: boolean,
+  };
 }
