@@ -3,7 +3,7 @@ import DeviceModel from '@/models/device';
 
 export default class DeviceService {
   // region public static methods
-  public static async addDevice(platform: string, mail: string, token: string) {
+  public static async addDevice(platform: string, mail: string, token: string): Promise<string> {
     let device = await DeviceModel.findOne({ platform, mail });
     if (!device) {
       device = new DeviceModel({
@@ -22,7 +22,10 @@ export default class DeviceService {
     }
 
     device.tokens.push(token);
-    await device.save();
+
+    const savedDevice = await device.save();
+
+    return savedDevice.id;
   }
 
   public static async getDevices(platform: string, mail: string): Promise<string[]> {
