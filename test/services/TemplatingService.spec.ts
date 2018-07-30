@@ -2,14 +2,14 @@ import 'mocha';
 import { expect } from 'chai';
 import { messaging as firebaseMessaging } from 'firebase-admin';
 import Mail from '@/interfaces/Mail';
-import UserRessource from '@/interfaces/UserRessource';
+import UserResource from '@/interfaces/UserResource';
 import TemplatingService from '@/services/TemplatingService';
 import message from '@test/data/message';
 
 // Instantiate the service
 const templatingService =
   new TemplatingService(message.platform, message.template, message.payload, message.languagePayloads);
-const receiver: UserRessource = (message.receivers[0] as UserRessource);
+const receiver: UserResource = (message.receivers[0] as UserResource);
 
 describe('TemplatingService.createMailMessage', () => {
 

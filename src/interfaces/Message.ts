@@ -1,4 +1,4 @@
-import UserRessource from '@/interfaces/UserRessource';
+import UserResource from '@/interfaces/UserResource';
 import LanguagePayload from '@/interfaces/LanguagePayload';
 
 
@@ -11,6 +11,6 @@ export default interface Message {
   };
   payload: {};
   languagePayloads: LanguagePayload[];
-  receivers: UserRessource[];
+  receivers: UserResource[];
   trackLinks?: boolean;
 }
