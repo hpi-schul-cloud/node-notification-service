@@ -1,20 +1,20 @@
 import 'mocha';
 import chai from 'chai';
 import spies from 'chai-spies';
-import subset from 'chai-subset';
 import mongoose from 'mongoose';
-import Message from '@/interfaces/Message';
-import MessageModel from '@/models/message';
-import MessageService from '@/services/MessageService';
 import message from '@test/data/message';
+import MessageService from '@/services/MessageService';
+import DeviceService from '@/services/DeviceService';
+import device from '@test/data/device';
+import Utils from '@/utils';
 import config from '@test/config';
+import TestUtils from '@test/test-utils';
 
 // Add extensions to chai
 chai.use(spies);
-chai.use(subset);
 const expect = chai.expect;
 
-describe('MessageService.send', () => {
+describe('EscalationLogic.escalate', () => {
 
   // Instantiate the service
   const messageService = new MessageService();
@@ -28,26 +28,26 @@ describe('MessageService.send', () => {
   });
 
   it('should call the escalation logic.', async () => {
-    const spyFunction = chai.spy();
-    (messageService as any).escalationLogic.escalate = spyFunction;
+    // add test device
+    await DeviceService.addDevice(device.platform, device.mail, device.tokens[0]);
+
+    // use spies for push and mail service
+    const spyFunctionPush = chai.spy();
+    const spyFunctionMail = chai.spy();
+    (messageService as any).escalationLogic.pushService.send = spyFunctionPush;
+    (messageService as any).escalationLogic.mailService.send = spyFunctionMail;
 
     await messageService.send(message);
 
-    expect(spyFunction)
+    expect(spyFunctionPush)
       .to.have.been.called();
-  });
 
-  it('should write the message to the database.', async () => {
-    const messageId = await messageService.send(message);
-    const databaseMessageModel = await MessageModel.findById(messageId);
-    if (!databaseMessageModel) {
-      expect(databaseMessageModel, 'Could not find message in database.').not.to.be.null;
-      return;
-    }
-    const databaseMessage: Message = databaseMessageModel.toObject();
+    const config = Utils.getPlatformConfig(message.platform);
 
-    expect(databaseMessage)
-      .to.containSubset(message);
+    await TestUtils.timeout(config.mail.defaults.delay + 10);
+
+    expect(spyFunctionMail)
+      .to.have.been.called();
   });
 
   after('should drop database and close connection', (done) => {
