@@ -6,6 +6,7 @@ import Device from '@/interfaces/Device';
 import DeviceModel from '@/models/device';
 import DeviceService from '@/services/DeviceService';
 import device from '@test/data/device';
+import config from '@test/config';
 
 // Add extensions to chai
 chai.use(subset);
@@ -18,7 +19,7 @@ describe('DeviceService', () => {
     const db = mongoose.connection;
     db.on('error', console.error.bind(console, 'connection error:'));
     db.once('open', done);
-    mongoose.connect(`mongodb://${process.env.MONGO_HOST || 'localhost'}/notification-service-test`);
+    mongoose.connect(config.MONGO_DB_PATH);
   });
 
   it('should write a new device to the database.', async () => {

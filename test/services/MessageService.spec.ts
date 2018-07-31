@@ -7,6 +7,7 @@ import Message from '@/interfaces/Message';
 import MessageModel from '@/models/message';
 import MessageService from '@/services/MessageService';
 import message from '@test/data/message';
+import config from '@test/config';
 
 // Add extensions to chai
 chai.use(spies);
@@ -23,7 +24,7 @@ describe('MessageService.send', () => {
     const db = mongoose.connection;
     db.on('error', console.error.bind(console, 'connection error:'));
     db.once('open', done);
-    mongoose.connect(`mongodb://${process.env.MONGO_HOST || 'localhost'}/notification-service-test`);
+    mongoose.connect(config.MONGO_DB_PATH);
   });
 
   it('should call the escalation logic.', async () => {

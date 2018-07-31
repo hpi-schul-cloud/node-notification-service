@@ -7,6 +7,7 @@ import MessageService from '@/services/MessageService';
 import DeviceService from '@/services/DeviceService';
 import device from '@test/data/device';
 import Utils from '@/utils';
+import config from '@test/config';
 
 // Add extensions to chai
 chai.use(spies);
@@ -22,7 +23,7 @@ describe('EscalationLogic.escalate', () => {
     const db = mongoose.connection;
     db.on('error', console.error.bind(console, 'connection error:'));
     db.once('open', done);
-    mongoose.connect(`mongodb://${process.env.MONGO_HOST || 'localhost'}/notification-service-test`);
+    mongoose.connect(config.MONGO_DB_PATH);
   });
 
   it('should call the escalation logic.', async () => {
