@@ -1,18 +1,19 @@
 import mongoose from 'mongoose';
 import Message from '@/interfaces/Message';
-import UserRessource from '@/interfaces/UserRessource';
+import UserResource from '@/interfaces/UserResource';
 
-export interface UserRessourceModel extends UserRessource, mongoose.Types.Subdocument {}
+export interface UserResourceModel extends UserResource, mongoose.Types.Subdocument {}
 
 export interface MessageModel extends Message, mongoose.Document {
-  receivers: mongoose.Types.DocumentArray<UserRessourceModel>;
+  receivers: mongoose.Types.DocumentArray<UserResourceModel>;
 }
 
-export const userRessourceSchema = new mongoose.Schema({
+export const userResourceSchema = new mongoose.Schema({
   name: String,
   mail: String,
-  language: String,
   payload: Object,
+  language: String,
+  preferences: Object,
 });
 
 export const messageSchema = new mongoose.Schema({
@@ -29,7 +30,7 @@ export const messageSchema = new mongoose.Schema({
       payload: Object,
     },
   ],
-  receivers: [ userRessourceSchema ],
+  receivers: [ userResourceSchema ],
   trackLinks: Boolean,
 });
 

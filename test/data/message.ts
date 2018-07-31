@@ -26,6 +26,10 @@ const message: RequestMessage = {
         name: 'Test Receiver',
       },
       language: 'en',
+      preferences: {
+        push: true,
+        mail: true,
+      },
     },
   ],
 };

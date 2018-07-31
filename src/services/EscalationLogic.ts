@@ -50,6 +50,10 @@ export default class EscalationLogic {
 
     // Send push messages
     for (const receiver of message.receivers) {
+      if (!receiver.preferences.push) {
+        continue;
+      }
+
       const receiverDevices = await DeviceService.getDevices(message.platform, receiver.mail);
       for (const device of receiverDevices) {
         const pushMessage = templatingService.createPushMessage(receiver, device);
@@ -75,6 +79,10 @@ export default class EscalationLogic {
     }
 
     for (const receiver of message.receivers) {
+      if (!receiver.preferences.mail) {
+        continue;
+      }
+
       const mailMessage = templatingService.createMailMessage(receiver);
       this.mailService.send(message.platform, mailMessage);
     }
