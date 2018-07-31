@@ -23,7 +23,7 @@ function startApiServer() {
     res.send('hello world!');
   });
 
-  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(require('../swagger.json')));
+  app.use('/docs', swaggerUi.serve, swaggerUi.setup(require('../swagger.json')));
 
   // Test Endpoint for user pagination
   app.get('/users', (req, res) => {
