@@ -1,7 +1,7 @@
 version: '3'
 services:
   notification-service:
-    image: friedow/notification-service:latest
+    image: friedow/node-notification-service:latest
     ports:
       - 3000:3000
     links:
