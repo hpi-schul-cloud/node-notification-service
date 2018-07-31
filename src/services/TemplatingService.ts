@@ -4,7 +4,7 @@ import winston from 'winston';
 import Mail from '@/interfaces/Mail';
 import Template from '@/interfaces/Template';
 import LanguagePayload from '@/interfaces/LanguagePayload';
-import UserRessource from '@/interfaces/UserRessource';
+import UserResource from '@/interfaces/UserResource';
 import Utils from '@/utils';
 import Payload from '@/interfaces/Payload';
 
@@ -87,7 +87,7 @@ export default class TemplatingService {
 
   // region public methods
 
-  public createMailMessage(user: UserRessource): Mail {
+  public createMailMessage(user: UserResource): Mail {
     const template = this.getTemplate(MAIL_MESSAGE);
     const payload = this.getUserPayload(user);
     const renderedTemplate = TemplatingService.renderMessageTemplate(template, payload);
@@ -102,7 +102,7 @@ export default class TemplatingService {
     return mail;
   }
 
-  public createPushMessage(user: UserRessource, device: string): firebaseMessaging.Message {
+  public createPushMessage(user: UserResource, device: string): firebaseMessaging.Message {
 
     const template = this.getTemplate(PUSH_MESSAGE);
     const payload = this.getUserPayload(user);
@@ -135,7 +135,7 @@ export default class TemplatingService {
     return parsedMessageTemplate;
   }
 
-  private getUserPayload(user: UserRessource): Payload {
+  private getUserPayload(user: UserResource): Payload {
     const messagePayload = this.messagePayloads.find( (payload) => payload.languageId === user.language );
 
     if (!messagePayload) {
