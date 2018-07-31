@@ -11,7 +11,7 @@
     },
     "defaults": {
       "from": "Sample Service <sample@sample.org>",
-      "delay": 144000
+      "delay": 0
     }
   },
   "push": {
