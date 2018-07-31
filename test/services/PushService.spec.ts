@@ -30,7 +30,7 @@ describe('PushService.send', () => {
     await pushService.send(message.platform, push);
   });
 
-  it('should send a push.', async () => {
+  it('should send a push.', () => {
     expect(spyFunction)
       .to.have.been.called();
   });
