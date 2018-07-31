@@ -8,6 +8,7 @@ import DeviceService from '@/services/DeviceService';
 import device from '@test/data/device';
 import Utils from '@/utils';
 import config from '@test/config';
+import TestUtils from '@test/test-utils';
 
 // Add extensions to chai
 chai.use(spies);
@@ -43,13 +44,10 @@ describe('EscalationLogic.escalate', () => {
 
     const config = Utils.getPlatformConfig(message.platform);
 
-    await new Promise((resolve) => {
-      setTimeout(() => {
-        expect(spyFunctionMail)
-          .to.have.been.called();
-        resolve();
-      }, config.mail.defaults.delay + 1);
-     });
+    await TestUtils.timeout(config.mail.defaults.delay + 10);
+
+    expect(spyFunctionMail)
+      .to.have.been.called();
   });
 
   after('should drop database and close connection', (done) => {
