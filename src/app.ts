@@ -9,7 +9,7 @@ import deviceRouter from '@/routes/device';
 
 function startApiServer() {
   const app: express.Application = express();
-  const port: string = process.env.PORT || '3000';
+  const port: string = process.env.NOTIFICATION_PORT || '3000';
 
   app.use(bodyParser.urlencoded({extended: true}));
   app.use(bodyParser.json());
