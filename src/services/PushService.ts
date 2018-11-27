@@ -25,6 +25,7 @@ export default class PushService extends BaseService {
 
   protected _createTransporter(config: any): firebaseMessaging.Messaging {
     return firebaseAdmin.initializeApp({
+      // https://stackoverflow.com/questions/40799258/where-can-i-get-serviceaccountcredentials-json-for-firebase-admin
       credential: firebaseAdmin.credential.cert(config.push.service_account_object),
       databaseURL: config.push.database_url,
     }).messaging();
