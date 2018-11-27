@@ -7,7 +7,8 @@
     "start": "nodemon",
     "lint": "tslint -p tsconfig.json",
     "server": "ts-node -r tsconfig-paths/register src/app.ts",
-    "dev": "node --inspect=5858 --require ts-node/register --require tsconfig-paths/register src/app.ts",
+    "dev": "NOTIFICATION_PORT=3031 node --inspect=5858 --require ts-node/register --require tsconfig-paths/register src/app.ts",
+    "debug": "NOTIFICATION_PORT=3031 nodemon --inspect=5858 --require ts-node/register --require tsconfig-paths/register src/app.ts",
     "build": "tsc",
     "production": "node -r tsconfig-paths/register build/app.js",
     "test": "mocha -t 30000 -r tsconfig-paths/register -r ts-node/register test/**/*.spec.ts"
