@@ -1,5 +1,5 @@
 export default interface Device {
   platform: string;
-  mail: string;
+  userId: string;
   tokens: string[];
 }

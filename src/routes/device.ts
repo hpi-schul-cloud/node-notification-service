@@ -5,20 +5,38 @@ const router: express.Router = express.Router();
 
 router.post('/', async (req, res) => {
   if (!req.body.platform) {
-    res.status(400).send('Missing body parameter: platform.');
+    return res.status(400).send('Missing body parameter: platform.');
   }
-  if (!req.body.mail) {
-    res.status(400).send('Missing body parameter: mail.');
+  if (!req.body.userId) {
+    return res.status(400).send('Missing body parameter: id.');
   }
   if (!req.body.token) {
-    res.status(400).send('Missing body parameter: token.');
+    return res.status(400).send('Missing body parameter: token.');
   }
 
   try {
-    await DeviceService.addDevice(req.body.platform, req.body.mail, req.body.token);
+    await DeviceService.addDevice(req.body.platform, req.body.userId, req.body.token);
     res.send('The device has been added.');
   } catch (e) {
     res.status(400).send(e.message);
+  }
+});
+
+router.get('/:platform/:id', async (req,res) => {
+  try {
+    const devices = await DeviceService.getDevices(req.params.platform, req.params.id);
+    res.send(devices);
+  } catch (e) {
+    res.status(400).send(e.message);
+  }
+})
+
+router.delete('/:platform/:id/:token', (req,res) => {
+  try{
+    const devices = DeviceService.removeDevice(req.params.platform, req.params.id, req.params.token);
+    res.send(devices);
+  }catch(e){
+    res.status(500).send(e.message);
   }
 });
 

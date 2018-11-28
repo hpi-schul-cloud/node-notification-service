@@ -31,7 +31,7 @@ export default abstract class BaseService {
       const transporter = this.getTransporter(platformId);
       return this._send(transporter, message);
     } catch (e) {
-      return Promise.reject(new Error('Invalid platformId. Platform config not found.'));
+      return Promise.reject(new Error(e.message));
     }
   }
 
