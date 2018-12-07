@@ -1,5 +1,5 @@
 import winston from 'winston';
-import { messaging as firebaseMessaging } from 'firebase-admin';
+import { messaging as firebaseMessaging, FirebaseError } from 'firebase-admin';
 import express from 'express';
 import PushService from '@/services/PushService';
 import DeviceService from '@/services/DeviceService';
@@ -28,10 +28,10 @@ router.post('/', (req, res) => {
   };
 
   Promise.all(req.body.receivers.map((user:string) => {
-    return DeviceService.getDevices(req.body.platformId, user);
-  })).then((devices:any) =>{
+    DeviceService.getDevices(req.body.platformId, user)
+    .then((devices:any) =>{
     return [].concat.apply([],devices); // flatten array
-  }).then(devices=>{
+  }).then((devices:any)=>{
     return Promise.all(devices.map((device:string) =>{
       const message = Object.assign({},push,{token: device});
       return pushService.send(req.body.platformId, message)
@@ -39,9 +39,12 @@ router.post('/', (req, res) => {
         winston.info(response);
         return Promise.resolve();
       })
-      .catch((e: Error) => {
+      .catch((e: FirebaseError) => {
+        if(e.code === 'messaging/registration-token-not-registered'){
+          pushService.removeToken(req.body.platformId, user, device);
+        }
         winston.error(e);
-        return Promise.reject();
+        return Promise.reject(e);
       });
     }));
   }).then(_=>{
@@ -49,6 +52,7 @@ router.post('/', (req, res) => {
   }).catch(err =>{
     res.status(500).send(err);
   });
+}));
 
   
 
