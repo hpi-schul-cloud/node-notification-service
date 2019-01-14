@@ -15,11 +15,10 @@ chai.use(subset);
 const expect = chai.expect;
 
 describe('MessageService.send', () => {
-
   // Instantiate the service
   const messageService = new MessageService();
 
-  before('should establish a database connection.', (done) => {
+  before('should establish a database connection.', done => {
     // connect to database
     const db = mongoose.connection;
     db.on('error', console.error.bind(console, 'connection error:'));
@@ -33,8 +32,7 @@ describe('MessageService.send', () => {
 
     await messageService.send(message);
 
-    expect(spyFunction)
-      .to.have.been.called();
+    expect(spyFunction).to.have.been.called();
   });
 
   it('should write the message to the database.', async () => {
@@ -46,14 +44,42 @@ describe('MessageService.send', () => {
     }
     const databaseMessage: Message = databaseMessageModel.toObject();
 
-    expect(databaseMessage)
-      .to.containSubset(message);
+    expect(databaseMessage).to.containSubset(message);
   });
 
-  after('should drop database and close connection', (done) => {
+  it.only('should mark the message as read.', async () => {
+    const messageId = await messageService.send(message);
+    let databaseMessageModel = await MessageModel.findById(messageId);
+    if (!databaseMessageModel) {
+      expect(databaseMessageModel, 'Could not find message in database.').not.to.be.null;
+      return;
+    }
+    let databaseMessage: Message = databaseMessageModel.toObject();
+    expect(
+      databaseMessage.receivers.length,
+      'Could not find any receiver in message'
+    ).to.be.equal(1);
+    const user: any = databaseMessage.receivers[0];
+    await messageService.seen(messageId, user._id);
+    databaseMessageModel = await MessageModel.findById(messageId);
+    if (!databaseMessageModel) {
+      expect(databaseMessageModel, 'Could not find message in database.').not.to.be.null;
+      return;
+    }
+    databaseMessage = databaseMessageModel.toObject();
+    if (!databaseMessage) {
+      expect(databaseMessage, 'Could not find message in database.').not.to.be.null;
+      return;
+    }
+    expect(
+      databaseMessage.receivers.length,
+      'Could not mark message seen by first receiver'
+    ).to.be.equal(0);
+  });
+
+  after('should drop database and close connection', done => {
     mongoose.connection.db.dropDatabase(() => {
       mongoose.connection.close(done);
     });
   });
-
 });
