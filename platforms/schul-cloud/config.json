@@ -1,0 +1,32 @@
+{
+  "mail": {
+    "options": {
+      "host": "",
+      "port": 465,
+      "secure": true,
+      "auth": {
+        "user": "",
+        "pass": ""
+      }
+    },
+    "defaults": {
+      "from": "Sample Service <sample@sample.org>",
+      "delay": 0
+    }
+  },
+  "push": {
+    "service_account_object": {
+      "type": "",
+      "project_id": "",
+      "private_key_id": "",
+      "private_key": "",
+      "client_email": "",
+      "client_id": "",
+      "auth_uri": "",
+      "token_uri": "",
+      "auth_provider_x509_cert_url": "",
+      "client_x509_cert_url": ""
+    },
+    "database_url": ""
+  }
+}
