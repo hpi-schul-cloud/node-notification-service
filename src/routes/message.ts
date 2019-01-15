@@ -59,4 +59,16 @@ router.post('/:messageId/seen', async (req, res) => {
   }
 });
 
+router.post('/user', async (req, res) => {
+  if (!req.body.userId) {
+    res.status(400).send('Missing url parameter: userId.');
+  }
+  try {
+    const messages = await messageService.byUser(req.params.userId);
+    res.send(messages);
+  } catch (e) {
+    res.status(400).send(e.message);
+  }
+});
+
 export default router;

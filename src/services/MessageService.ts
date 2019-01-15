@@ -1,6 +1,7 @@
 import EscalationLogic from '@/services/EscalationLogic';
 import RequestMessage from '@/interfaces/RequestMessage';
 import MessageModel from '@/models/message';
+import mongoose from 'mongoose';
 import axios from 'axios';
 import winston from 'winston';
 
@@ -71,6 +72,14 @@ export default class MessageService {
     message.receivers.pull(user._id);
     return await message.save();
   }
+
+  private static async messagesByUser(userId: string) {
+    const messages = await MessageModel.find(
+      // todo update mail to identifier
+      { 'receivers.mail': { $in: userId } },
+    );
+    return messages;
+  }
   // endregion
 
   // region public members
@@ -95,6 +104,10 @@ export default class MessageService {
 
   public async seen(messageId: string, userId: string) {
     return await MessageService.unregisterNotification(messageId, userId);
+  }
+
+  public async byUser(userId: string): Promise<any> {
+    return await MessageService.messagesByUser(userId);
   }
   // endregion
 

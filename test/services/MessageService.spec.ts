@@ -8,6 +8,7 @@ import MessageModel from '@/models/message';
 import MessageService from '@/services/MessageService';
 import message from '@test/data/message';
 import config from '@test/config';
+import UserResource from '@/interfaces/UserResource';
 
 // Add extensions to chai
 chai.use(spies);
@@ -18,7 +19,7 @@ describe('MessageService.send', () => {
   // Instantiate the service
   const messageService = new MessageService();
 
-  before('should establish a database connection.', done => {
+  before('should establish a database connection.', (done) => {
     // connect to database
     const db = mongoose.connection;
     db.on('error', console.error.bind(console, 'connection error:'));
@@ -47,7 +48,7 @@ describe('MessageService.send', () => {
     expect(databaseMessage).to.containSubset(message);
   });
 
-  it.only('should mark the message as read.', async () => {
+  it('should mark the message as read.', async () => {
     const messageId = await messageService.send(message);
     let databaseMessageModel = await MessageModel.findById(messageId);
     if (!databaseMessageModel) {
@@ -57,7 +58,7 @@ describe('MessageService.send', () => {
     let databaseMessage: Message = databaseMessageModel.toObject();
     expect(
       databaseMessage.receivers.length,
-      'Could not find any receiver in message'
+      'Could not find any receiver in message',
     ).to.be.equal(1);
     const user: any = databaseMessage.receivers[0];
     await messageService.seen(messageId, user._id);
@@ -73,11 +74,19 @@ describe('MessageService.send', () => {
     }
     expect(
       databaseMessage.receivers.length,
-      'Could not mark message seen by first receiver'
+      'Could not mark message seen by first receiver',
     ).to.be.equal(0);
   });
 
-  after('should drop database and close connection', done => {
+  it('should return user messages', async () => {
+    const messageId = await messageService.send(message);
+    const receivers: any = message.receivers;
+    const userId = receivers[0]['mail'];
+    const messages = await messageService.byUser(userId);
+    expect(messages.length).to.be.greaterThan(0);
+  });
+
+  after('should drop database and close connection', (done) => {
     mongoose.connection.db.dropDatabase(() => {
       mongoose.connection.close(done);
     });
