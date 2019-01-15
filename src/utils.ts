@@ -2,10 +2,19 @@ import yaml from 'js-yaml';
 import fs from 'fs';
 import path from 'path';
 import Template from '@/interfaces/Template';
+import winston from 'winston';
+
 
 export default class Utils {
   public static getPlatformConfig(platformId: string): any {
-    return require(`../platforms/${platformId}/config.json`);
+    let config = {};
+    try {
+      config = require(`../platforms/${platformId}/config.json`)
+    } catch (err) {
+      winston.error('config.json missing. copy config.default.json to selected platform folder and rename.');
+      config = require(`../platforms/config.default.json`);
+    }
+    return config;
   }
 
   public static loadTemplate(platformId: string, templateId: string, type: string): Template {
