@@ -81,7 +81,7 @@ describe('MessageService.send', () => {
   it('should return user messages', async () => {
     const messageId = await messageService.send(message);
     const receivers: any = message.receivers;
-    const userId = receivers[0]['mail'];
+    const userId = receivers[0].mail;
     const messages = await messageService.byUser(userId);
     expect(messages.length).to.be.greaterThan(0);
   });
