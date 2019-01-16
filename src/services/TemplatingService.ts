@@ -18,9 +18,9 @@ export default class TemplatingService {
   // endregion
 
   // region private static methods
-  private static initializeMessageTemplates(platformId: string, templateId: string): Template[] {
+  private static initializeMessageTemplates(platformId: string, templateId: string, language?: string): Template[] {
     return [MAIL_MESSAGE, PUSH_MESSAGE].map((type) => {
-      const messageTemplate = Utils.loadTemplate(platformId, templateId, type);
+      const messageTemplate = Utils.loadTemplate(platformId, templateId, type, language);
       TemplatingService.parseMessageTemplate(messageTemplate);
       return messageTemplate;
     });
@@ -81,10 +81,10 @@ export default class TemplatingService {
 
   // region constructor
 
-  public constructor(platformId: string, templateId: string, payload: {}, languagePayloads: LanguagePayload[], messageId: string) {
+  public constructor(platformId: string, templateId: string, payload: {}, languagePayloads: LanguagePayload[], messageId: string, language?: string) {
     this.platform = platformId;
     this.messageId = messageId;
-    this.parsedMessageTemplates = TemplatingService.initializeMessageTemplates(platformId, templateId);
+    this.parsedMessageTemplates = TemplatingService.initializeMessageTemplates(platformId, templateId, language);
     this.messagePayloads = TemplatingService.initializeMessagePayloads(payload, languagePayloads);
   }
 

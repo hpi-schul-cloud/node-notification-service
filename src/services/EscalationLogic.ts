@@ -45,8 +45,7 @@ export default class EscalationLogic {
     const message: Message = databaseMessage.toObject();
 
     // Construct Templating Service
-    const templatingService: TemplatingService = new TemplatingService(message.platform, message.template,
-      message.payload, message.languagePayloads, messageId);
+    let templatingService: TemplatingService;
 
     // Send push messages
     for (const receiver of message.receivers) {
@@ -56,6 +55,9 @@ export default class EscalationLogic {
 
       const receiverDevices = await DeviceService.getDevices(message.platform, receiver.mail);
       for (const device of receiverDevices) {
+        // todo avoid recreation of templatingService for each receiver device/user
+        templatingService = new TemplatingService(message.platform, message.template,
+          message.payload, message.languagePayloads, messageId, receiver.language);
         const pushMessage = templatingService.createPushMessage(receiver, device);
         this.pushService.send(message.platform, pushMessage);
       }
@@ -63,12 +65,12 @@ export default class EscalationLogic {
 
     // Send mail messages after 4 hours delay
     const config = Utils.getPlatformConfig(message.platform);
-    setTimeout(() => { this.sendMailMessages(messageId, templatingService); }, config.mail.defaults.delay);
+    setTimeout(() => { this.sendMailMessages(messageId); }, config.mail.defaults.delay);
   }
   // endregion
 
   // region private methods
-  private async sendMailMessages(messageId: string, templatingService: TemplatingService) {
+  private async sendMailMessages(messageId: string) {
     // Fetch message again to get updated list of receivers
     const message = await MessageModel.findById(messageId);
 
@@ -82,6 +84,9 @@ export default class EscalationLogic {
       if (!receiver.preferences.mail) {
         continue;
       }
+
+      const templatingService = new TemplatingService(message.platform, message.template,
+        message.payload, message.languagePayloads, messageId, receiver.language);
 
       const mailMessage = templatingService.createMailMessage(receiver);
       this.mailService.send(message.platform, mailMessage);
