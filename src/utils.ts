@@ -6,6 +6,8 @@ import winston from 'winston';
 
 
 export default class Utils {
+
+
   public static getPlatformConfig(platformId: string): any {
     let config = {};
     try {
@@ -23,5 +25,17 @@ export default class Utils {
     const template = yaml.safeLoad(fs.readFileSync(templatePath, 'utf8'));
     template.type = type;
     return template;
+  }
+
+  public static mustacheFunctions(platformId: string, messageId: string): any {
+    const config = Utils.getPlatformConfig(platformId);
+    return {
+      callbackLink: function () {
+        let url = config.callback.url;
+        return function (text: any, render: any) {
+          return url.replace('{MESSAGE_ID}', messageId).replace('{REDIRECT_URL}', render(text));
+        };
+      }
+    }
   }
 }

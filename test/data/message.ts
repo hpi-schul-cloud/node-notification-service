@@ -9,6 +9,7 @@ const message: RequestMessage = {
   },
   payload: {
     title: 'Test Title',
+    url: 'http://example.com'
   },
   languagePayloads: [
     {

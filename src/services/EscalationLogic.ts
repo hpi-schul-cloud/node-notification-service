@@ -46,7 +46,7 @@ export default class EscalationLogic {
 
     // Construct Templating Service
     const templatingService: TemplatingService = new TemplatingService(message.platform, message.template,
-      message.payload, message.languagePayloads);
+      message.payload, message.languagePayloads, messageId);
 
     // Send push messages
     for (const receiver of message.receivers) {
@@ -70,7 +70,7 @@ export default class EscalationLogic {
   // region private methods
   private async sendMailMessages(messageId: string, templatingService: TemplatingService) {
     // Fetch message again to get updated list of receivers
-    const message =  await MessageModel.findById(messageId);
+    const message = await MessageModel.findById(messageId);
 
     if (!message) {
       const errorMessage = `Could not send mail messages: Message (id: ${messageId}) not found.`;

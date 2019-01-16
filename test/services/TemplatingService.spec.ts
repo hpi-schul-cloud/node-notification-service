@@ -7,8 +7,9 @@ import TemplatingService from '@/services/TemplatingService';
 import message from '@test/data/message';
 
 // Instantiate the service
+const messageId = 'a1a2a3a4a5a6a7a8a9a0a1a2';
 const templatingService =
-  new TemplatingService(message.platform, message.template, message.payload, message.languagePayloads);
+  new TemplatingService(message.platform, message.template, message.payload, message.languagePayloads, messageId);
 const receiver: UserResource = (message.receivers[0] as UserResource);
 
 describe('TemplatingService.createMailMessage', () => {
@@ -94,6 +95,47 @@ describe('TemplatingService.createPushMessage', () => {
 
     expect(push.notification.body)
       .to.equal(message.languagePayloads[0].payload.description);
+  });
+
+});
+
+describe('TemplatingService.createMailMessage with callbackLink', () => {
+
+  let mail: Mail;
+  let templatingService = new TemplatingService(message.platform, 'callback-link', message.payload, message.languagePayloads, messageId);
+
+
+  beforeEach('create a mail message.', () => {
+    mail = templatingService.createMailMessage(receiver);
+  });
+
+  it('should replace placeholders with payload values.', () => {
+
+    expect(mail.subject)
+      .to.equal(message.payload.title);
+
+    expect(mail.text)
+      .to.equal(`Greetings ${receiver.payload.name}!`);
+
+    const html = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
+          <title>HTML Mail</title>
+        </head>
+        <body>
+          <h1>${ message.payload.title}</h1>
+          <a href="http://localhost:3100/notification/callback/${messageId}/seen?redirect=${message.payload.url}">Test Description</a>
+          <p>Greetings ${ receiver.payload.name}!</p>
+        </body>
+      </html>
+      `;
+
+    const regex = /[\s\n\r\t\0]/g;
+
+    expect(mail.html.replace(regex, ''))
+      .to.equal(html.replace(regex, ''));
   });
 
 });
