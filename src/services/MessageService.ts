@@ -54,6 +54,21 @@ export default class MessageService {
     } while (pageUrl);
   }
 
+  private static async messageSeen(messageId: string, userId: string) {
+    const message = await MessageModel.findById(messageId);
+    if (!message) {
+      const errorMessage = `Could not unregister Notification: Message (id: ${messageId}) not found.`;
+      winston.error(errorMessage);
+      throw new Error(errorMessage);
+    }
+    if (!(userId in message.seen)) {
+      message.seen.push(userId);
+      return await message.save();
+    } else {
+      return message;
+    }
+  }
+
   private static async unregisterNotification(messageId: string, userId: string) {
     const message = await MessageModel.findById(messageId);
     if (!message) {
@@ -103,7 +118,7 @@ export default class MessageService {
   }
 
   public async seen(messageId: string, userId: string) {
-    return await MessageService.unregisterNotification(messageId, userId);
+    return await MessageService.messageSeen(messageId, userId);
   }
 
   public async byUser(userId: string): Promise<any> {

@@ -95,7 +95,7 @@ export default class TemplatingService {
   public createMailMessage(user: UserResource): Mail {
     const template = this.getTemplate(MAIL_MESSAGE);
     const payload = this.getUserPayload(user);
-    const functions = this.getMustacheFunctions();
+    const functions = this.getMustacheFunctions(user);
     const renderedTemplate = TemplatingService.renderMessageTemplate(template, payload, functions);
 
     const mail = {
@@ -112,7 +112,7 @@ export default class TemplatingService {
 
     const template = this.getTemplate(PUSH_MESSAGE);
     const payload = this.getUserPayload(user);
-    const functions = this.getMustacheFunctions();
+    const functions = this.getMustacheFunctions(user);
     const renderedTemplate = TemplatingService.renderMessageTemplate(template, payload, functions);
     const push = {
       token: device,
@@ -129,8 +129,8 @@ export default class TemplatingService {
 
   // region private methods
 
-  private getMustacheFunctions(): any {
-    return Utils.mustacheFunctions(this.platform, this.messageId);
+  private getMustacheFunctions(user: any): any {
+    return Utils.mustacheFunctions(this.platform, this.messageId, user.id);
   }
 
   private getTemplate(type: string): Template {
