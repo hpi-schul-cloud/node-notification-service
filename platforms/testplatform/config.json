@@ -30,6 +30,6 @@
     "database_url": ""
   },
   "callback": {
-    "url": "http://localhost:3100/notification/callback/{MESSAGE_ID}/seen?redirect={REDIRECT_URL}"
+    "url": "http://localhost:3100/notification/callback/{MESSAGE_ID}/seenBy/{RECEIVER_ID}/?redirect={REDIRECT_URL}"
   }
 }

@@ -38,7 +38,7 @@ describe('TemplatingService.createMailMessage', () => {
       .to.not.to.have.lengthOf(0);
   });
 
-  it('should replace placeholders with payload values.', () => {
+  it('should replace placeholders with payload values (1).', () => {
 
     expect(mail.subject)
       .to.equal(message.payload.title);
@@ -83,7 +83,7 @@ describe('TemplatingService.createPushMessage', () => {
 
   });
 
-  it('should replace placeholders with payload values.', () => {
+  it('should replace placeholders with payload values (2).', () => {
 
     if (!push.notification) {
       expect(push.notification, 'Push template has no notification.').not.to.be.undefined;
@@ -109,7 +109,7 @@ describe('TemplatingService.createMailMessage with callbackLink', () => {
     mail = templatingService.createMailMessage(receiver);
   });
 
-  it('should replace placeholders with payload values.', () => {
+  it('should replace placeholders with payload values (3).', () => {
 
     expect(mail.subject)
       .to.equal(message.payload.title);
@@ -126,7 +126,7 @@ describe('TemplatingService.createMailMessage with callbackLink', () => {
         </head>
         <body>
           <h1>${ message.payload.title}</h1>
-          <a href="http://localhost:3100/notification/callback/${messageId}/seen?redirect=${message.payload.url}">Test Description</a>
+          <a href="http://localhost:3100/notification/callback/${messageId}/seenBy/${receiver.id}/?redirect=${message.payload.url}">Test Description</a>
           <p>Greetings ${ receiver.payload.name}!</p>
         </body>
       </html>

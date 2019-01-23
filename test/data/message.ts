@@ -33,6 +33,7 @@ const message: RequestMessage = {
       },
     },
   ],
+  seen: []
 };
 
 export default message;
