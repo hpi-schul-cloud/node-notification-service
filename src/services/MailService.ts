@@ -25,6 +25,7 @@ export default class MailService extends BaseService {
   }
 
   protected _createTransporter(config: any): nodeMailer.Transporter {
+    // todo check default from becomes defined
     return nodeMailer.createTransport(config.mail.options, config.mail.defaults);
   }
 

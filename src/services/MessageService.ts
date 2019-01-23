@@ -93,6 +93,7 @@ export default class MessageService {
       // todo update mail to identifier
       { 'receivers.mail': { $in: userId } },
     );
+    // todo rewrite seen to boolean, if userid in seen
     return messages;
   }
   // endregion
@@ -119,6 +120,12 @@ export default class MessageService {
 
   public async seen(messageId: string, userId: string) {
     return await MessageService.messageSeen(messageId, userId);
+  }
+
+  public async remove(messageId: string, userId: string) {
+    //return await MessageService.unregisterNotification(messageId, userId);
+    // todo remove message if last receiver has beren removed
+    // todo test this
   }
 
   public async byUser(userId: string): Promise<any> {
