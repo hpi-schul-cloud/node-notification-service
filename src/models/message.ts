@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import Message from '@/interfaces/Message';
 import UserResource from '@/interfaces/UserResource';
 
-export interface UserResourceModel extends UserResource, mongoose.Types.Subdocument {}
+export interface UserResourceModel extends UserResource, mongoose.Types.Subdocument { }
 
 export interface MessageModel extends Message, mongoose.Document {
   receivers: mongoose.Types.DocumentArray<UserResourceModel>;
@@ -30,8 +30,9 @@ export const messageSchema = new mongoose.Schema({
       payload: Object,
     },
   ],
-  receivers: [ userResourceSchema ],
+  receivers: [userResourceSchema],
   trackLinks: Boolean,
+  seen: [String],
 });
 
 const messageModel: mongoose.Model<MessageModel> = mongoose.model('Message', messageSchema);

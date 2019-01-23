@@ -12,13 +12,15 @@ const MAIL_MESSAGE = 'MAIL';
 const PUSH_MESSAGE = 'PUSH';
 
 export default class TemplatingService {
+  platform: string;
+  messageId: string;
   // region public static methods
   // endregion
 
   // region private static methods
-  private static initializeMessageTemplates(platformId: string, templateId: string): Template[] {
+  private static initializeMessageTemplates(platformId: string, templateId: string, language?: string): Template[] {
     return [MAIL_MESSAGE, PUSH_MESSAGE].map((type) => {
-      const messageTemplate = Utils.loadTemplate(platformId, templateId, type);
+      const messageTemplate = Utils.loadTemplate(platformId, templateId, type, language);
       TemplatingService.parseMessageTemplate(messageTemplate);
       return messageTemplate;
     });
@@ -38,16 +40,17 @@ export default class TemplatingService {
     }
   }
 
-  private static renderMessageTemplate(template: Template, payload: Payload): Template {
+  private static renderMessageTemplate(template: Template, payload: Payload, functions?: any): Template {
+    const enrichedPayload = Object.assign({}, payload, functions ? functions : {});
     const compiledTemplate = Object.assign({}, template);
     for (const key in compiledTemplate) {
       if (compiledTemplate.hasOwnProperty(key)) {
         const value = compiledTemplate[key];
 
         if (typeof value === 'object') {
-          compiledTemplate[key] = this.renderMessageTemplate(value, payload);
+          compiledTemplate[key] = this.renderMessageTemplate(value, enrichedPayload);
         } else if (typeof value === 'string') {
-          compiledTemplate[key] = Mustache.render(value, payload);
+          compiledTemplate[key] = Mustache.render(value, enrichedPayload);
         }
       }
     }
@@ -78,8 +81,10 @@ export default class TemplatingService {
 
   // region constructor
 
-  public constructor(platformId: string, templateId: string, payload: {}, languagePayloads: LanguagePayload[]) {
-    this.parsedMessageTemplates = TemplatingService.initializeMessageTemplates(platformId, templateId);
+  public constructor(platformId: string, templateId: string, payload: {}, languagePayloads: LanguagePayload[], messageId: string, language?: string) {
+    this.platform = platformId;
+    this.messageId = messageId;
+    this.parsedMessageTemplates = TemplatingService.initializeMessageTemplates(platformId, templateId, language);
     this.messagePayloads = TemplatingService.initializeMessagePayloads(payload, languagePayloads);
   }
 
@@ -90,7 +95,8 @@ export default class TemplatingService {
   public createMailMessage(user: UserResource): Mail {
     const template = this.getTemplate(MAIL_MESSAGE);
     const payload = this.getUserPayload(user);
-    const renderedTemplate = TemplatingService.renderMessageTemplate(template, payload);
+    const functions = this.getMustacheFunctions(user);
+    const renderedTemplate = TemplatingService.renderMessageTemplate(template, payload, functions);
 
     const mail = {
       from: renderedTemplate.from,
@@ -106,7 +112,8 @@ export default class TemplatingService {
 
     const template = this.getTemplate(PUSH_MESSAGE);
     const payload = this.getUserPayload(user);
-    const renderedTemplate = TemplatingService.renderMessageTemplate(template, payload);
+    const functions = this.getMustacheFunctions(user);
+    const renderedTemplate = TemplatingService.renderMessageTemplate(template, payload, functions);
     const push = {
       token: device,
       data: renderedTemplate.data,
@@ -121,10 +128,15 @@ export default class TemplatingService {
   // endregion
 
   // region private methods
+
+  private getMustacheFunctions(user: any): any {
+    return Utils.mustacheFunctions(this.platform, this.messageId, user.id);
+  }
+
   private getTemplate(type: string): Template {
-    const parsedMessageTemplate = this.parsedMessageTemplates.find( (template) => {
+    const parsedMessageTemplate = this.parsedMessageTemplates.find((template) => {
       return template.type === type;
-    } );
+    });
 
     if (!parsedMessageTemplate) {
       const errorMessage = `Could not find message template for type ${type}`;
@@ -136,7 +148,7 @@ export default class TemplatingService {
   }
 
   private getUserPayload(user: UserResource): Payload {
-    const messagePayload = this.messagePayloads.find( (payload) => payload.languageId === user.language );
+    const messagePayload = this.messagePayloads.find((payload) => payload.languageId === user.language);
 
     if (!messagePayload) {
       const errorMessage = `Could not find message payload for language ${user.language}`;

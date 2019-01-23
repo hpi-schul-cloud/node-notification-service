@@ -1,0 +1,16 @@
+subject:  "Neue News sind verfügbar!"
+text: |
+  Neue News sind verfügbar: {{ message.title }}
+  News anzeigen: {{#callbackLink}}url{{/callbackLink}}
+html: |
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
+      <title>HTML Mail</title>
+    </head>
+    <body>
+      <h1>Neue News sind verfügbar!</h1>
+      <span>News anzeigen: <a href='{{#callbackLink}}url{{/callbackLink}}'>{{ message.title }}</a></span>
+    </body>
+  </html>
