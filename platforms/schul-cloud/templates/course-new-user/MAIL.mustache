@@ -1,0 +1,16 @@
+subject:  "Ein neuer Kurs ist verfügbar"
+text: |
+  Ein neuer Kurs ist verfügbar: {{ message.title }}
+  Kurs anzeigen: {{ message.url }}
+html: |
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
+      <title>HTML Mail</title>
+    </head>
+    <body>
+      <h1>Ein neuer Kurs ist verfügbar</h1>
+      <span>Kurs anzeigen: <a href='{{ message.url }}'>{{ message.title }}</a></span>
+    </body>
+  </html>

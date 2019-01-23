@@ -1,6 +1,7 @@
 import EscalationLogic from '@/services/EscalationLogic';
 import RequestMessage from '@/interfaces/RequestMessage';
 import MessageModel from '@/models/message';
+import mongoose from 'mongoose';
 import axios from 'axios';
 import winston from 'winston';
 
@@ -53,6 +54,21 @@ export default class MessageService {
     } while (pageUrl);
   }
 
+  private static async messageSeen(messageId: string, userId: string) {
+    const message = await MessageModel.findById(messageId);
+    if (!message) {
+      const errorMessage = `Could not unregister Notification: Message (id: ${messageId}) not found.`;
+      winston.error(errorMessage);
+      throw new Error(errorMessage);
+    }
+    if (!(userId in message.seen)) {
+      message.seen.push(userId);
+      return await message.save();
+    } else {
+      return message;
+    }
+  }
+
   private static async unregisterNotification(messageId: string, userId: string) {
     const message = await MessageModel.findById(messageId);
     if (!message) {
@@ -61,16 +77,23 @@ export default class MessageService {
       throw new Error(errorMessage);
     }
 
-    const user = message.receivers.find((receiver) => receiver._id.toString() === userId);
+    const user = message.receivers.find((receiver) => receiver._id.toString() === userId.toString());
     if (!user) {
-      const errorMessage =
-        `Could not unregister Notification: User (id: ${userId}) not found in Message (id: ${messageId}).`;
+      const errorMessage = `Could not unregister Notification: User (id: ${userId}) not found in Message (id: ${messageId}).`;
       winston.error(errorMessage);
       throw new Error(errorMessage);
     }
 
     message.receivers.pull(user._id);
-    await message.save();
+    return await message.save();
+  }
+
+  private static async messagesByUser(userId: string) {
+    const messages = await MessageModel.find(
+      // todo update mail to identifier
+      { 'receivers.mail': { $in: userId } },
+    );
+    return messages;
   }
   // endregion
 
@@ -95,7 +118,11 @@ export default class MessageService {
   }
 
   public async seen(messageId: string, userId: string) {
-    return await MessageService.unregisterNotification(messageId, userId);
+    return await MessageService.messageSeen(messageId, userId);
+  }
+
+  public async byUser(userId: string): Promise<any> {
+    return await MessageService.messagesByUser(userId);
   }
   // endregion
 

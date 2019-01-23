@@ -13,4 +13,5 @@ export default interface Message {
   languagePayloads: LanguagePayload[];
   receivers: UserResource[];
   trackLinks?: boolean;
+  seen: [string];
 }

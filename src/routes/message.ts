@@ -43,17 +43,37 @@ router.post('/', (req, res) => {
   res.send('Message queued.');
 });
 
+/**
+ * mark message as seen by given user and optionally responds with redirect url
+ */
 router.post('/:messageId/seen', async (req, res) => {
   if (!req.params.messageId) {
     res.status(400).send('Missing url parameter: messageId.');
   }
-  if (!req.body.userId) {
+  if (!req.body.receiverId) {
     res.status(400).send('Missing body parameter: userId.');
   }
 
   try {
-    await messageService.seen(req.params.messageId, req.body.userId);
-    res.send('The message has been marked as seen.');
+    const message = await messageService.seen(req.params.messageId, req.body.receiverId);
+    if (req.body.redirect && message && message.payload && req.body.redirect in message.payload) {
+      const payload: any = message.payload;
+      return res.send({ redirect: payload[req.body.redirect], status: 'success' });
+    } else {
+      res.send({ status: 'success', redirect: null });
+    }
+  } catch (e) {
+    res.status(400).send(e.message);
+  }
+});
+
+router.post('/user', async (req, res) => {
+  if (!req.body.userId) {
+    res.status(400).send('Missing url parameter: userId.');
+  }
+  try {
+    const messages = await messageService.byUser(req.params.userId);
+    res.send(messages);
   } catch (e) {
     res.status(400).send(e.message);
   }

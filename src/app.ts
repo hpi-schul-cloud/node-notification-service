@@ -9,9 +9,9 @@ import deviceRouter from '@/routes/device';
 
 function startApiServer() {
   const app: express.Application = express();
-  const port: string = process.env.PORT || '3000';
+  const port: string = process.env.NOTIFICATION_PORT || '3000';
 
-  app.use(bodyParser.urlencoded({extended: true}));
+  app.use(bodyParser.urlencoded({ extended: true }));
   app.use(bodyParser.json());
 
   app.use('/mails', mailRouter);
@@ -71,7 +71,7 @@ function startApiServer() {
     }
 
     const links = {
-      next: `http://localhost:3000/users?page=${ parseInt(req.query.page, 10) + 1 }`,
+      next: `http://localhost:3000/users?page=${parseInt(req.query.page, 10) + 1}`,
     };
 
     res.json({
