@@ -35,7 +35,7 @@ const message: RequestMessage = {
       },
     },
   ],
-  seen: []
+  seenCallback: []
 };
 
 export default message;

@@ -54,15 +54,15 @@ export default class MessageService {
     } while (pageUrl);
   }
 
-  private static async messageSeen(messageId: string, userId: string) {
+  private static async messageSeen(messageId: string, userId: mongoose.Types.ObjectId) {
     const message = await MessageModel.findById(messageId);
     if (!message) {
       const errorMessage = `Could not unregister Notification: Message (id: ${messageId}) not found.`;
       winston.error(errorMessage);
       throw new Error(errorMessage);
     }
-    if (!(userId in message.seen)) {
-      message.seen.push(userId);
+    if (message.seenCallback.filter(cb => cb.userId === userId).length === 0) {
+      message.seenCallback.push({ userId, createdAt: Date.now() });
       return await message.save();
     } else {
       return message;
@@ -119,7 +119,7 @@ export default class MessageService {
   }
 
   public async seen(messageId: string, userId: string) {
-    return await MessageService.messageSeen(messageId, userId);
+    return await MessageService.messageSeen(messageId, mongoose.Types.ObjectId(userId));
   }
 
   public async remove(messageId: string, userId: string) {

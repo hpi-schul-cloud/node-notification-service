@@ -73,9 +73,9 @@ describe('MessageService.send', () => {
       return;
     }
     expect(
-      databaseMessage.seen,
+      databaseMessage.seenCallback[0],
       'Could not mark message seen by first receiver',
-    ).to.contain(user._id.toString());
+    ).to.containSubset({ userId: user._id });
   });
 
   it('should return user messages', async () => {

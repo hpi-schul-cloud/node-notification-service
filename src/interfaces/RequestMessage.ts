@@ -1,5 +1,6 @@
 import UserResource from '@/interfaces/UserResource';
 import LanguagePayload from '@/interfaces/LanguagePayload';
+import Callback from '@/interfaces/Callback';
 
 
 export default interface RequestMessage {
@@ -13,5 +14,5 @@ export default interface RequestMessage {
   languagePayloads: LanguagePayload[];
   receivers: UserResource[] | string;
   trackLinks?: boolean;
-  seen: string[];
+  seenCallback: Callback[];
 }

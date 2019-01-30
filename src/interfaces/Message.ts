@@ -1,6 +1,7 @@
 import UserResource from '@/interfaces/UserResource';
 import LanguagePayload from '@/interfaces/LanguagePayload';
-
+import Callback from '@/interfaces/Callback';
+import { Types } from 'mongoose';
 
 export default interface Message {
   platform: string;
@@ -13,5 +14,5 @@ export default interface Message {
   languagePayloads: LanguagePayload[];
   receivers: UserResource[];
   trackLinks?: boolean;
-  seen: [string];
+  seenCallback: Callback[];
 }
