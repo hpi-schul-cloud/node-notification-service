@@ -34,6 +34,19 @@ const message: RequestMessage = {
         mail: true,
       },
     },
+    {
+      name: 'Test Receiver 2',
+      mail: 'receiver2@test.test',
+      userId: mongoose.Types.ObjectId('4ede40c86362e0fb12000002'),
+      payload: {
+        name: 'Test Receiver 2',
+      },
+      language: 'en',
+      preferences: {
+        push: true,
+        mail: true,
+      },
+    },
   ],
   seenCallback: []
 };

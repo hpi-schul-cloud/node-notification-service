@@ -78,12 +78,17 @@ describe('MessageService.send', () => {
     ).to.containSubset({ userId: user._id });
   });
 
-  it('should return user messages', async () => {
+  it.only('should return user messages', async () => {
     const messageId = await messageService.send(message);
     const receivers: any = message.receivers;
-    const userId = receivers[0].mail;
+    const userId = receivers[0].userId;
+    await messageService.seen(messageId, userId);
+    await messageService.seen(messageId, '507f191e810c19729de860ea');
     const messages = await messageService.byUser(userId);
-    expect(messages.length).to.be.greaterThan(0);
+    expect(messages.length).to.be.equal(1);
+    const dbMessage = messages[0];
+    expect(dbMessage.receivers.length, 'foreign receivers should be removed for export to user').to.be.equal(1);
+    expect(dbMessage.seenCallback.length, 'foreign callbacks should be removed for export to user').to.be.equal(1);
   });
 
   after('should drop database and close connection', (done) => {

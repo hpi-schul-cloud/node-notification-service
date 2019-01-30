@@ -1,6 +1,7 @@
 import EscalationLogic from '@/services/EscalationLogic';
 import RequestMessage from '@/interfaces/RequestMessage';
 import MessageModel from '@/models/message';
+import Message from '@/interfaces/Message';
 import mongoose from 'mongoose';
 import axios from 'axios';
 import winston from 'winston';
@@ -88,13 +89,28 @@ export default class MessageService {
     return await message.save();
   }
 
-  private static async messagesByUser(userId: string) {
-    const messages = await MessageModel.find(
-      // todo update mail to identifier
-      { 'receivers.mail': { $in: userId } },
-    );
-    // todo rewrite seen to boolean, if userid in seen
-    return messages;
+  /**
+   * populates and cleanup message from other users data like other receivers or callbacks 
+   * @param message
+   * @param userId 
+   */
+  private static filter(message: Message, userId: mongoose.Types.ObjectId) {
+    message.receivers = message.receivers.filter(receiver => receiver.userId.equals(userId));
+    message.seenCallback = message.seenCallback.filter(callback => callback.userId.equals(userId));
+    return message;
+  }
+
+  private static async messagesByUser(userId: mongoose.Types.ObjectId) {
+    const messages = await MessageModel
+      .find({ 'receivers.userId': { $in: userId } })
+      .populate({ path: 'receivers' })
+      .populate({ path: 'seenCallback' })
+      .exec();
+    if (messages && messages.length !== 0) {
+      return messages.map(message => this.filter(message.toObject(), userId));
+    } else {
+      return [];
+    }
   }
   // endregion
 
@@ -129,7 +145,8 @@ export default class MessageService {
   }
 
   public async byUser(userId: string): Promise<any> {
-    return await MessageService.messagesByUser(userId);
+    // todo add paging
+    return await MessageService.messagesByUser(mongoose.Types.ObjectId(userId));
   }
   // endregion
 
