@@ -1,13 +1,13 @@
-import { Document, Schema, Model, model } from 'mongoose';
+import { Document, Schema, Model, model, Types } from 'mongoose';
 import Device from '@/interfaces/Device';
 
 export interface IDeviceModel extends Device, Document {
 }
 
 const deviceSchema = new Schema({
-  userId: String,
+  userId: Types.ObjectId,
   platform: String,
-  tokens: [ String ],
+  tokens: [String],
 });
 
 const deviceModel: Model<IDeviceModel> = model('Device', deviceSchema);

@@ -29,7 +29,7 @@ describe('EscalationLogic.escalate', () => {
 
   it('should call the escalation logic.', async () => {
     // add test device
-    await DeviceService.addDevice(device.platform, device.mail, device.tokens[0]);
+    await DeviceService.addDevice(device.platform, device.userId, device.tokens[0]);
 
     // use spies for push and mail service
     const spyFunctionPush = chai.spy();

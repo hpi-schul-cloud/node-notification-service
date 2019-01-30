@@ -126,7 +126,7 @@ describe('TemplatingService.createMailMessage with callbackLink', () => {
         </head>
         <body>
           <h1>${ message.payload.title}</h1>
-          <a href="http://localhost:3100/notification/callback/${messageId}/seenBy/${receiver.id}/?redirect=${message.payload.url}">Test Description</a>
+          <a href="http://localhost:3100/notification/callback/${messageId}/seenBy/${receiver.userId}/?redirect=${message.payload.url}">Test Description</a>
           <p>Greetings ${ receiver.payload.name}!</p>
         </body>
       </html>

@@ -130,7 +130,7 @@ export default class TemplatingService {
   // region private methods
 
   private getMustacheFunctions(user: any): any {
-    return Utils.mustacheFunctions(this.platform, this.messageId, user.id);
+    return Utils.mustacheFunctions(this.platform, this.messageId, user.userId);
   }
 
   private getTemplate(type: string): Template {

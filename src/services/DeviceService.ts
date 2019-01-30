@@ -1,10 +1,11 @@
 import winston from 'winston';
 import DeviceModel from '@/models/device';
 import Device from '../interfaces/Device';
+import mongoose from 'mongoose';
 
 export default class DeviceService {
   // region public static methods
-  public static async addDevice(platform: string, userId: string, token: string): Promise<string> {
+  public static async addDevice(platform: string, userId: mongoose.Types.ObjectId, token: string): Promise<string> {
     let device = await DeviceModel.findOne({ platform, userId });
     if (!device) {
       device = new DeviceModel({
@@ -25,23 +26,23 @@ export default class DeviceService {
     return savedDevice.id;
   }
 
-  public static async getDevices(platform: string, userId: string): Promise<string[]> {
+  public static async getDevices(platform: string, userId: mongoose.Types.ObjectId): Promise<string[]> {
     const devices = await DeviceModel.findOne({ platform, userId });
-    if (!devices){
+    if (!devices) {
       return [];
     }
     return devices.tokens;
   }
 
 
-  public static async removeDevice(platform: string, userId: string, token: string): Promise<String[]> {
+  public static async removeDevice(platform: string, userId: mongoose.Types.ObjectId, token: string): Promise<String[]> {
 
-    const device = await DeviceModel.findOne({platform, userId});
-    if(device){
-      const deleted = device.tokens.filter(t=> t===token);
+    const device = await DeviceModel.findOne({ platform, userId });
+    if (device) {
+      const deleted = device.tokens.filter(t => t === token);
       device.tokens = device.tokens.filter(t => t !== token);
       await device.save();
-      return deleted; 
+      return deleted;
     }
     return [];
   }

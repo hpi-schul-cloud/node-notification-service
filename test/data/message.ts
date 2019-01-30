@@ -1,4 +1,5 @@
 import RequestMessage from '@/interfaces/RequestMessage';
+import mongoose from 'mongoose';
 
 const message: RequestMessage = {
   platform: 'testplatform',
@@ -23,6 +24,7 @@ const message: RequestMessage = {
     {
       name: 'Test Receiver',
       mail: 'receiver@test.test',
+      userId: mongoose.Types.ObjectId('4ede40c86362e0fb12000003'),
       payload: {
         name: 'Test Receiver',
       },

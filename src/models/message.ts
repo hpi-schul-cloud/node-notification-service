@@ -11,6 +11,7 @@ export interface MessageModel extends Message, mongoose.Document {
 export const userResourceSchema = new mongoose.Schema({
   name: String,
   mail: String,
+  userId: mongoose.Types.ObjectId,
   payload: Object,
   language: String,
   preferences: Object,

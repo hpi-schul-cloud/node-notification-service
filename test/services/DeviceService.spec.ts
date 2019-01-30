@@ -23,7 +23,7 @@ describe('DeviceService', () => {
   });
 
   it('should write a new device to the database.', async () => {
-    const deviceId = await DeviceService.addDevice(device.platform, device.mail, device.tokens[0]);
+    const deviceId = await DeviceService.addDevice(device.platform, device.userId, device.tokens[0]);
     const databaseDeviceModel = await DeviceModel.findById(deviceId);
     if (!databaseDeviceModel) {
       expect(databaseDeviceModel, 'Could not find device in database.').not.to.be.null;
@@ -37,7 +37,7 @@ describe('DeviceService', () => {
 
   it('should add new token to existing device in the database.', async () => {
     const newToken = 'bshC5cgaggfa31hgR';
-    const deviceId = await DeviceService.addDevice(device.platform, device.mail, newToken);
+    const deviceId = await DeviceService.addDevice(device.platform, device.userId, newToken);
     const databaseDeviceModel = await DeviceModel.findById(deviceId);
     if (!databaseDeviceModel) {
       expect(databaseDeviceModel, 'Could not find device in database.').not.to.be.null;
@@ -53,7 +53,7 @@ describe('DeviceService', () => {
   });
 
   it('should get tokens for existing device in the database.', async () => {
-    const tokens = await DeviceService.getDevices(device.platform, device.mail);
+    const tokens = await DeviceService.getDevices(device.platform, device.userId);
 
     expect(tokens)
       .to.containSubset(device.tokens);

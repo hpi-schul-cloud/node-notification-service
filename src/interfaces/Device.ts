@@ -1,5 +1,6 @@
+import mongoose from 'mongoose';
 export default interface Device {
   platform: string;
-  userId: string;
+  userId: mongoose.Types.ObjectId;
   tokens: string[];
 }

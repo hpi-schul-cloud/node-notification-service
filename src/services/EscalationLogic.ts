@@ -53,7 +53,7 @@ export default class EscalationLogic {
         continue;
       }
 
-      const receiverDevices = await DeviceService.getDevices(message.platform, receiver.mail);
+      const receiverDevices = await DeviceService.getDevices(message.platform, receiver.userId);
       for (const device of receiverDevices) {
         // todo avoid recreation of templatingService for each receiver device/user
         templatingService = new TemplatingService(message.platform, message.template,
