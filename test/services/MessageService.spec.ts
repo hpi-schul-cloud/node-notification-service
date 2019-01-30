@@ -59,7 +59,7 @@ describe('MessageService.send', () => {
     expect(
       databaseMessage.receivers.length,
       'Could not find any receiver in message',
-    ).to.be.equal(1);
+    ).to.be.equal(2);
     const user: any = databaseMessage.receivers[0];
     await messageService.seen(messageId, user._id);
     databaseMessageModel = await MessageModel.findById(messageId);
@@ -78,15 +78,15 @@ describe('MessageService.send', () => {
     ).to.containSubset({ userId: user._id });
   });
 
-  it.only('should return user messages', async () => {
+  it('should return user messages as seen', async () => {
     const messageId = await messageService.send(message);
     const receivers: any = message.receivers;
     const userId = receivers[0].userId;
     await messageService.seen(messageId, userId);
     await messageService.seen(messageId, '507f191e810c19729de860ea');
     const messages = await messageService.byUser(userId);
-    expect(messages.length).to.be.equal(1);
-    const dbMessage = messages[0];
+    expect(messages.length).to.be.greaterThan(0);
+    const dbMessage = messages.filter((message: any) => message._id.equals(messageId))[0];
     expect(dbMessage.receivers.length, 'foreign receivers should be removed for export to user').to.be.equal(1);
     expect(dbMessage.seenCallback.length, 'foreign callbacks should be removed for export to user').to.be.equal(1);
   });
