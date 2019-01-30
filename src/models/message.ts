@@ -22,8 +22,7 @@ export const userResourceSchema = new mongoose.Schema({
 
 export const callbackSchema = new mongoose.Schema({
   userId: mongoose.Types.ObjectId,
-  createdAt: { type: Date, default: Date.now }
-});
+}, { timestamps: { createdAt: true, updatedAt: false } });
 
 export const messageSchema = new mongoose.Schema({
   platform: String,
@@ -42,7 +41,7 @@ export const messageSchema = new mongoose.Schema({
   receivers: [userResourceSchema],
   trackLinks: Boolean,
   seenCallback: [callbackSchema],
-});
+}, { timestamps: { createdAt: true, updatedAt: false } });
 
 const messageModel: mongoose.Model<MessageModel> = mongoose.model('Message', messageSchema);
 

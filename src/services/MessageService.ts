@@ -63,7 +63,7 @@ export default class MessageService {
       throw new Error(errorMessage);
     }
     if (message.seenCallback.filter(cb => cb.userId === userId).length === 0) {
-      message.seenCallback.push({ userId, createdAt: Date.now() });
+      message.seenCallback.push({ userId });
       return await message.save();
     } else {
       return message;
