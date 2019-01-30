@@ -1,11 +1,12 @@
 import firebaseAdmin, { messaging as firebaseMessaging } from 'firebase-admin';
 import BaseService from '@/services/BaseService';
 import DeviceService from './DeviceService';
+import mongoose from 'mongoose';
 
 export default class PushService extends BaseService {
-  
+
   removeToken(platform: string, userId: string, device: string): any {
-    return DeviceService.removeDevice(platform, userId, device);
+    return DeviceService.removeDevice(platform, mongoose.Types.ObjectId(userId), device);
   }
   // region public static methods
   // endregion
