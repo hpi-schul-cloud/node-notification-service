@@ -11,7 +11,7 @@ export default class Utils {
   public static getPlatformConfig(platformId: string): any {
     let config = {};
     try {
-      config = require(`../platforms/${platformId}/config.json`)
+      config = require(`../platforms/${platformId}/config.json`);
     } catch (err) {
       winston.error('config.json missing. copy config.default.json to selected platform folder and rename. use default fallback instead...');
       config = require(`../platforms/config.default.json`);
@@ -39,12 +39,12 @@ export default class Utils {
   public static mustacheFunctions(platformId: string, messageId: string, receiverId: string): any {
     const config = Utils.getPlatformConfig(platformId);
     return {
-      callbackLink: function () {
-        let url = config.callback.url;
-        return function (text: any, render: any) {
+      callbackLink() {
+        const url = config.callback.url;
+        return function(text: any, render: any) {
           return url.replace('{RECEIVER_ID}', receiverId).replace('{MESSAGE_ID}', messageId).replace('{REDIRECT_URL}', render(text));
         };
-      }
-    }
+      },
+    };
   }
 }

@@ -10,7 +10,7 @@ const message: RequestMessage = {
   },
   payload: {
     title: 'Test Title',
-    url: 'http://example.com'
+    url: 'http://example.com',
   },
   languagePayloads: [
     {
@@ -48,7 +48,7 @@ const message: RequestMessage = {
       },
     },
   ],
-  seenCallback: []
+  seenCallback: [],
 };
 
 export default message;

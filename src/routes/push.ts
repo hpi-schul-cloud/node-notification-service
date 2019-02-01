@@ -47,9 +47,9 @@ router.post('/', (req, res) => {
               return Promise.reject(e);
             });
         }));
-      }).then(_ => {
+      }).then((_) => {
         res.send('Push queued.');
-      }).catch(err => {
+      }).catch((err) => {
         res.status(500).send(err);
       });
   }));

@@ -5,7 +5,7 @@ import mongoose from 'mongoose';
 
 export default class PushService extends BaseService {
 
-  removeToken(platform: string, userId: string, device: string): any {
+  public removeToken(platform: string, userId: string, device: string): any {
     return DeviceService.removeDevice(platform, mongoose.Types.ObjectId(userId), device);
   }
   // region public static methods

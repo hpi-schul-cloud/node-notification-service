@@ -62,7 +62,7 @@ export default class MessageService {
       winston.error(errorMessage);
       throw new Error(errorMessage);
     }
-    if (message.seenCallback.filter(cb => cb.userId === userId).length === 0) {
+    if (message.seenCallback.filter((cb) => cb.userId === userId).length === 0) {
       message.seenCallback.push({ userId });
       return await message.save();
     } else {
@@ -90,13 +90,13 @@ export default class MessageService {
   }
 
   /**
-   * populates and cleanup message from other users data like other receivers or callbacks 
+   * populates and cleanup message from other users data like other receivers or callbacks
    * @param message
-   * @param userId 
+   * @param userId
    */
   private static filter(message: Message, userId: mongoose.Types.ObjectId) {
-    message.receivers = message.receivers.filter(receiver => receiver.userId.equals(userId));
-    message.seenCallback = message.seenCallback.filter(callback => callback.userId.equals(userId));
+    message.receivers = message.receivers.filter((receiver) => receiver.userId.equals(userId));
+    message.seenCallback = message.seenCallback.filter((callback) => callback.userId.equals(userId));
     return message;
   }
 
@@ -107,7 +107,7 @@ export default class MessageService {
       .populate({ path: 'seenCallback' })
       .exec();
     if (messages && messages.length !== 0) {
-      return messages.map(message => this.filter(message.toObject(), userId));
+      return messages.map((message) => this.filter(message.toObject(), userId));
     } else {
       return [];
     }
@@ -139,7 +139,7 @@ export default class MessageService {
   }
 
   public async remove(messageId: string, userId: string) {
-    //return await MessageService.unregisterNotification(messageId, userId);
+    // return await MessageService.unregisterNotification(messageId, userId);
     // todo remove message if last receiver has beren removed
     // todo test this
   }

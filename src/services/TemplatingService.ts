@@ -12,8 +12,6 @@ const MAIL_MESSAGE = 'MAIL';
 const PUSH_MESSAGE = 'PUSH';
 
 export default class TemplatingService {
-  platform: string;
-  messageId: string;
   // region public static methods
   // endregion
 
@@ -67,6 +65,8 @@ export default class TemplatingService {
       };
     });
   }
+  public platform: string;
+  public messageId: string;
   // endregion
 
   // region public members

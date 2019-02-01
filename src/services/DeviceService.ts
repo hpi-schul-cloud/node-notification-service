@@ -39,8 +39,8 @@ export default class DeviceService {
 
     const device = await DeviceModel.findOne({ platform, userId });
     if (device) {
-      const deleted = device.tokens.filter(t => t === token);
-      device.tokens = device.tokens.filter(t => t !== token);
+      const deleted = device.tokens.filter((t) => t === token);
+      device.tokens = device.tokens.filter((t) => t !== token);
       await device.save();
       return deleted;
     }

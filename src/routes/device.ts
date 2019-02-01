@@ -22,20 +22,20 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.get('/:platform/:id', async (req,res) => {
+router.get('/:platform/:id', async (req, res) => {
   try {
     const devices = await DeviceService.getDevices(req.params.platform, req.params.id);
     res.send(devices);
   } catch (e) {
     res.status(400).send(e.message);
   }
-})
+});
 
-router.delete('/:platform/:id/:token', (req,res) => {
-  try{
+router.delete('/:platform/:id/:token', (req, res) => {
+  try {
     const devices = DeviceService.removeDevice(req.params.platform, req.params.id, req.params.token);
     res.send(devices);
-  }catch(e){
+  } catch (e) {
     res.status(500).send(e.message);
   }
 });
