@@ -28,7 +28,7 @@ router.post('/', (req, res) => {
     payload: req.body.payload,
     languagePayloads: req.body.languagePayloads,
     receivers: req.body.receivers,
-    seen: [],
+    seenCallback: [],
   };
 
   if (req.body.sender) {
