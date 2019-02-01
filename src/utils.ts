@@ -65,7 +65,7 @@ export default class Utils {
     return {
       callbackLink() {
         const url = config.callback.url;
-        return function (text: any, render: any) {
+        return function(text: any, render: any) {
           return url
             .replace('{RECEIVER_ID}', receiverId)
             .replace('{MESSAGE_ID}', messageId)
