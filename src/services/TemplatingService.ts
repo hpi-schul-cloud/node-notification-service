@@ -58,6 +58,7 @@ export default class TemplatingService {
   private static initializeMessagePayloads(payload: any, languagePayloads: LanguagePayload[]): Payload[] {
     return languagePayloads.map((languagePayload: LanguagePayload): Payload => {
       return {
+        _id: Utils.guid(),
         message: payload,
         languageId: languagePayload.language,
         language: languagePayload.payload,

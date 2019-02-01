@@ -7,6 +7,6 @@ export default interface UserResource {
   payload: any;
   language: string;
   preferences: {
-    [key: string]: boolean,
+    [key: string]: boolean;
   };
 }

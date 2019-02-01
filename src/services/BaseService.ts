@@ -31,6 +31,7 @@ export default abstract class BaseService {
       const transporter = this.getTransporter(platformId);
       return this._send(transporter, message);
     } catch (e) {
+      // todo cleanup database from old tokens
       return Promise.reject(new Error(e.message));
     }
   }
