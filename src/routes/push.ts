@@ -12,21 +12,21 @@ import Utils from '@/utils';
 const router: express.Router = express.Router();
 const pushService: PushService = new PushService();
 
-const PromiseAny = function (promises: Array<Promise<any>>) {
-  return new Promise(function (resolve, reject) {
+const PromiseAny = function(promises: Array<Promise<any>>) {
+  return new Promise(function(resolve, reject) {
     let count = promises.length,
       resolved = false;
     if (count === 0) {
       reject(new Error('No promises resolved successfully.'));
     }
-    promises.forEach(function (p) {
+    promises.forEach(function(p) {
       Promise.resolve(p).then(
-        function (value) {
+        function(value) {
           resolved = true;
           count--;
           resolve(value);
         },
-        function () {
+        function() {
           count--;
           if (count === 0 && !resolved) {
             reject(new Error('No promises resolved successfully.'));
@@ -55,15 +55,6 @@ router.post('/', (req, res) => {
   }
 
   const id = Utils.guid();
-
-  // Construct Templating Service
-  const templatingService: TemplatingService = new TemplatingService(
-    req.body.platform,
-    req.body.template,
-    req.body.payload,
-    req.body.languagePayloads,
-    id,
-  );
 
   const push: firebaseMessaging.Message = {
     token: req.body.token,
@@ -106,8 +97,8 @@ router.post('/', (req, res) => {
   // todo fix promiseany to resolve
 
   Promise.all(
-    req.body.receivers.map((user: UserResource) => {
-      DeviceService.getDevices(req.body.platform, user.userId)
+    req.body.receivers.map((userId: string) => {
+      DeviceService.getDevices(req.body.platform, mongoose.Types.ObjectId(userId))
         .then((devices: any) => {
           return [].concat.apply([], devices); // flatten array
         })
@@ -117,12 +108,8 @@ router.post('/', (req, res) => {
           }
           return PromiseAny(
             devices.map((device: string) => {
-              // const message = Object.assign({}, push, { token: device });
-              const pushMessage = templatingService.createPushMessage(
-                user,
-                device,
-              );
-              // pushService.send(req.body.platform, pushMessage);
+              const pushMessage = Object.assign({}, push, { token: device });
+              pushService.send(req.body.platform, pushMessage);
               return pushService
                 .send(req.body.platform, pushMessage)
                 .then((response: any) => {
@@ -130,12 +117,13 @@ router.post('/', (req, res) => {
                   return Promise.resolve();
                 })
                 .catch((e: FirebaseError) => {
+                  // todo move to pushService
                   if (
                     e.code === 'messaging/registration-token-not-registered'
                   ) {
                     pushService.removeToken(
                       req.body.platform,
-                      user.userId.toHexString(),
+                      userId,
                       device,
                     );
                   }
