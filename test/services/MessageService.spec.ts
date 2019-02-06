@@ -9,6 +9,7 @@ import MessageService from '@/services/MessageService';
 import message from '@test/data/message';
 import config from '@test/config';
 import UserResource from '@/interfaces/UserResource';
+import RequestMessage from '@/interfaces/RequestMessage';
 
 // Add extensions to chai
 chai.use(spies);
@@ -86,9 +87,15 @@ describe('MessageService.send', () => {
     await messageService.seen(messageId, '507f191e810c19729de860ea');
     const messages = await messageService.byUser(userId);
     expect(messages.length).to.be.greaterThan(0);
-    const dbMessage = messages.filter((message: any) => message._id.equals(messageId))[0];
-    expect(dbMessage.receivers.length, 'foreign receivers should be removed for export to user').to.be.equal(1);
-    expect(dbMessage.seenCallback.length, 'foreign callbacks should be removed for export to user').to.be.equal(1);
+    const dbMessage: RequestMessage = messages
+      .filter((message: any) => message._id
+        .equals(mongoose.Types.ObjectId(messageId)))[0];
+    expect(dbMessage.receivers.length,
+      'foreign receivers should be removed for export to user')
+      .to.be.equal(1);
+    expect(dbMessage.seenCallback.length,
+      'foreign callbacks should be removed for export to user')
+      .to.be.equal(1);
   });
 
   after('should drop database and close connection', (done) => {
