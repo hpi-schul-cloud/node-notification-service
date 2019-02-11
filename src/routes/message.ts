@@ -80,4 +80,20 @@ router.post('/user', async (req, res) => {
   }
 });
 
+router.post('/remove/:messageId/:userId', async (req, res) => {
+  if (!req.params.messageId) {
+    res.status(400).send('Missing parameter: messageId.');
+  }
+  if (!req.params.userId) {
+    res.status(400).send('Missing parameter: userId.');
+  }
+  try {
+    const message = await messageService
+      .remove(req.params.messageId, req.params.userId);
+    res.send(message);
+  } catch (e) {
+    res.status(400).send(e.message);
+  }
+});
+
 export default router;
