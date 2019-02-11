@@ -101,11 +101,11 @@ describe('MessageService.send', () => {
     expect(await messageService
       .seen(messageId, user.userId),
       'first call adds seen callback')
-      .to.be.equal('added');
+      .to.containSubset({ seenCallback: { userId: user.Id } });
     expect(await messageService
       .seen(messageId, user.userId),
       'second call should be ignored')
-      .to.be.equal('already seen');
+      .to.containSubset({ seenCallback: { userId: user.Id } });
   });
 
   it('should return user messages as seen', async () => {
@@ -141,7 +141,7 @@ describe('MessageService.send', () => {
     // remove user from message
     expect(await getMessage(messageId, userId)).to.be.not.equal(undefined);
     let removed = await messageService.remove(messageId, userId);
-    expect(removed).to.be.equal('removed');
+    expect(removed).to.not.containSubset({ receivers: [{ userId }] });
     expect(await getMessage(messageId, userId)).to.be.equal(undefined);
 
     // remove last user from message should remove message itself
@@ -150,7 +150,7 @@ describe('MessageService.send', () => {
     let dbMessage = await MessageModel.findById(messageId).exec();
     expect(dbMessage).to.be.not.equal(null);
     removed = await messageService.remove(messageId, userId);
-    expect(removed).to.be.equal('removed');
+    expect(removed).to.not.containSubset({ receivers: [{ userId }] });
     dbMessage = await MessageModel.findById(messageId).exec();
     expect(dbMessage).to.be.equal(null);
   });

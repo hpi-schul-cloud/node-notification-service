@@ -72,10 +72,9 @@ export default class MessageService {
     }
     if (message.seenCallback.filter((cb: Callback) => cb.userId.equals(userId)).length === 0) {
       databaseMessage.seenCallback.push({ userId });
-      await databaseMessage.save();
-      return 'added';
+      return await databaseMessage.save();
     } else {
-      return 'already seen';
+      return message;
     }
   }
 
@@ -147,12 +146,13 @@ export default class MessageService {
   }
 
   public async seen(messageId: string, userId: string) {
-    return await MessageService.messageSeen(messageId, mongoose.Types.ObjectId(userId));
+    const message = await MessageService.messageSeen(messageId, mongoose.Types.ObjectId(userId));
+    return MessageService.filter(message, mongoose.Types.ObjectId(userId));
   }
 
   public async remove(messageId: string, userId: string) {
-    await MessageService.removeReceiverFromMessage(messageId, userId);
-    return 'removed';
+    const message = await MessageService.removeReceiverFromMessage(messageId, userId);
+    return MessageService.filter(message, mongoose.Types.ObjectId(userId));
   }
 
   public async byUser(userId: string): Promise<any> {
