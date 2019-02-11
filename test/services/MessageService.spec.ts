@@ -62,7 +62,7 @@ describe('MessageService.send', () => {
       'Could not find any receiver in message',
     ).to.be.equal(2);
     const user: any = databaseMessage.receivers[0];
-    await messageService.seen(messageId, user._id);
+    await messageService.seen(messageId, user.userId);
     databaseMessageModel = await MessageModel.findById(messageId);
     if (!databaseMessageModel) {
       expect(databaseMessageModel, 'Could not find message in database.').not.to.be.null;
@@ -76,7 +76,28 @@ describe('MessageService.send', () => {
     expect(
       databaseMessage.seenCallback[0],
       'Could not mark message seen by first receiver',
-    ).to.containSubset({ userId: user._id });
+    ).to.containSubset({ userId: user.userId });
+  });
+
+  it('only receivers can mark the message as read', async () => {
+    const messageId = await messageService.send(message);
+    let databaseMessageModel = await MessageModel.findById(messageId);
+    if (!databaseMessageModel) {
+      expect(databaseMessageModel, 'Could not find message in database.').not.to.be.null;
+      return;
+    }
+    let databaseMessage: Message = databaseMessageModel.toObject();
+    expect(
+      databaseMessage.receivers.length,
+      'Could not find any receiver in message',
+    ).to.be.equal(2);
+    const user: any = databaseMessage.receivers[0];
+    await messageService.seen(messageId, user.userId);
+    try {
+      await messageService.seen(messageId, '307f191e813c19729de860ea');
+    } catch (err) {
+      expect(err.message).to.be.equal('Could not find Receiver in Message');
+    }
   });
 
   it('should return user messages as seen', async () => {
@@ -84,7 +105,7 @@ describe('MessageService.send', () => {
     const receivers: any = message.receivers;
     const userId = receivers[0].userId;
     await messageService.seen(messageId, userId);
-    await messageService.seen(messageId, '507f191e810c19729de860ea');
+    await messageService.seen(messageId, receivers[1].userId);
     const messages = await messageService.byUser(userId);
     expect(messages.length).to.be.greaterThan(0);
     const dbMessage: RequestMessage = messages

@@ -60,12 +60,12 @@ export default class MessageService {
   private static async messageSeen(messageId: string, userId: mongoose.Types.ObjectId) {
     const databaseMessage = await MessageModel.findById(messageId);
     if (!databaseMessage) {
-      const errorMessage = `Could not unregister Notification: Message (id: ${messageId}) not found.`;
+      const errorMessage = `Message (id: ${messageId}) not found.`;
       winston.error(errorMessage);
       throw new Error(errorMessage);
     }
     const message = databaseMessage.toObject();
-    if (!message.receivers || message.receivers.filter((receiver: UserResource) => receiver.userId === userId).length !== 0) {
+    if (!message.receivers || message.receivers.filter((receiver: UserResource) => receiver.userId.equals(userId)).length == 0) {
       const errorMessage = `Could not find Receiver in Message`;
       winston.error(errorMessage);
       throw new Error(errorMessage);
