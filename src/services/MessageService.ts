@@ -70,11 +70,12 @@ export default class MessageService {
       winston.error(errorMessage);
       throw new Error(errorMessage);
     }
-    if (message.seenCallback.filter((cb: Callback) => cb.userId === userId).length === 0) {
+    if (message.seenCallback.filter((cb: Callback) => cb.userId.equals(userId)).length === 0) {
       databaseMessage.seenCallback.push({ userId });
-      return await databaseMessage.save();
+      await databaseMessage.save();
+      return 'added';
     } else {
-      return message;
+      return 'already seen';
     }
   }
 

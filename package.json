@@ -24,8 +24,10 @@
   },
   "homepage": "https://github.com/schul-cloud/node-notification-service",
   "dependencies": {
+    "@types/chai-as-promised": "^7.1.0",
     "axios": "^0.18.0",
     "body-parser": "^1.18.3",
+    "chai-as-promised": "^7.1.1",
     "express": "^4.16.3",
     "firebase-admin": "^5.12.1",
     "js-yaml": "^3.12.0",

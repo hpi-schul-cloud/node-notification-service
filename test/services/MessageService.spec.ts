@@ -2,6 +2,7 @@ import 'mocha';
 import chai from 'chai';
 import spies from 'chai-spies';
 import subset from 'chai-subset';
+import asPromised = require('chai-as-promised');
 import mongoose from 'mongoose';
 import Message from '@/interfaces/Message';
 import MessageModel from '@/models/message';
@@ -14,6 +15,8 @@ import RequestMessage from '@/interfaces/RequestMessage';
 // Add extensions to chai
 chai.use(spies);
 chai.use(subset);
+chai.use(asPromised)
+
 const expect = chai.expect;
 
 describe('MessageService.send', () => {
@@ -92,12 +95,18 @@ describe('MessageService.send', () => {
       'Could not find any receiver in message',
     ).to.be.equal(2);
     const user: any = databaseMessage.receivers[0];
-    await messageService.seen(messageId, user.userId);
-    try {
-      await messageService.seen(messageId, '307f191e813c19729de860ea');
-    } catch (err) {
-      expect(err.message).to.be.equal('Could not find Receiver in Message');
-    }
+    // unknown receiverid should fail
+    await expect(messageService
+      .seen(messageId, '307f191e813c19729de860ea'))
+      .to.eventually.be.rejectedWith(Error);
+    // first call adds seen callback
+    expect(await messageService
+      .seen(messageId, user.userId))
+      .to.be.equal('added');
+    // second call should be ignored
+    expect(await messageService
+      .seen(messageId, user.userId))
+      .to.be.equal('already seen');
   });
 
   it('should return user messages as seen', async () => {
