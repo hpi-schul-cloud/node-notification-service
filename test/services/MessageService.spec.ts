@@ -9,7 +9,6 @@ import MessageModel from '@/models/message';
 import MessageService from '@/services/MessageService';
 import message from '@test/data/message';
 import config from '@test/config';
-import UserResource from '@/interfaces/UserResource';
 import RequestMessage from '@/interfaces/RequestMessage';
 
 // Add extensions to chai
@@ -95,17 +94,17 @@ describe('MessageService.send', () => {
       'Could not find any receiver in message',
     ).to.be.equal(2);
     const user: any = databaseMessage.receivers[0];
-    // unknown receiverid should fail
     await expect(messageService
-      .seen(messageId, '307f191e813c19729de860ea'))
+      .seen(messageId, '307f191e813c19729de860ea'),
+      'unknown receiverid should fail')
       .to.eventually.be.rejectedWith(Error);
-    // first call adds seen callback
     expect(await messageService
-      .seen(messageId, user.userId))
+      .seen(messageId, user.userId),
+      'first call adds seen callback')
       .to.be.equal('added');
-    // second call should be ignored
     expect(await messageService
-      .seen(messageId, user.userId))
+      .seen(messageId, user.userId),
+      'second call should be ignored')
       .to.be.equal('already seen');
   });
 
