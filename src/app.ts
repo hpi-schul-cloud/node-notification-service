@@ -83,11 +83,9 @@ app.get('/users', (req, res) => {
 });
 
 app.listen(port);
-// }
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
-// db.once('open', () => { startApiServer(app) });
 
 mongoose.connect(`mongodb://${process.env.MONGO_HOST || 'localhost'}/notification-service`);
 

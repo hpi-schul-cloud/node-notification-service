@@ -79,23 +79,26 @@ export default class MessageService {
     }
   }
 
-  private static async unregisterNotification(messageId: string, userId: string) {
+  private static async removeReceiverFromMessage(messageId: string, userId: string) {
     const message = await MessageModel.findById(messageId);
     if (!message) {
-      const errorMessage = `Could not unregister Notification: Message (id: ${messageId}) not found.`;
+      const errorMessage = `Message (id: ${messageId}) not found.`;
       winston.error(errorMessage);
       throw new Error(errorMessage);
     }
 
-    const user = message.receivers.find((receiver) => receiver._id.toString() === userId.toString());
+    const user = message.receivers.find((receiver) => receiver.userId.equals(userId));
     if (!user) {
-      const errorMessage = `Could not unregister Notification: User (id: ${userId}) not found in Message (id: ${messageId}).`;
+      const errorMessage = `User (userId: ${userId}) not found in Message (id: ${messageId}).`;
       winston.error(errorMessage);
       throw new Error(errorMessage);
     }
-
-    message.receivers.pull(user._id);
-    return await message.save();
+    if (message.receivers.length > 1) {
+      message.receivers.pull(user._id);
+      return await message.save();
+    } else {
+      return await message.remove();
+    }
   }
 
   /**
@@ -148,9 +151,8 @@ export default class MessageService {
   }
 
   public async remove(messageId: string, userId: string) {
-    // return await MessageService.unregisterNotification(messageId, userId);
-    // todo remove message if last receiver has beren removed
-    // todo test this
+    await MessageService.removeReceiverFromMessage(messageId, userId);
+    return 'removed';
   }
 
   public async byUser(userId: string): Promise<any> {

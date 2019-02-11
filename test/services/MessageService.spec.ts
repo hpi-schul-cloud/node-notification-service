@@ -14,7 +14,7 @@ import RequestMessage from '@/interfaces/RequestMessage';
 // Add extensions to chai
 chai.use(spies);
 chai.use(subset);
-chai.use(asPromised)
+chai.use(asPromised);
 
 const expect = chai.expect;
 
@@ -83,12 +83,12 @@ describe('MessageService.send', () => {
 
   it('only receivers can mark the message as read', async () => {
     const messageId = await messageService.send(message);
-    let databaseMessageModel = await MessageModel.findById(messageId);
+    const databaseMessageModel = await MessageModel.findById(messageId);
     if (!databaseMessageModel) {
       expect(databaseMessageModel, 'Could not find message in database.').not.to.be.null;
       return;
     }
-    let databaseMessage: Message = databaseMessageModel.toObject();
+    const databaseMessage: Message = databaseMessageModel.toObject();
     expect(
       databaseMessage.receivers.length,
       'Could not find any receiver in message',
@@ -125,6 +125,34 @@ describe('MessageService.send', () => {
     expect(dbMessage.seenCallback.length,
       'foreign callbacks should be removed for export to user')
       .to.be.equal(1);
+  });
+
+  async function getMessage(messageId: string, userId: string) {
+    const messages = await messageService.byUser(userId);
+    const msg = messages.filter((m: any) => m._id.equals(messageId))[0];
+    return msg;
+  }
+
+  it('should remove user message', async () => {
+    const messageId = await messageService.send(message);
+    const receivers: any = message.receivers;
+    let userId = receivers[0].userId.toHexString();
+
+    // remove user from message
+    expect(await getMessage(messageId, userId)).to.be.not.equal(undefined);
+    let removed = await messageService.remove(messageId, userId);
+    expect(removed).to.be.equal('removed');
+    expect(await getMessage(messageId, userId)).to.be.equal(undefined);
+
+    // remove last user from message should remove message itself
+    userId = receivers[1].userId.toHexString();
+    expect(await getMessage(messageId, userId)).to.be.not.equal(undefined);
+    let dbMessage = await MessageModel.findById(messageId).exec();
+    expect(dbMessage).to.be.not.equal(null);
+    removed = await messageService.remove(messageId, userId);
+    expect(removed).to.be.equal('removed');
+    dbMessage = await MessageModel.findById(messageId).exec();
+    expect(dbMessage).to.be.equal(null);
   });
 
   after('should drop database and close connection', (done) => {
