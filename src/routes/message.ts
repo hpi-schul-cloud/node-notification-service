@@ -80,7 +80,7 @@ router.post('/user', async (req, res) => {
   }
 });
 
-router.post('/remove/:messageId/:userId', async (req, res) => {
+router.post('/:messageId/remove/:userId', async (req, res) => {
   if (!req.params.messageId) {
     res.status(400).send('Missing parameter: messageId.');
   }
