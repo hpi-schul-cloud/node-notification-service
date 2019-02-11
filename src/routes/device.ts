@@ -23,6 +23,12 @@ router.post('/', async (req, res) => {
 });
 
 router.get('/:platform/:id', async (req, res) => {
+  if (!req.params.platform) {
+    return res.status(400).send('Missing body parameter: platform.');
+  }
+  if (!req.params.userId) {
+    return res.status(400).send('Missing body parameter: id.');
+  }
   try {
     const devices = await DeviceService.getDevices(req.params.platform, req.params.id);
     res.send(devices);
@@ -32,6 +38,15 @@ router.get('/:platform/:id', async (req, res) => {
 });
 
 router.delete('/:platform/:id/:token', (req, res) => {
+  if (!req.params.platform) {
+    return res.status(400).send('Missing body parameter: platform.');
+  }
+  if (!req.params.userId) {
+    return res.status(400).send('Missing body parameter: id.');
+  }
+  if (!req.params.token) {
+    return res.status(400).send('Missing body parameter: token.');
+  }
   try {
     const devices = DeviceService.removeDevice(req.params.platform, req.params.id, req.params.token);
     res.send(devices);

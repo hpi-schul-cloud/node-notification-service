@@ -2,6 +2,7 @@ import winston from 'winston';
 import DeviceModel from '@/models/device';
 import Device from '../interfaces/Device';
 import mongoose from 'mongoose';
+import { error } from 'util';
 
 export default class DeviceService {
   // region public static methods
@@ -27,6 +28,7 @@ export default class DeviceService {
   }
 
   public static async getDevices(platform: string, userId: mongoose.Types.ObjectId): Promise<string[]> {
+    if (!userId) { throw new Error('userId missing'); }
     const devices = await DeviceModel.findOne({ platform, userId });
     if (!devices) {
       return [];

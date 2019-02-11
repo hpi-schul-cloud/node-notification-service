@@ -5,6 +5,8 @@ import Message from '@/interfaces/Message';
 import mongoose from 'mongoose';
 import axios from 'axios';
 import winston from 'winston';
+import UserResource from '@/interfaces/UserResource';
+import Callback from '@/interfaces/Callback';
 
 export default class MessageService {
   // region public static methods
@@ -56,15 +58,21 @@ export default class MessageService {
   }
 
   private static async messageSeen(messageId: string, userId: mongoose.Types.ObjectId) {
-    const message = await MessageModel.findById(messageId);
-    if (!message) {
+    const databaseMessage = await MessageModel.findById(messageId);
+    if (!databaseMessage) {
       const errorMessage = `Could not unregister Notification: Message (id: ${messageId}) not found.`;
       winston.error(errorMessage);
       throw new Error(errorMessage);
     }
-    if (message.seenCallback.filter((cb) => cb.userId === userId).length === 0) {
-      message.seenCallback.push({ userId });
-      return await message.save();
+    const message = databaseMessage.toObject();
+    if (!message.receivers || message.receivers.filter((receiver: UserResource) => receiver.userId === userId).length !== 0) {
+      const errorMessage = `Could not find Receiver in Message`;
+      winston.error(errorMessage);
+      throw new Error(errorMessage);
+    }
+    if (message.seenCallback.filter((cb: Callback) => cb.userId === userId).length === 0) {
+      databaseMessage.seenCallback.push({ userId });
+      return await databaseMessage.save();
     } else {
       return message;
     }
