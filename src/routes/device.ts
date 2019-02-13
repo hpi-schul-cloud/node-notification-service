@@ -37,7 +37,7 @@ router.get('/:platform/:id', async (req, res) => {
   }
 });
 
-router.delete('/:platform/:id/:token', (req, res) => {
+router.delete('/:platform/:userId/:token', (req, res) => {
   if (!req.params.platform) {
     return res.status(400).send('Missing body parameter: platform.');
   }
