@@ -4,29 +4,25 @@ import express from 'express';
 import PushService from '@/services/PushService';
 import DeviceService from '@/services/DeviceService';
 import mongoose from 'mongoose';
-import device from '@test/data/device';
-import TemplatingService from '@/services/TemplatingService';
-import UserResource from '@/interfaces/UserResource';
-import Utils from '@/utils';
 
 const router: express.Router = express.Router();
 const pushService: PushService = new PushService();
 
-const PromiseAny = function(promises: Array<Promise<any>>) {
-  return new Promise(function(resolve, reject) {
+const PromiseAny = function (promises: Array<Promise<any>>) {
+  return new Promise(function (resolve, reject) {
     let count = promises.length,
       resolved = false;
     if (count === 0) {
       reject(new Error('No promises resolved successfully.'));
     }
-    promises.forEach(function(p) {
+    promises.forEach(function (p) {
       Promise.resolve(p).then(
-        function(value) {
+        function (value) {
           resolved = true;
           count--;
           resolve(value);
         },
-        function() {
+        function () {
           count--;
           if (count === 0 && !resolved) {
             reject(new Error('No promises resolved successfully.'));
@@ -54,11 +50,9 @@ router.post('/', (req, res) => {
     res.status(400).send('Missing body parameter: receivers.');
   }
 
-  const id = Utils.guid();
-
   const push: firebaseMessaging.Message = {
     token: req.body.token,
-    data: Object.assign({}, req.body.data, { _id: id }),
+    data: req.body.data,
     notification: req.body.notification,
     android: req.body.android,
     webpush: req.body.webpush,
