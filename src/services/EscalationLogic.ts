@@ -52,15 +52,26 @@ export default class EscalationLogic {
       if (!receiver.preferences.push) {
         continue;
       }
-
-      const receiverDevices = await DeviceService.getDevices(message.platform, receiver.userId);
-      for (const device of receiverDevices) {
-        // todo avoid recreation of templatingService for each receiver device/user
-        templatingService = new TemplatingService(message.platform, message.template,
-          message.payload, message.languagePayloads, messageId, receiver.language);
-        const pushMessage = templatingService.createPushMessage(receiver, device);
-        this.pushService.send(message.platform, pushMessage);
-      }
+      const services = Utils.serviceEnum();
+      services.forEach(async service => {
+        const receiverDevices = await DeviceService.getDevices(message.platform, receiver.userId, service);
+        for (const device of receiverDevices) {
+          // todo avoid recreation of templatingService for each receiver device/user
+          templatingService = new TemplatingService(message.platform, message.template,
+            message.payload, message.languagePayloads, messageId, receiver.language);
+          if (service == 'firebase') {
+            const pushMessage = templatingService.createPushMessage(receiver, device);
+            // FIXME add queuing, add rest route for queue length
+            this.pushService.send(message.platform, pushMessage);
+          }
+          if (service === 'safari') {
+            // const pushMessage = templatingService.createSafariPushMessage(receiver, device);
+            // // FIXME add queuing, add rest route for queue length
+            // this.pushService.send(message.platform, pushMessage);
+            winston.error('unsupported send service requested: ' + service);
+          }
+        }
+      });
     }
 
     // Send mail messages after 4 hours delay
@@ -90,6 +101,7 @@ export default class EscalationLogic {
         message.payload, message.languagePayloads, messageId, receiver.language);
 
       const mailMessage = templatingService.createMailMessage(receiver);
+      // FIXME add queuing, add rest route for queue length
       this.mailService.send(message.platform, mailMessage);
     }
   }

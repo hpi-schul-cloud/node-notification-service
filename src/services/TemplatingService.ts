@@ -17,6 +17,7 @@ export default class TemplatingService {
 
   // region private static methods
   private static initializeMessageTemplates(platformId: string, templateId: string, language?: string): Template[] {
+    // FIXME fetch all languages and initialize only once
     return [MAIL_MESSAGE, PUSH_MESSAGE].map((type) => {
       const messageTemplate = Utils.loadTemplate(platformId, templateId, type, language);
       TemplatingService.parseMessageTemplate(messageTemplate);
@@ -124,6 +125,11 @@ export default class TemplatingService {
       apns: renderedTemplate.apns,
     };
     return push;
+  }
+
+  public createSafariPushMessage(user: UserResource, device: string): any {
+    // FIXME create safari push message type for send interface
+    throw Error('safari push currently not supported');
   }
 
   // endregion

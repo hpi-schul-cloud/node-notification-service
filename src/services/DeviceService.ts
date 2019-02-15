@@ -6,13 +6,14 @@ import { error } from 'util';
 
 export default class DeviceService {
   // region public static methods
-  public static async addDevice(platform: string, userId: mongoose.Types.ObjectId, token: string): Promise<string> {
-    let device = await DeviceModel.findOne({ platform, userId });
+  public static async addDevice(platform: string, userId: mongoose.Types.ObjectId, token: string, service: string): Promise<string> {
+    let device = await DeviceModel.findOne({ platform, userId, service });
     if (!device) {
       device = new DeviceModel({
         userId,
         platform,
         tokens: [],
+        service,
       });
       await device.save();
     }
@@ -21,15 +22,12 @@ export default class DeviceService {
       device.tokens.push(token);
     }
 
-
     const savedDevice = await device.save();
-
     return savedDevice.id;
   }
 
-  public static async getDevices(platform: string, userId: mongoose.Types.ObjectId): Promise<string[]> {
-    if (!userId) { throw new Error('userId missing'); }
-    const devices = await DeviceModel.findOne({ platform, userId });
+  public static async getDevices(platform: string, userId: mongoose.Types.ObjectId, service: string): Promise<string[]> {
+    const devices = await DeviceModel.findOne({ platform, userId, service });
     if (!devices) {
       return [];
     }

@@ -14,6 +14,8 @@ import TestUtils from '@test/test-utils';
 chai.use(spies);
 const expect = chai.expect;
 
+const SERVICE = 'firebase';
+
 describe('EscalationLogic.escalate', () => {
 
   // Instantiate the service
@@ -29,7 +31,7 @@ describe('EscalationLogic.escalate', () => {
 
   it('should call the escalation logic.', async () => {
     // add test device
-    await DeviceService.addDevice(device.platform, device.userId, device.tokens[0]);
+    await DeviceService.addDevice(device.platform, device.userId, device.tokens[0], SERVICE);
 
     // use spies for push and mail service
     const spyFunctionPush = chai.spy();
@@ -39,13 +41,14 @@ describe('EscalationLogic.escalate', () => {
 
     await messageService.send(message);
 
+    // wait for async calls have been called
+    await TestUtils.timeout(500);
     expect(spyFunctionPush)
       .to.have.been.called();
 
     const config = Utils.getPlatformConfig(message.platform);
 
     await TestUtils.timeout(config.mail.defaults.delay + 10);
-
     expect(spyFunctionMail)
       .to.have.been.called();
   });

@@ -12,6 +12,8 @@ import config from '@test/config';
 chai.use(subset);
 const expect = chai.expect;
 
+const SERVICE = 'firebase';
+
 describe('DeviceService', () => {
 
   before('should establish a database connection.', (done) => {
@@ -23,7 +25,7 @@ describe('DeviceService', () => {
   });
 
   it('should write a new device to the database.', async () => {
-    const deviceId = await DeviceService.addDevice(device.platform, device.userId, device.tokens[0]);
+    const deviceId = await DeviceService.addDevice(device.platform, device.userId, device.tokens[0], SERVICE);
     const databaseDeviceModel = await DeviceModel.findById(deviceId);
     if (!databaseDeviceModel) {
       expect(databaseDeviceModel, 'Could not find device in database.').not.to.be.null;
@@ -37,7 +39,7 @@ describe('DeviceService', () => {
 
   it('should add new token to existing device in the database.', async () => {
     const newToken = 'bshC5cgaggfa31hgR';
-    const deviceId = await DeviceService.addDevice(device.platform, device.userId, newToken);
+    const deviceId = await DeviceService.addDevice(device.platform, device.userId, newToken, SERVICE);
     const databaseDeviceModel = await DeviceModel.findById(deviceId);
     if (!databaseDeviceModel) {
       expect(databaseDeviceModel, 'Could not find device in database.').not.to.be.null;
@@ -53,7 +55,7 @@ describe('DeviceService', () => {
   });
 
   it('should get tokens for existing device in the database.', async () => {
-    const tokens = await DeviceService.getDevices(device.platform, device.userId);
+    const tokens = await DeviceService.getDevices(device.platform, device.userId, SERVICE);
 
     expect(tokens)
       .to.containSubset(device.tokens);

@@ -26,7 +26,7 @@ export default abstract class BaseService {
 
   // region public methods
 
-  public async send(platformId: string, message: Mail | firebaseMessaging.Message): Promise<SentMessageInfo | string> {
+  public async send(platformId: string, message: Mail | firebaseMessaging.Message, service?: string): Promise<SentMessageInfo | string> {
     try {
       const transporter = this.getTransporter(platformId);
       return this._send(transporter, message);
@@ -41,7 +41,7 @@ export default abstract class BaseService {
   // region private methods
 
   protected abstract _send(transporter: nodeMailer.Transporter | firebaseMessaging.Messaging,
-                           message: Mail | firebaseMessaging.Message): Promise<SentMessageInfo | string>;
+    message: Mail | firebaseMessaging.Message): Promise<SentMessageInfo | string>;
 
   protected abstract _createTransporter(config: any): nodeMailer.Transporter | firebaseMessaging.Messaging;
 

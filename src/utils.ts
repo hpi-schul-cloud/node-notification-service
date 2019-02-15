@@ -106,4 +106,8 @@ export default class Utils {
     }
   }
 
+  public static serviceEnum() {
+    return ['firebase', 'safari'];
+  }
+
 }
