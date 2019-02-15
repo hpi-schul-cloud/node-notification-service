@@ -65,7 +65,7 @@ export default class Utils {
     return {
       callbackLink() {
         const url = config.callback.url;
-        return function(text: any, render: any) {
+        return function (text: any, render: any) {
           return url
             .replace('{RECEIVER_ID}', receiverId)
             .replace('{MESSAGE_ID}', messageId)
@@ -96,4 +96,14 @@ export default class Utils {
       s4()
     );
   }
+
+  public static parametersMissing(parametersList: String[], base: any, res: any) {
+    for (const parameter in parametersList) {
+      if (!(parameter in base) || !base[parameter]) {
+        res.status(400).send('Missing body parameter: ' + parameter + '.');
+        return true;
+      }
+    }
+  }
+
 }

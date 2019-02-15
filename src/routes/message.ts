@@ -1,26 +1,16 @@
 import express from 'express';
 import MessageService from '@/services/MessageService';
 import RequestMessage from '@/interfaces/RequestMessage';
+import utils from '@/utils';
 
 const router: express.Router = express.Router();
 const messageService: MessageService = new MessageService();
 
 router.post('/', (req, res) => {
-  if (!req.body.platform) {
-    res.status(400).send('Missing body parameter: platform.');
-  }
-  if (!req.body.template) {
-    res.status(400).send('Missing body parameter: template.');
-  }
-  if (!req.body.payload) {
-    res.status(400).send('Missing body parameter: payload.');
-  }
-  if (!req.body.languagePayloads) {
-    res.status(400).send('Missing body parameter: languagePayloads.');
-  }
-  if (!req.body.receivers) {
-    res.status(400).send('Missing body parameter: receivers.');
-  }
+
+  if (utils.parametersMissing(
+    ['platform', 'template', 'payload', 'languagePayloads', 'receivers'],
+    req.params, res)) return;
 
   const message: RequestMessage = {
     platform: req.body.platform,
@@ -48,12 +38,9 @@ router.post('/', (req, res) => {
  * mark message as seen by given user and optionally responds with redirect url
  */
 router.post('/:messageId/seen', async (req, res) => {
-  if (!req.params.messageId) {
-    res.status(400).send('Missing url parameter: messageId.');
-  }
-  if (!req.body.receiverId) {
-    res.status(400).send('Missing body parameter: userId.');
-  }
+
+  if (utils.parametersMissing(['messageId'], req.params, res)) return;
+  if (utils.parametersMissing(['receiverId'], req.body, res)) return;
 
   try {
     const message = await messageService.seen(req.params.messageId, req.body.receiverId);
@@ -69,9 +56,9 @@ router.post('/:messageId/seen', async (req, res) => {
 });
 
 router.post('/user', async (req, res) => {
-  if (!req.body.userId) {
-    res.status(400).send('Missing url parameter: userId.');
-  }
+
+  if (utils.parametersMissing(['userId'], req.params, res)) return;
+
   try {
     const messages = await messageService.byUser(req.params.userId);
     res.send(messages);
@@ -81,12 +68,9 @@ router.post('/user', async (req, res) => {
 });
 
 router.post('/:messageId/remove/:userId', async (req, res) => {
-  if (!req.params.messageId) {
-    res.status(400).send('Missing parameter: messageId.');
-  }
-  if (!req.params.userId) {
-    res.status(400).send('Missing parameter: userId.');
-  }
+
+  if (utils.parametersMissing(['messageId', 'userId'], req.params, res)) return;
+
   try {
     const message = await messageService
       .remove(req.params.messageId, req.params.userId);

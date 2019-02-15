@@ -4,6 +4,7 @@ import express from 'express';
 import PushService from '@/services/PushService';
 import DeviceService from '@/services/DeviceService';
 import mongoose from 'mongoose';
+import utils from '@/utils';
 
 const router: express.Router = express.Router();
 const pushService: PushService = new PushService();
@@ -34,21 +35,8 @@ const PromiseAny = function (promises: Array<Promise<any>>) {
 };
 
 router.post('/', (req, res) => {
-  if (!req.body.platform) {
-    res.status(400).send('Missing body parameter: platform.');
-  }
-  if (!req.body.template) {
-    res.status(400).send('Missing body parameter: template.');
-  }
-  if (!req.body.payload) {
-    res.status(400).send('Missing body parameter: payload.');
-  }
-  if (!req.body.languagePayloads) {
-    res.status(400).send('Missing body parameter: languagePayloads.');
-  }
-  if (!req.body.receivers) {
-    res.status(400).send('Missing body parameter: receivers.');
-  }
+
+  if (utils.parametersMissing(['platform', 'template', 'payload', 'languagePayloads', 'receivers'], req.body, res)) return;
 
   const push: firebaseMessaging.Message = {
     token: req.body.token,
