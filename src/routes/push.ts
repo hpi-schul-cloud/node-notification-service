@@ -5,6 +5,8 @@ import PushService from '@/services/PushService';
 import DeviceService from '@/services/DeviceService';
 import mongoose from 'mongoose';
 import utils from '@/utils';
+import TemplatingService from '@/services/TemplatingService';
+import Utils from '@/utils';
 
 const router: express.Router = express.Router();
 const pushService: PushService = new PushService();
@@ -38,91 +40,43 @@ router.post('/', (req, res) => {
 
   if (utils.parametersMissing(['platform', 'template', 'payload', 'languagePayloads', 'receivers'], req.body, res)) return;
 
-  const push: firebaseMessaging.Message = {
-    token: req.body.token,
-    data: req.body.data,
-    notification: req.body.notification,
-    android: req.body.android,
-    webpush: req.body.webpush,
-    apns: req.body.apns,
-  };
+  // Construct Templating Service
+  let templatingService: TemplatingService;
+  const messageId = Utils.guid();
+  const queuedMessages: Array<Promise<any>> = [];
 
-  // let messageQueue: Promise<any>[] = [];
-
-  // req.body.receivers.map( (receiver: UserResource) => {
-
-  //   return DeviceService.getDevices(req.body.platform, receiver._id)
-  //   .then(devices =>{
-  //     for (const device of devices) {
-  //       const pushMessage = templatingService.createPushMessage(receiver, device);
-  //       messageQueue.push(pushService.send(req.body.platform, pushMessage)
-  //       .then((response: any) => {
-  //         winston.info(response);
-  //       }).catch(async (e: FirebaseError) => {
-  //         if (e.code === 'messaging/registration-token-not-registered') {
-  //           await pushService.removeToken(req.body.platformId, receiver._id, device);
-  //         }
-  //         winston.error(e);
-  //       }));
-  //     }
-  //     return;
-  //   });
-  // }).then((_:any) =>{
-  //   return PromiseAny(messageQueue)
-  //     .then(_ => {
-  //       res.send('Push queued.');
-  //     }).catch(err => {
-  //       res.status(500).send(err);
-  //     });
-  // });
-
-  // todo fix promiseany to resolve
-
-  Promise.all(
-    req.body.receivers.map((userId: string) => {
-      DeviceService.getDevices(req.body.platform, mongoose.Types.ObjectId(userId))
-        .then((devices: any) => {
-          return [].concat.apply([], devices); // flatten array
-        })
-        .then((devices: any[]) => {
-          if (devices.length === 0) {
-            return Promise.reject('no devices found');
+  try {
+    // Send push messages
+    for (const receiver of req.body.receivers) {
+      if (!receiver.preferences.push) {
+        continue;
+      }
+      const services = Utils.serviceEnum();
+      services.forEach(async service => {
+        const receiverDevices = await DeviceService.getDevices(req.body.platform, receiver.userId, service);
+        for (const device of receiverDevices) {
+          // todo avoid recreation of templatingService for each receiver device/user
+          templatingService = new TemplatingService(req.body.platform, req.body.template,
+            req.body.payload, req.body.languagePayloads, messageId, receiver.language);
+          if (service == 'firebase') {
+            const pushMessage = templatingService.createPushMessage(receiver, device);
+            // FIXME add queuing, add rest route for queue length
+            queuedMessages.push(pushService.send(req.body.platform, pushMessage));
           }
-          return PromiseAny(
-            devices.map((device: string) => {
-              const pushMessage = Object.assign({}, push, { token: device });
-              pushService.send(req.body.platform, pushMessage);
-              return pushService
-                .send(req.body.platform, pushMessage)
-                .then((response: any) => {
-                  winston.info(response);
-                  return Promise.resolve();
-                })
-                .catch((e: FirebaseError) => {
-                  // todo move to pushService
-                  if (
-                    e.code === 'messaging/registration-token-not-registered'
-                  ) {
-                    pushService.removeToken(
-                      req.body.platform,
-                      userId,
-                      device,
-                    );
-                  }
-                  winston.error(e);
-                  return Promise.reject(e);
-                });
-            }),
-          );
-        })
-        .then((_) => {
-          res.send('Push queued.');
-        })
-        .catch((err) => {
-          res.status(500).send(err);
-        });
-    }),
-  );
+          if (service === 'safari') {
+            // const pushMessage = templatingService.createSafariPushMessage(receiver, device);
+            // // FIXME add queuing, add rest route for queue length
+            // this.pushService.send(message.platform, pushMessage);
+            winston.error('unsupported send service requested: ' + service);
+          }
+        }
+      });
+    }
+    PromiseAny(queuedMessages)
+      .then(() => res.send('Push queued.'))
+  } catch (err) {
+    res.status(500).send(err);
+  }
 });
 
 export default router;
