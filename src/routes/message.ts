@@ -10,7 +10,9 @@ router.post('/', (req, res) => {
 
   if (utils.parametersMissing(
     ['platform', 'template', 'payload', 'languagePayloads', 'receivers'],
-    req.params, res)) { return; }
+    req.body, res)) {
+    return;
+  }
 
   const message: RequestMessage = {
     platform: req.body.platform,
