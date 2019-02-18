@@ -53,7 +53,7 @@ export default class EscalationLogic {
         continue;
       }
       const services = Utils.serviceEnum();
-      services.forEach(async service => {
+      services.forEach(async (service) => {
         const receiverDevices = await DeviceService.getDevices(message.platform, receiver.userId, service);
         for (const device of receiverDevices) {
           // todo avoid recreation of templatingService for each receiver device/user

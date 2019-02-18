@@ -10,7 +10,7 @@ router.post('/', (req, res) => {
 
   if (utils.parametersMissing(
     ['platform', 'template', 'payload', 'languagePayloads', 'receivers'],
-    req.params, res)) return;
+    req.params, res)) { return; }
 
   const message: RequestMessage = {
     platform: req.body.platform,
@@ -39,8 +39,8 @@ router.post('/', (req, res) => {
  */
 router.post('/:messageId/seen', async (req, res) => {
 
-  if (utils.parametersMissing(['messageId'], req.params, res)) return;
-  if (utils.parametersMissing(['receiverId'], req.body, res)) return;
+  if (utils.parametersMissing(['messageId'], req.params, res)) { return; }
+  if (utils.parametersMissing(['receiverId'], req.body, res)) { return; }
 
   try {
     const message = await messageService.seen(req.params.messageId, req.body.receiverId);
@@ -57,7 +57,7 @@ router.post('/:messageId/seen', async (req, res) => {
 
 router.post('/user', async (req, res) => {
 
-  if (utils.parametersMissing(['userId'], req.params, res)) return;
+  if (utils.parametersMissing(['userId'], req.params, res)) { return; }
 
   try {
     const messages = await messageService.byUser(req.params.userId);
@@ -69,7 +69,7 @@ router.post('/user', async (req, res) => {
 
 router.post('/:messageId/remove/:userId', async (req, res) => {
 
-  if (utils.parametersMissing(['messageId', 'userId'], req.params, res)) return;
+  if (utils.parametersMissing(['messageId', 'userId'], req.params, res)) { return; }
 
   try {
     const message = await messageService

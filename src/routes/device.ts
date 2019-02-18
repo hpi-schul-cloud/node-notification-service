@@ -1,11 +1,12 @@
 import express from 'express';
 import DeviceService from '@/services/DeviceService';
 import utils from '@/utils';
+import Utils from '@/utils';
 const router: express.Router = express.Router();
 
 router.post('/', async (req, res) => {
 
-  if (utils.parametersMissing(['platform', 'userId', 'token', 'service'], req.params, res)) return;
+  if (utils.parametersMissing(['platform', 'userId', 'token', 'service'], req.body, res)) { return; }
 
   try {
     await DeviceService.addDevice(req.body.platform, req.body.userId, req.body.token, req.body.service);
@@ -15,24 +16,30 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.get('/:platform/:id', async (req, res) => {
+router.get('/:platform/:userId', async (req, res) => {
 
-  if (utils.parametersMissing(['platform', 'userId', 'service'], req.params, res)) return;
+  if (utils.parametersMissing(['platform', 'userId'], req.params, res)) { return; }
 
   try {
-    const devices = await DeviceService.getDevices(req.params.platform, req.params.id, req.params.service);
-    res.send(devices);
+    const devices: string[] = [];
+    const chain = Utils.serviceEnum().map((service) => {
+      return DeviceService.getDevices(req.params.platform, req.params.userId, service);
+    });
+    Promise.all(chain).then((tokens) => {
+      tokens.forEach((serviceTokens) => { devices.push(...serviceTokens); });
+      res.send(devices);
+    });
   } catch (e) {
     res.status(400).send(e.message);
   }
 });
 
-router.delete('/:platform/:userId/:token', (req, res) => {
+router.delete('/:platform/:userId/:token', async (req, res) => {
 
-  if (utils.parametersMissing(['platform', 'userId', 'token'], req.params, res)) return;
+  if (utils.parametersMissing(['platform', 'userId', 'token'], req.params, res)) { return; }
 
   try {
-    const devices = DeviceService.removeDevice(req.params.platform, req.params.userId, req.params.token);
+    const devices = await DeviceService.removeDevice(req.params.platform, req.params.userId, req.params.token);
     res.send(devices);
   } catch (e) {
     res.status(500).send(e.message);

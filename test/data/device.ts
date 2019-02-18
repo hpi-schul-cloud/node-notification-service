@@ -7,7 +7,7 @@ const device: Device = {
   tokens: [
     'nyht4ca81bGam26a',
   ],
-  service: 'firebase'
+  service: 'firebase',
 };
 
 export default device;
