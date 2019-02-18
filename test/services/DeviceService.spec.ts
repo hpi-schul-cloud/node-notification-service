@@ -61,6 +61,16 @@ describe('DeviceService', () => {
       .to.containSubset(device.tokens);
   });
 
+  it('should remove a device from database', async () => {
+    const newToken = 'cshC5cgaggfa31hgR';
+    const userId = mongoose.Types.ObjectId('aade40c86362e0fb12000003')
+    const deviceId = await DeviceService.addDevice(device.platform, userId, newToken, SERVICE);
+    const removedId = await DeviceService.removeDevice(device.platform, userId, newToken);
+    expect(removedId, 'removed device').to.include(newToken);
+    const emptyList = await DeviceService.removeDevice(device.platform, userId, newToken);
+    expect(emptyList.length, 'device already removed').to.be.equal(0);
+  });
+
   after('should drop database and close connection', (done) => {
     mongoose.connection.db.dropDatabase(() => {
       mongoose.connection.close(done);

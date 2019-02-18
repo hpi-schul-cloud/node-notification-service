@@ -37,11 +37,14 @@ export default class DeviceService {
 
   public static async removeDevice(platform: string, userId: mongoose.Types.ObjectId, token: string): Promise<String[]> {
 
-    const device = await DeviceModel.findOne({ platform, userId });
+    const device = await DeviceModel.findOne({ platform, userId, tokens: [token] });
     if (device) {
       const deleted = device.tokens.filter((t) => t === token);
       device.tokens = device.tokens.filter((t) => t !== token);
       await device.save();
+      if (device.tokens.length === 0) {
+        await device.remove();
+      }
       return deleted;
     }
     return [];
