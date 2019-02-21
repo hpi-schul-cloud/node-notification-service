@@ -117,6 +117,8 @@ export default class MessageService {
       .populate('receivers')
       .populate('seenCallback')
       .exec();
+    console.log('userId', userId.toString())
+    messages.forEach(message => { console.log('message', message); if (message.receivers.length === 0) { throw new Error('receiver missing!') } });
     if (messages && messages.length !== 0) {
       return messages.map((message) => this.filter(message.toObject(), userId));
     } else {
