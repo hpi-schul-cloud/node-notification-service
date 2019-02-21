@@ -31,6 +31,7 @@ export default class MessageService {
     const savedMessage = await messageModel.save();
 
     if (typeof message.receivers === 'string') {
+      // FIXME test class scope working here
       await MessageService.updateReceivers(savedMessage.id, message.receivers);
     }
 
@@ -103,8 +104,10 @@ export default class MessageService {
    * @param userId
    */
   private static filter(message: Message, userId: mongoose.Types.ObjectId) {
-    message.receivers = message.receivers.filter((receiver) => receiver.userId.equals(userId));
-    message.seenCallback = message.seenCallback.filter((callback) => callback.userId.equals(userId));
+    // FIXME decorator pattern?
+    const uid = userId.toString();
+    message.receivers = message.receivers.filter((receiver) => receiver.userId.toString() === uid);
+    message.seenCallback = message.seenCallback.filter((callback) => callback.userId.toString() === uid);
     return message;
   }
 
