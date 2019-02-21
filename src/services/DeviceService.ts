@@ -34,8 +34,8 @@ export default class DeviceService {
     return devices.tokens;
   }
 
+  /** removed a device, if only token defined it can remove multiple devices from different users if they have shared one device */
   public static async removeDevice(token: string, platform?: string, userId?: mongoose.Types.ObjectId, ): Promise<String[]> {
-    // FIXME add test for token defined only
     if (userId && platform) {
       const device = await DeviceModel.findOne({ platform, userId, tokens: token });
       if (device) {
@@ -59,7 +59,7 @@ export default class DeviceService {
           if (device.tokens.length === 0) {
             await device.remove();
           }
-          return;
+          return Promise.resolve();
         });
         return Promise.all(chain).then(() => deleted);
       }
