@@ -15,7 +15,6 @@ export default class DeviceService {
         tokens: [],
         service,
       });
-      await device.save();
     }
 
     if (device.tokens.indexOf(token) === -1) {
@@ -42,9 +41,6 @@ export default class DeviceService {
         const deleted = device.tokens.filter((t) => t === token);
         device.tokens = device.tokens.filter((t) => t !== token);
         await device.save();
-        if (device.tokens.length === 0) {
-          await device.remove(); // FIXME after update hook
-        }
         return deleted;
       }
       return [];
@@ -56,9 +52,6 @@ export default class DeviceService {
           deleted.push(...device.tokens.filter((t) => t === token));
           device.tokens = device.tokens.filter((t) => t !== token);
           await device.save();
-          if (device.tokens.length === 0) {
-            await device.remove();
-          }
           return Promise.resolve();
         });
         return Promise.all(chain).then(() => deleted);

@@ -12,6 +12,12 @@ const deviceSchema = new Schema({
   tokens: [String],
 });
 
+deviceSchema.post('save', async function (device: IDeviceModel) {
+  if (device.tokens.length === 0) {
+    await device.remove();
+  }
+});
+
 const deviceModel: Model<IDeviceModel> = model('Device', deviceSchema);
 
 export default deviceModel;
