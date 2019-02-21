@@ -17,8 +17,11 @@ describe('PushService.send', () => {
 
   before('should create a mock push transporter.', async () => {
     const transporter = {
-      send: spyFunction,
-  };
+      send: function () {
+        spyFunction();
+        return Promise.resolve();
+      },
+    };
 
     // Add the custom transporter
     (pushService as any).transporters.push({

@@ -65,9 +65,9 @@ describe('DeviceService', () => {
     const newToken = 'cshC5cgaggfa31hgR';
     const userId = mongoose.Types.ObjectId('aade40c86362e0fb12000003');
     const deviceId = await DeviceService.addDevice(device.platform, userId, newToken, SERVICE);
-    const removedId = await DeviceService.removeDevice(device.platform, userId, newToken);
+    const removedId = await DeviceService.removeDevice(newToken, device.platform, userId);
     expect(removedId, 'removed device').to.include(newToken);
-    const emptyList = await DeviceService.removeDevice(device.platform, userId, newToken);
+    const emptyList = await DeviceService.removeDevice(newToken, device.platform, userId);
     expect(emptyList.length, 'device already removed').to.be.equal(0);
   });
 

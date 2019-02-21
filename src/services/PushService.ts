@@ -6,7 +6,7 @@ import mongoose from 'mongoose';
 export default class PushService extends BaseService {
 
   public removeToken(platform: string, userId: string, device: string): any {
-    return DeviceService.removeDevice(platform, mongoose.Types.ObjectId(userId), device);
+    return DeviceService.removeDevice(device, platform, mongoose.Types.ObjectId(userId));
   }
   // region public static methods
   // endregion
@@ -26,7 +26,13 @@ export default class PushService extends BaseService {
   // region public methods
 
   protected _send(transporter: firebaseMessaging.Messaging, push: firebaseMessaging.Message): Promise<string> {
-    return transporter.send(push);
+    return transporter.send(push).catch(async error => {
+      if (error.code === 'messaging/registration-token-not-registered') {
+        await DeviceService.removeDevice((push as any).token);
+        return Promise.resolve(error.code);
+      }
+      return Promise.reject(error.code);
+    });
   }
 
   protected _createTransporter(config: any): firebaseMessaging.Messaging {

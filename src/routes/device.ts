@@ -39,7 +39,7 @@ router.delete('/:platform/:userId/:token', async (req, res) => {
   if (utils.parametersMissing(['platform', 'userId', 'token'], req.params, res)) { return; }
 
   try {
-    const devices = await DeviceService.removeDevice(req.params.platform, req.params.userId, req.params.token);
+    const devices = await DeviceService.removeDevice(req.params.token, req.params.platform, req.params.userId);
     res.send(devices);
   } catch (e) {
     res.status(500).send(e.message);

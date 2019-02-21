@@ -31,8 +31,7 @@ export default abstract class BaseService {
       const transporter = this.getTransporter(platformId);
       return this._send(transporter, message);
     } catch (e) {
-      // FIXME cleanup database from old tokens
-      return Promise.reject(new Error(e.message));
+      return Promise.reject(e);
     }
   }
 
@@ -41,7 +40,7 @@ export default abstract class BaseService {
   // region private methods
 
   protected abstract _send(transporter: nodeMailer.Transporter | firebaseMessaging.Messaging,
-                           message: Mail | firebaseMessaging.Message): Promise<SentMessageInfo | string>;
+    message: Mail | firebaseMessaging.Message): Promise<SentMessageInfo | string>;
 
   protected abstract _createTransporter(config: any): nodeMailer.Transporter | firebaseMessaging.Messaging;
 
