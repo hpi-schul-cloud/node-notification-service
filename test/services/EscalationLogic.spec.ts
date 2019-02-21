@@ -43,13 +43,13 @@ describe('EscalationLogic.escalate', () => {
 
     // wait for async calls have been called
     await TestUtils.timeout(500);
-    expect(spyFunctionPush)
+    expect(spyFunctionPush, 'push spy not executed')
       .to.have.been.called();
 
     const config = Utils.getPlatformConfig(message.platform);
 
     await TestUtils.timeout(config.mail.defaults.delay + 10);
-    expect(spyFunctionMail)
+    expect(spyFunctionMail, 'mail spy not executed')
       .to.have.been.called();
   });
 
