@@ -106,6 +106,7 @@ export default class MessageService {
   private static filter(message: Message, userId: mongoose.Types.ObjectId) {
     // FIXME decorator pattern?
     const uid = userId.toString();
+    console.log(message);
     message.receivers = message.receivers.filter((receiver) => receiver.userId.toString() === uid);
     message.seenCallback = message.seenCallback.filter((callback) => callback.userId.toString() === uid);
     return message;
@@ -113,10 +114,7 @@ export default class MessageService {
 
   private static async messagesByUser(userId: mongoose.Types.ObjectId) {
     const messages = await MessageModel
-      .find({ 'receivers.userId': { $in: userId } })
-      .populate('receivers')
-      .populate('seenCallback')
-      .exec();
+      .find({ 'receivers.userId': { $in: userId } });
     console.log('userId', userId.toString())
     messages.forEach(message => { console.log('message', message); if (message.receivers.length === 0) { throw new Error('receiver missing!') } });
     if (messages && messages.length !== 0) {
