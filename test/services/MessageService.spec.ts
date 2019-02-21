@@ -5,7 +5,7 @@ import subset from 'chai-subset';
 import asPromised = require('chai-as-promised');
 import mongoose from 'mongoose';
 import Message from '@/interfaces/Message';
-import MessageModel from '@/models/message';
+import messageModel, { MessageModel } from '@/models/message';
 import MessageService from '@/services/MessageService';
 import message from '@test/data/message';
 import config from '@test/config';
@@ -41,7 +41,7 @@ describe('MessageService.send', () => {
 
   it('should write the message to the database.', async () => {
     const messageId = await messageService.send(message);
-    const databaseMessageModel = await MessageModel.findById(messageId);
+    const databaseMessageModel = await messageModel.findById(messageId);
     if (!databaseMessageModel) {
       expect(databaseMessageModel, 'Could not find message in database.').not.to.be.null;
       return;
@@ -53,7 +53,7 @@ describe('MessageService.send', () => {
 
   it('should mark the message as read.', async () => {
     const messageId = await messageService.send(message);
-    let databaseMessageModel = await MessageModel.findById(messageId);
+    let databaseMessageModel = await messageModel.findById(messageId);
     if (!databaseMessageModel) {
       expect(databaseMessageModel, 'Could not find message in database.').not.to.be.null;
       return;
@@ -65,7 +65,7 @@ describe('MessageService.send', () => {
     ).to.be.equal(2);
     const user: any = databaseMessage.receivers[0];
     await messageService.seen(messageId, user.userId);
-    databaseMessageModel = await MessageModel.findById(messageId);
+    databaseMessageModel = await messageModel.findById(messageId);
     if (!databaseMessageModel) {
       expect(databaseMessageModel, 'Could not find message in database.').not.to.be.null;
       return;
@@ -83,7 +83,7 @@ describe('MessageService.send', () => {
 
   it('only receivers can mark the message as read', async () => {
     const messageId = await messageService.send(message);
-    const databaseMessageModel = await MessageModel.findById(messageId);
+    const databaseMessageModel = await messageModel.findById(messageId);
     if (!databaseMessageModel) {
       expect(databaseMessageModel, 'Could not find message in database.').not.to.be.null;
       return;
@@ -116,10 +116,12 @@ describe('MessageService.send', () => {
     await messageService.seen(messageId, receivers[1].userId);
     const messages = await messageService.byUser(userId);
     expect(messages.length).to.be.greaterThan(0);
-    const dbMessage: RequestMessage = messages
-      .filter((message: any) => message._id
-        .equals(mongoose.Types.ObjectId(messageId)))[0];
-    expect(dbMessage.receivers.length,
+    const dbMessages: MessageModel[] = messages
+      .filter((message: MessageModel) =>
+        mongoose.Types.ObjectId(messageId).equals(message._id));
+    expect(dbMessages.length).to.be.equal(1);
+    const dbMessage = dbMessages[0];
+    expect(dbMessage.receivers.length, // FIXME fails on travis
       'foreign receivers should be removed for export to user')
       .to.be.equal(1);
     expect(dbMessage.seenCallback.length,
@@ -147,11 +149,11 @@ describe('MessageService.send', () => {
     // remove last user from message should remove message itself
     userId = receivers[1].userId.toHexString();
     expect(await getMessage(messageId, userId)).to.be.not.equal(undefined);
-    let dbMessage = await MessageModel.findById(messageId).exec();
+    let dbMessage = await messageModel.findById(messageId).exec();
     expect(dbMessage).to.be.not.equal(null);
     removed = await messageService.remove(messageId, userId);
     expect(removed).to.not.containSubset({ receivers: [{ userId }] });
-    dbMessage = await MessageModel.findById(messageId).exec();
+    dbMessage = await messageModel.findById(messageId).exec();
     expect(dbMessage).to.be.equal(null);
   });
 
