@@ -108,8 +108,11 @@ describe('MessageService.send', () => {
       .to.containSubset({ seenCallback: { userId: user.Id } });
   });
 
-  it('should return user messages as seen', async () => {
+  it.only('should return user messages as seen', async () => {
+    const spyFunction = chai.spy();
+    (messageService as any).escalationLogic.escalate = spyFunction;
     const messageId = await messageService.send(message);
+    expect(spyFunction).to.have.been.called();
     const receivers: any = message.receivers;
     const userId = receivers[0].userId;
     await messageService.seen(messageId, userId);
