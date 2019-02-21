@@ -43,6 +43,12 @@ export const messageSchema = new mongoose.Schema({
   seenCallback: [callbackSchema],
 }, { timestamps: { createdAt: true, updatedAt: false } });
 
+messageSchema.post('save', async function (message: MessageModel) {
+  if (message.receivers.length === 0) {
+    await message.remove();
+  }
+});
+
 const messageModel: mongoose.Model<MessageModel> = mongoose.model('Message', messageSchema);
 
 export default messageModel;

@@ -92,12 +92,9 @@ export default class MessageService {
       winston.error(errorMessage);
       throw new Error(errorMessage);
     }
-    if (message.receivers.length > 1) {
-      message.receivers.pull(user._id);
-      return await message.save();
-    } else {
-      return await message.remove();
-    }
+
+    message.receivers.pull(user);
+    return await message.save();
   }
 
   /**
