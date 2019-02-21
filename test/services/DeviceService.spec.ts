@@ -71,6 +71,17 @@ describe('DeviceService', () => {
     expect(emptyList.length, 'device already removed').to.be.equal(0);
   });
 
+  it('should remove a device from database with only a token defined', async () => {
+    const newToken = 'jweiofjmewof43ef343fr3rfcr3';
+    const userId = mongoose.Types.ObjectId('dede40c86362e0fb12000003');
+    const deviceId = await DeviceService.addDevice(device.platform, userId, newToken, SERVICE);
+    const removedId = await DeviceService.removeDevice(newToken);
+    expect(removedId, 'removed device').to.include(newToken);
+    expect(removedId.length, 'only one device has been removed').to.be.equal(1);
+    const emptyList = await DeviceService.removeDevice(newToken);
+    expect(emptyList.length, 'device already removed').to.be.equal(0);
+  });
+
   after('should drop database and close connection', (done) => {
     mongoose.connection.db.dropDatabase(() => {
       mongoose.connection.close(done);
