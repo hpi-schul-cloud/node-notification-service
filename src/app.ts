@@ -18,6 +18,8 @@ const port: string = process.env.NOTIFICATION_PORT || '3000';
 
 const format = json(':status :method :url :res[content-length] bytes :response-time ms');
 app.use(morgan(format, { stream: new LoggerStream('request') }));
+process.stdout.pipe(logger);
+process.stderr.pipe(logger);
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
