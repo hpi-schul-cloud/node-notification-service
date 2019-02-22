@@ -3,6 +3,7 @@ import express, { NextFunction, Request, Response } from 'express';
 import bodyParser from 'body-parser';
 import swaggerUi from 'swagger-ui-express';
 import morgan from 'morgan';
+const json = require('morgan-json');
 import logger, { LoggerStream } from '@/config/logger';
 
 import mailRouter from '@/routes/mail';
@@ -15,7 +16,8 @@ const app: express.Application = express();
 
 const port: string = process.env.NOTIFICATION_PORT || '3000';
 
-app.use(morgan('combined', { stream: new LoggerStream() }));
+const format = json(':status :method :url :res[content-length] bytes :response-time ms');
+app.use(morgan(format, { stream: new LoggerStream() }));
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
