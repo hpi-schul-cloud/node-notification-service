@@ -29,8 +29,16 @@ let logger = createLogger({
 });
 
 export class LoggerStream {
+	name: string;
+	constructor(name: string) {
+		this.name = name;
+	}
 	write(message: string) {
-		logger.info(message);
+		if (this.name) {
+			logger.info(this.name + ' ' + message)
+		} else {
+			logger.info(message);
+		}
 	}
 }
 
