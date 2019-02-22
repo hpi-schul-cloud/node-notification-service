@@ -112,7 +112,7 @@ export default class MessageService {
   }
 
   private static async messagesByUser(userId: mongoose.Types.ObjectId) {
-    const messages = await MessageModel.find({ 'receivers.userId': { $in: userId } });
+    const messages = await MessageModel.find({ 'receivers.userId': { $in: userId } }).exec();
     if (messages && messages.length !== 0) {
       return messages.map((message) => this.filter(message.toObject(), userId));
     } else {
