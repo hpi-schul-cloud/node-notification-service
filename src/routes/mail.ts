@@ -18,7 +18,7 @@ router.post('/', (req, res) => {
     mail.from = req.body.from;
   }
 
-  mailService.send(req.body.platformId, mail)
+  mailService.send(req.body.platformId, mail, req.body.to)
     .then((response: any) => {
       winston.info(response);
     })

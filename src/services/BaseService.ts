@@ -4,6 +4,13 @@ import Mail from '@/interfaces/Mail';
 import PlatformMailTransporter from '@/interfaces/PlatformMailTransporter';
 import PlatformPushTransporter from '@/interfaces/PlatformPushTransporter';
 import Utils from '@/utils';
+import logger from '@/config/logger';
+
+
+function getType(object: Object | null) {
+  if (object === null) return 'null';
+  return object.constructor.name;
+}
 
 export default abstract class BaseService {
   // region public static methods
@@ -21,17 +28,22 @@ export default abstract class BaseService {
 
   // endregion
 
+
   // region constructor
   // endregion
 
   // region public methods
 
-  public async send(platformId: string, message: Mail | firebaseMessaging.Message, service?: string): Promise<SentMessageInfo | string> {
+  public async send(platformId: string, message: Mail | firebaseMessaging.Message, receiver: string, messageId?: string, ): Promise<SentMessageInfo | string> {
+    let transporter = null;
     try {
-      const transporter = this.getTransporter(platformId);
-      return this._send(transporter, message);
-    } catch (e) {
-      return Promise.reject(e);
+      transporter = this.getTransporter(platformId);
+      const info: SentMessageInfo | string = await this._send(transporter, message);
+      logger.info('message successfully sent', { platformId, transporter: getType(transporter), receiver, messageId });
+      return info;
+    } catch (error) {
+      logger.error(error.message, { platformId, transporter: getType(transporter), receiver, messageId });
+      return Promise.reject(error);
     }
   }
 

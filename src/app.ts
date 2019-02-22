@@ -1,17 +1,21 @@
 import mongoose from 'mongoose';
-import express from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import bodyParser from 'body-parser';
 import swaggerUi from 'swagger-ui-express';
+import morgan from 'morgan';
+import logger, { LoggerStream } from '@/config/logger';
+
 import mailRouter from '@/routes/mail';
 import pushRouter from '@/routes/push';
 import messageRouter from '@/routes/message';
 import deviceRouter from '@/routes/device';
+import HttpException from './exceptions/httpException';
 
 const app: express.Application = express();
 
-// function startApiServer(app: express.Application) {
-
 const port: string = process.env.NOTIFICATION_PORT || '3000';
+
+app.use(morgan('combined', { stream: new LoggerStream() }));
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -57,29 +61,36 @@ app.get('/users', (req, res) => {
       },
     },
   ];
-
   if (!req.query.page) {
     res.json({
       data: users,
     });
     return;
   }
-
   if (req.query.page >= users.length) {
     res.json({
       data: [],
     });
     return;
   }
-
   const links = {
     next: `http://localhost:3000/users?page=${parseInt(req.query.page, 10) + 1}`,
   };
-
   res.json({
     data: [users[req.query.page]],
     links: req.query.page + 1 >= users.length ? {} : links,
   });
+});
+
+app.use(function (err: HttpException, req: Request, res: Response, next: NextFunction) {
+  // set locals, only providing error in development
+  res.locals.message = err.message || 'unknown error';
+  res.locals.error = req.app.get('NODE_ENV') !== 'production' ? err : {};
+  const status = err.status || 500;
+
+  // render the error page
+  res.status(status);
+  res.render('error');
 });
 
 app.listen(port);

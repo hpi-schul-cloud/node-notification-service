@@ -26,10 +26,9 @@ export default class PushService extends BaseService {
   // region public methods
 
   protected _send(transporter: firebaseMessaging.Messaging, push: firebaseMessaging.Message): Promise<string> {
-    return transporter.send(push).catch(async error => {
+    return transporter.send(push).catch(async (error) => {
       if (error.code === 'messaging/registration-token-not-registered') {
         await DeviceService.removeDevice((push as any).token);
-        return Promise.resolve(error.code);
       }
       return Promise.reject(error.code);
     });

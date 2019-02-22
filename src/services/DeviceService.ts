@@ -34,7 +34,7 @@ export default class DeviceService {
   }
 
   /** removed a device, if only token defined it can remove multiple devices from different users if they have shared one device */
-  public static async removeDevice(token: string, platform?: string, userId?: mongoose.Types.ObjectId, ): Promise<String[]> {
+  public static async removeDevice(token: string, platform?: string, userId?: mongoose.Types.ObjectId ): Promise<String[]> {
     if (userId && platform) {
       const device = await DeviceModel.findOne({ platform, userId, tokens: token });
       if (device) {
@@ -47,8 +47,8 @@ export default class DeviceService {
     } else {
       const devices = await DeviceModel.find({ tokens: token });
       if (devices && devices.length) {
-        let deleted: string[] = [];
-        const chain = devices.map(async device => {
+        const deleted: string[] = [];
+        const chain = devices.map(async (device) => {
           deleted.push(...device.tokens.filter((t) => t === token));
           device.tokens = device.tokens.filter((t) => t !== token);
           await device.save();

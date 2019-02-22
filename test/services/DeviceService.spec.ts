@@ -87,10 +87,10 @@ describe('DeviceService', () => {
     const newToken = 'f4jfi039fj089fj903ij49';
     const userIds = [
       mongoose.Types.ObjectId('cdcd40c86362e0fb12000001'),
-      mongoose.Types.ObjectId('cdcd40c86362e0fb12000002')
+      mongoose.Types.ObjectId('cdcd40c86362e0fb12000002'),
     ];
-    return Promise.all(userIds.map(userId => DeviceService.addDevice(device.platform, userId, newToken, SERVICE)))
-      .then(async deviceIds => {
+    return Promise.all(userIds.map((userId) => DeviceService.addDevice(device.platform, userId, newToken, SERVICE)))
+      .then(async (deviceIds) => {
         const removedId = await DeviceService.removeDevice(newToken);
         expect(removedId.length, 'only one device has been removed').to.be.equal(2);
         expect(removedId[0], 'removed device').to.be.equal(newToken);

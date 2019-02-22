@@ -4,13 +4,13 @@
   "description": "A notification service for mails and push notifications build with Typescript on top of Node and Express.js.",
   "main": "src/app.ts",
   "scripts": {
-    "start": "nodemon",
+    "start": "nodemon --debug=5859",
     "lint": "tslint -p tsconfig.json --fix",
     "server": "ts-node -r tsconfig-paths/register src/app.ts",
     "dev": "npm run lint && npm run server",
     "debug": "NOTIFICATION_PORT=3031 node --inspect=5859 --require ts-node/register --require tsconfig-paths/register src/app.ts",
     "build": "tsc",
-    "production": "node -r tsconfig-paths/register build/app.js",
+    "production": "NODE_ENV=production node -r tsconfig-paths/register build/app.js",
     "test": "mocha -t 30000 -r tsconfig-paths/register -r ts-node/register test/**/*.spec.ts"
   },
   "repository": {
@@ -24,7 +24,10 @@
   },
   "homepage": "https://github.com/schul-cloud/node-notification-service",
   "dependencies": {
+    "@types/app-root-path": "^1.2.4",
     "@types/chai-as-promised": "^7.1.0",
+    "@types/morgan": "^1.7.35",
+    "app-root-path": "^2.1.0",
     "axios": "^0.18.0",
     "body-parser": "^1.18.3",
     "chai-as-promised": "^7.1.1",
@@ -32,10 +35,11 @@
     "firebase-admin": "^5.12.1",
     "js-yaml": "^3.12.0",
     "mongoose": "^5.1.6",
+    "morgan": "^1.9.1",
     "mustache": "^2.3.0",
     "nodemailer": "^4.6.5",
     "swagger-ui-express": "^3.0.10",
-    "winston": "^3.0.0"
+    "winston": "^3.2.1"
   },
   "devDependencies": {
     "@types/chai": "^4.1.4",

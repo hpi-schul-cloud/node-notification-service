@@ -1,4 +1,4 @@
-import winston from 'winston';
+import logger from '@/config/logger';
 import MailService from '@/services/MailService';
 import PushService from '@/services/PushService';
 import TemplatingService from '@/services/TemplatingService';
@@ -6,6 +6,7 @@ import MessageModel from '@/models/message';
 import Utils from '@/utils';
 import DeviceService from '@/services/DeviceService';
 import Message from '@/interfaces/Message';
+import { Document } from 'mongoose';
 
 export default class EscalationLogic {
   // region public static methods
@@ -38,7 +39,7 @@ export default class EscalationLogic {
     const databaseMessage = await MessageModel.findById(messageId);
     if (!databaseMessage) {
       const errorMessage = `Could not escalate Message: Message (id: ${messageId}) not found.`;
-      winston.error(errorMessage);
+      logger.error(errorMessage);
       throw new Error(errorMessage);
     }
 
@@ -62,13 +63,13 @@ export default class EscalationLogic {
           if (service == 'firebase') {
             const pushMessage = templatingService.createPushMessage(receiver, device);
             // FIXME add queuing, add rest route for queue length
-            this.pushService.send(message.platform, pushMessage);
+            this.pushService.send(message.platform, pushMessage, device, messageId);
           }
           if (service === 'safari') {
             // const pushMessage = templatingService.createSafariPushMessage(receiver, device);
             // // FIXME add queuing, add rest route for queue length
             // this.pushService.send(message.platform, pushMessage);
-            winston.error('unsupported send service requested: ' + service);
+            logger.error('unsupported send service requested: ' + service);
           }
         }
       });
@@ -88,7 +89,7 @@ export default class EscalationLogic {
 
     if (!message) {
       const errorMessage = `Could not send mail messages: Message (id: ${messageId}) not found.`;
-      winston.error(errorMessage);
+      logger.error(errorMessage);
       throw new Error(errorMessage);
     }
 
@@ -102,7 +103,7 @@ export default class EscalationLogic {
 
       const mailMessage = templatingService.createMailMessage(receiver);
       // FIXME add queuing, add rest route for queue length
-      this.mailService.send(message.platform, mailMessage);
+      this.mailService.send(message.platform, mailMessage, receiver.mail, messageId);
     }
   }
   // endregion
