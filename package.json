@@ -11,9 +11,12 @@
     "debug": "NOTIFICATION_PORT=3031 node --inspect=5859 --require ts-node/register --require tsconfig-paths/register src/app.ts",
     "build": "tsc",
     "production": "NODE_ENV=production node -r tsconfig-paths/register build/app.js",
-    "test": "mocha -t 30000 -r tsconfig-paths/register -r ts-node/register test/**/*.spec.ts",
-    "pre-commit": "npm run lint && npm test"
+    "test": "mocha -t 30000 -r tsconfig-paths/register -r ts-node/register test/**/*.spec.ts"
   },
+  "pre-commit": [
+    "lint",
+    "test"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/schul-cloud/node-notification-service.git"
@@ -59,6 +62,7 @@
     "chai-subset": "^1.6.0",
     "mocha": "^5.2.0",
     "nodemon": "^1.17.5",
+    "pre-commit": "^1.2.2",
     "ts-node": "^7.0.0",
     "tsconfig-paths": "^3.4.2",
     "tslint": "^5.10.0",
