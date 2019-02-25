@@ -30,71 +30,71 @@ app.use('/messages', messageRouter);
 app.use('/devices', deviceRouter);
 
 app.get('/', (req, res) => {
-  res.send('hello world!');
+	res.send('hello world!');
 });
 
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(require('../swagger.json')));
 
 // Test Endpoint for user pagination
 app.get('/users', (req, res) => {
-  const users = [
-    {
-      name: 'Bob',
-      mail: 'bob@bob.bob',
-      payload: {
-        course: 'Bobs Course',
-        week: 6,
-      },
-      language: 'en',
-      preferences: {
-        push: true,
-        mail: true,
-      },
-    },
-    {
-      name: 'Alice',
-      mail: 'alice@alice.alice',
-      payload: {
-        course: 'Alices Course',
-        week: 4,
-      },
-      language: 'de',
-      preferences: {
-        push: true,
-        mail: true,
-      },
-    },
-  ];
-  if (!req.query.page) {
-    res.json({
-      data: users,
-    });
-    return;
-  }
-  if (req.query.page >= users.length) {
-    res.json({
-      data: [],
-    });
-    return;
-  }
-  const links = {
-    next: `http://localhost:3000/users?page=${parseInt(req.query.page, 10) + 1}`,
-  };
-  res.json({
-    data: [users[req.query.page]],
-    links: req.query.page + 1 >= users.length ? {} : links,
-  });
+	const users = [
+		{
+			name: 'Bob',
+			mail: 'bob@bob.bob',
+			payload: {
+				course: 'Bobs Course',
+				week: 6,
+			},
+			language: 'en',
+			preferences: {
+				push: true,
+				mail: true,
+			},
+		},
+		{
+			name: 'Alice',
+			mail: 'alice@alice.alice',
+			payload: {
+				course: 'Alices Course',
+				week: 4,
+			},
+			language: 'de',
+			preferences: {
+				push: true,
+				mail: true,
+			},
+		},
+	];
+	if (!req.query.page) {
+		res.json({
+			data: users,
+		});
+		return;
+	}
+	if (req.query.page >= users.length) {
+		res.json({
+			data: [],
+		});
+		return;
+	}
+	const links = {
+		next: `http://localhost:3000/users?page=${parseInt(req.query.page, 10) + 1}`,
+	};
+	res.json({
+		data: [users[req.query.page]],
+		links: req.query.page + 1 >= users.length ? {} : links,
+	});
 });
 
 app.use(function(err: HttpException, req: Request, res: Response, next: NextFunction) {
-  // set locals, only providing error in development
-  res.locals.message = err.message || 'unknown error';
-  res.locals.error = req.app.get('NODE_ENV') !== 'production' ? err : {};
-  const status = err.status || 500;
+	// set locals, only providing error in development
+	res.locals.message = err.message || 'unknown error';
+	res.locals.error = req.app.get('NODE_ENV') !== 'production' ? err : {};
+	const status = err.status || 500;
 
-  // render the error page
-  res.status(status);
-  res.render('error');
+	// render the error page
+	res.status(status);
+	res.render('error');
 });
 
 app.listen(port);

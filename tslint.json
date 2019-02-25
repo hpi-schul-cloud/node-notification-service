@@ -15,7 +15,7 @@
     ],
     "indent": [
       true,
-      "spaces",
+      "tabs",
       2
     ],
     "interface-name": false,

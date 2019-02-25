@@ -7,26 +7,26 @@ const router: express.Router = express.Router();
 const mailService: MailService = new MailService();
 
 router.post('/', (req, res) => {
-  const mail: Mail = {
-    to: req.body.to,
-    subject: req.body.subject,
-    text: req.body.text,
-    html: req.body.html,
-  };
+	const mail: Mail = {
+		to: req.body.to,
+		subject: req.body.subject,
+		text: req.body.text,
+		html: req.body.html,
+	};
 
-  if (req.body.from) {
-    mail.from = req.body.from;
-  }
+	if (req.body.from) {
+		mail.from = req.body.from;
+	}
 
-  mailService.send(req.body.platformId, mail, req.body.to)
-    .then((response: any) => {
-      winston.info(response);
-    })
-    .catch((e: Error) => {
-      winston.error(e);
-    });
+	mailService.send(req.body.platformId, mail, req.body.to)
+		.then((response: any) => {
+			winston.info(response);
+		})
+		.catch((e: Error) => {
+			winston.error(e);
+		});
 
-  res.send('Mail queued.');
+	res.send('Mail queued.');
 });
 
 export default router;

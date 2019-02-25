@@ -18,45 +18,46 @@ const SERVICE = 'firebase';
 
 describe('EscalationLogic.escalate', () => {
 
-  // Instantiate the service
-  const messageService = new MessageService();
+	// Instantiate the service
+	const messageService = new MessageService();
 
-  before('should establish a database connection.', (done) => {
-    // connect to database
-    const db = mongoose.connection;
-    db.on('error', console.error.bind(console, 'connection error:'));
-    db.once('open', done);
-    mongoose.connect(config.MONGO_DB_PATH);
-  });
+	before('should establish a database connection.', (done) => {
+		// connect to database
+		const db = mongoose.connection;
+		// tslint:disable-next-line: no-console
+		db.on('error', console.error.bind(console, 'connection error:'));
+		db.once('open', done);
+		mongoose.connect(config.MONGO_DB_PATH);
+	});
 
-  it('should call the escalation logic.', async () => {
-    // add test device
-    await DeviceService.addDevice(device.platform, device.userId, device.tokens[0], SERVICE);
+	it('should call the escalation logic.', async () => {
+		// add test device
+		await DeviceService.addDevice(device.platform, device.userId, device.tokens[0], SERVICE);
 
-    // use spies for push and mail service
-    const spyFunctionPush = chai.spy();
-    const spyFunctionMail = chai.spy();
-    (messageService as any).escalationLogic.pushService.send = spyFunctionPush;
-    (messageService as any).escalationLogic.mailService.send = spyFunctionMail;
+		// use spies for push and mail service
+		const spyFunctionPush = chai.spy();
+		const spyFunctionMail = chai.spy();
+		(messageService as any).escalationLogic.pushService.send = spyFunctionPush;
+		(messageService as any).escalationLogic.mailService.send = spyFunctionMail;
 
-    await messageService.send(message);
+		await messageService.send(message);
 
-    // wait for async calls have been called
-    await TestUtils.timeout(500);
-    expect(spyFunctionPush, 'push spy not executed')
-      .to.have.been.called();
+		// wait for async calls have been called
+		await TestUtils.timeout(500);
+		expect(spyFunctionPush, 'push spy not executed')
+			.to.have.been.called();
 
-    const config = Utils.getPlatformConfig(message.platform);
+		const conf = Utils.getPlatformConfig(message.platform);
 
-    await TestUtils.timeout(config.mail.defaults.delay + 10);
-    expect(spyFunctionMail, 'mail spy not executed')
-      .to.have.been.called();
-  });
+		await TestUtils.timeout(conf.mail.defaults.delay + 10);
+		expect(spyFunctionMail, 'mail spy not executed')
+			.to.have.been.called();
+	});
 
-  after('should drop database and close connection', (done) => {
-    mongoose.connection.db.dropDatabase(() => {
-      mongoose.connection.close(done);
-    });
-  });
+	after('should drop database and close connection', (done) => {
+		mongoose.connection.db.dropDatabase(() => {
+			mongoose.connection.close(done);
+		});
+	});
 
 });

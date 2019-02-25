@@ -4,15 +4,15 @@ import Callback from '@/interfaces/Callback';
 import { Types } from 'mongoose';
 
 export default interface Message {
-  platform: string;
-  template: string;
-  sender?: {
-    name: string;
-    mail: string;
-  };
-  payload: {};
-  languagePayloads: LanguagePayload[];
-  receivers: UserResource[];
-  trackLinks?: boolean;
-  seenCallback: Callback[];
+	platform: string;
+	template: string;
+	sender?: {
+		name: string;
+		mail: string;
+	};
+	payload: {};
+	languagePayloads: LanguagePayload[];
+	receivers: UserResource[];
+	trackLinks?: boolean;
+	seenCallback: Callback[];
 }
