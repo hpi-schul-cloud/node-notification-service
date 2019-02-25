@@ -82,4 +82,13 @@ router.post('/:messageId/remove/:userId', async (req, res) => {
 	}
 });
 
+router.get('/health', async (req, res) => {
+	try {
+		const health = await messageService.health();
+		res.send(health);
+	} catch (e) {
+		res.status(400).send(e.message);
+	}
+});
+
 export default router;

@@ -7,6 +7,7 @@ import axios from 'axios';
 import UserResource from '@/interfaces/UserResource';
 import Callback from '@/interfaces/Callback';
 import logger from '@/config/logger';
+import PlatformQueue from '@/interfaces/PlatformQueue';
 
 export default class MessageService {
 	// region public static methods
@@ -154,6 +155,19 @@ export default class MessageService {
 	public async byUser(userId: string): Promise<any> {
 		// todo add paging
 		return await MessageService.messagesByUser(mongoose.Types.ObjectId(userId));
+	}
+
+	public async health() {
+		return Promise.all(this.escalationLogic.queues()
+			.map(async (platformQueue: PlatformQueue) => {
+				return platformQueue.queue.checkHealth()
+					.then((health: any) => {
+						return {
+							queue: platformQueue.queue.name,
+							health,
+						};
+					});
+			}));
 	}
 	// endregion
 

@@ -6,14 +6,14 @@ import logger from './config/logger';
 import defaults from 'defaults-deep';
 
 export default class Utils {
-	public static getPlatformConfig(platformId: string): any {
+	public static getPlatformConfig(platformId?: string): any {
 		try {
-			let config = require(`../platforms/${platformId}/config.json`) || {};
+			let config = platformId ? require(`../platforms/${platformId}/config.json`) : {};
 			config = defaults(
 				config,
 				require(`../platforms/config.default.json`),
 			);
-			logger.debug('config loaded', config);
+			logger.debug('platform config loaded', { platformId, config });
 			return config;
 		} catch (err) {
 			logger.error(
@@ -114,5 +114,4 @@ export default class Utils {
 	public static serviceEnum() {
 		return ['firebase', 'safari'];
 	}
-
 }

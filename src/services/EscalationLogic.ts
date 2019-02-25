@@ -7,6 +7,8 @@ import Utils from '@/utils';
 import DeviceService from '@/services/DeviceService';
 import Message from '@/interfaces/Message';
 import { Document } from 'mongoose';
+import PlatformQueue from '@/interfaces/PlatformQueue';
+import { runInThisContext } from 'vm';
 
 export default class EscalationLogic {
 	// region public static methods
@@ -35,6 +37,14 @@ export default class EscalationLogic {
 	// endregion
 
 	// region public methods
+
+	public queues = () => {
+		const q: PlatformQueue[] = [];
+		q.push(...this.mailService.queues);
+		q.push(...this.pushService.queues);
+		return q;
+	}
+
 	public async escalate(messageId: string) {
 		const databaseMessage = await MessageModel.findById(messageId);
 		if (!databaseMessage) {

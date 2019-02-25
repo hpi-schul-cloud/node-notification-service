@@ -161,6 +161,12 @@ describe('MessageService.send', () => {
 		expect(dbMessage).to.be.equal(null);
 	});
 
+	it('should report health statistics for all queues', async () => {
+		await messageService.send(message);
+		const health = await messageService.health();
+		expect(health.length).to.be.greaterThan(0);
+	});
+
 	after('should drop database and close connection', (done) => {
 		mongoose.connection.db.dropDatabase(() => {
 			mongoose.connection.close(done);

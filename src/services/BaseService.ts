@@ -22,17 +22,21 @@ export default abstract class BaseService {
 	// endregion
 
 	// region public members
+	public readonly queues: PlatformQueue[] = [];
 	// endregion
 
 	// region private members
 
 	private readonly transporters: any[] = [];
-	private readonly queues: PlatformQueue[] = [];
 
 	// endregion
 
 
 	// region constructor
+	constructor() {
+		const { platforms_enabled } = Utils.getPlatformConfig();
+		platforms_enabled.map((platform: string) => this.createQueue(platform));
+	}
 
 	// endregion
 
@@ -89,8 +93,21 @@ export default abstract class BaseService {
 	private createQueue(platformId: string): Queue {
 		const config = Utils.getPlatformConfig(platformId);
 		const queue = this._createQueue(config);
+		queue.on('ready', () => {
+			logger.debug('queue ' + queue.name + ' ready...');
+		});
+		queue.on('retrying', (job, err) => {
+			logger.warn(`Job ${job.id} failed with error ${err.message} but is being retried!`);
+		});
+		queue.on('failed', (job, err) => {
+			logger.error(`Job ${job.id} failed with error ${err.message}`);
+		});
+		queue.on('stalled', (jobId) => {
+			logger.warn(`Job ${jobId} stalled and will be reprocessed`);
+		});
 		queue.process((job: any, done: Queue.DoneCallback<{}>) => {
 			const { message, receiver, messageId } = job.data;
+			logger.debug('queue ' + queue.name + ' processing message' + messageId + ' for receiver ' + receiver);
 			return this.process(platformId, message, receiver, messageId, queue)
 				.then((info) => done(null, info))
 				.catch((error) => done(error));
@@ -108,7 +125,7 @@ export default abstract class BaseService {
 		return this._send(transporter, message)
 			.then((info) => {
 				logger.info('message sent', {
-					queue: queue ? queue.name : 'none',
+					queue: queue ? queue.name : null,
 					platformId,
 					transporter: getType(transporter),
 					receiver,
@@ -117,7 +134,7 @@ export default abstract class BaseService {
 				return Promise.resolve(info);
 			}).catch((error) => {
 				logger.error('message not sent', {
-					queue: queue ? queue.name : 'none',
+					queue: queue ? queue.name : null,
 					error,
 					platformId,
 					transporter: getType(transporter),
