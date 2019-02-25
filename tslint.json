@@ -15,8 +15,7 @@
     ],
     "indent": [
       true,
-      "tabs",
-      2
+      "tabs"
     ],
     "interface-name": false,
     "ordered-imports": false,
@@ -24,6 +23,7 @@
     "no-consecutive-blank-lines": false,
     "unified-signatures": false,
     "no-var-requires": false,
+    "no-unused-expression": false,
     "max-line-length": [
       true,
       {

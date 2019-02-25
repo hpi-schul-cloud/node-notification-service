@@ -7,7 +7,7 @@ import Utils from '@/utils';
 import logger from '@/config/logger';
 
 
-function getType(object: Object | null) {
+function getType(object: object | null) {
 	if (object === null) { return 'null'; }
 	return object.constructor.name;
 }
@@ -55,8 +55,7 @@ export default abstract class BaseService {
 
 	// region private methods
 
-	protected abstract _send(transporter: nodeMailer.Transporter | firebaseMessaging.Messaging,
-														            message: Mail | firebaseMessaging.Message): Promise<SentMessageInfo | string>;
+	protected abstract _send(transporter: nodeMailer.Transporter | firebaseMessaging.Messaging, message: Mail | firebaseMessaging.Message): Promise<SentMessageInfo | string>;
 
 	protected abstract _createTransporter(config: any): nodeMailer.Transporter | firebaseMessaging.Messaging;
 

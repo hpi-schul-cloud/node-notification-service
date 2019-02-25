@@ -86,7 +86,7 @@ app.get('/users', (req, res) => {
 	});
 });
 
-app.use(function(err: HttpException, req: Request, res: Response, next: NextFunction) {
+app.use((err: HttpException, req: Request, res: Response, next: NextFunction) => {
 	// set locals, only providing error in development
 	res.locals.message = err.message || 'unknown error';
 	res.locals.error = req.app.get('NODE_ENV') !== 'production' ? err : {};
@@ -100,7 +100,8 @@ app.use(function(err: HttpException, req: Request, res: Response, next: NextFunc
 app.listen(port);
 
 const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
+// tslint:disable-next-line: no-console
+db.on('error', console.error.bind(logger, 'connection error:'));
 
 mongoose.connect(`mongodb://${process.env.MONGO_HOST || 'localhost'}/notification-service`);
 

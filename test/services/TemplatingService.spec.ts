@@ -102,11 +102,11 @@ describe('TemplatingService.createPushMessage', () => {
 describe('TemplatingService.createMailMessage with callbackLink', () => {
 
 	let mail: Mail;
-	const templatingService = new TemplatingService(message.platform, 'callback-link', message.payload, message.languagePayloads, messageId);
+	const tpls = new TemplatingService(message.platform, 'callback-link', message.payload, message.languagePayloads, messageId);
 
 
 	beforeEach('create a mail message.', () => {
-		mail = templatingService.createMailMessage(receiver);
+		mail = tpls.createMailMessage(receiver);
 	});
 
 	it('should replace placeholders with payload values (3).', () => {

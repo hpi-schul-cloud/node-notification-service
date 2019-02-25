@@ -9,7 +9,7 @@ import messageModel, { MessageModel } from '@/models/message';
 import MessageService from '@/services/MessageService';
 import message from '@test/data/message';
 import config from '@test/config';
-import RequestMessage from '@/interfaces/RequestMessage';
+import logger from '@/config/logger';
 
 // Add extensions to chai
 chai.use(spies);
@@ -25,7 +25,8 @@ describe('MessageService.send', () => {
 	before('should establish a database connection.', (done) => {
 		// connect to database
 		const db = mongoose.connection;
-		db.on('error', console.error.bind(console, 'connection error:'));
+		// tslint:disable-next-line: no-console
+		db.on('error', console.error.bind(logger, 'connection error:'));
 		db.once('open', done);
 		mongoose.connect(config.MONGO_DB_PATH);
 	});
@@ -120,8 +121,8 @@ describe('MessageService.send', () => {
 		const messages = await messageService.byUser(userId);
 		expect(messages.length).to.be.greaterThan(0);
 		const dbMessages: MessageModel[] = messages
-			.filter((message: MessageModel) =>
-				mongoose.Types.ObjectId(messageId).equals(message._id));
+			.filter((msg: MessageModel) =>
+				mongoose.Types.ObjectId(messageId).equals(msg._id));
 		expect(dbMessages.length).to.be.equal(1);
 		const dbMessage = dbMessages[0];
 		expect(dbMessage.receivers.length, // FIXME fails on travis

@@ -7,6 +7,7 @@ import DeviceModel from '@/models/device';
 import DeviceService from '@/services/DeviceService';
 import device from '@test/data/device';
 import config from '@test/config';
+import logger from '@/config/logger';
 
 // Add extensions to chai
 chai.use(subset);
@@ -19,7 +20,8 @@ describe('DeviceService', () => {
 	before('should establish a database connection.', (done) => {
 		// connect to database
 		const db = mongoose.connection;
-		db.on('error', console.error.bind(console, 'connection error:'));
+		// tslint:disable-next-line: no-console
+		db.on('error', console.error.bind(logger, 'connection error:'));
 		db.once('open', done);
 		mongoose.connect(config.MONGO_DB_PATH);
 	});

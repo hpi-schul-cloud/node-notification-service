@@ -11,21 +11,21 @@ import Utils from '@/utils';
 const router: express.Router = express.Router();
 const pushService: PushService = new PushService();
 
-const PromiseAny = function(promises: Array<Promise<any>>) {
-	return new Promise(function(resolve, reject) {
-		let count = promises.length,
-			resolved = false;
+const PromiseAny = (promises: Array<Promise<any>>) => {
+	return new Promise((resolve, reject) => {
+		let count = promises.length;
+		let resolved = false;
 		if (count === 0) {
 			reject(new Error('No promises resolved successfully.'));
 		}
-		promises.forEach(function(p) {
+		promises.forEach((p) => {
 			Promise.resolve(p).then(
-				function(value) {
+				(value) => {
 					resolved = true;
 					count--;
 					resolve(value);
 				},
-				function() {
+				() => {
 					count--;
 					if (count === 0 && !resolved) {
 						reject(new Error('No promises resolved successfully.'));
@@ -58,7 +58,7 @@ router.post('/', (req, res) => {
 					// todo avoid recreation of templatingService for each receiver device/user
 					templatingService = new TemplatingService(req.body.platform, req.body.template,
 						req.body.payload, req.body.languagePayloads, messageId, receiver.language);
-					if (service == 'firebase') {
+					if (service === 'firebase') {
 						const pushMessage = templatingService.createPushMessage(receiver, device);
 						// FIXME add queuing, add rest route for queue length
 						queuedMessages.push(pushService.send(req.body.platform, pushMessage, device));

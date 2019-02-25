@@ -60,7 +60,7 @@ export default class EscalationLogic {
 					// todo avoid recreation of templatingService for each receiver device/user
 					templatingService = new TemplatingService(message.platform, message.template,
 						message.payload, message.languagePayloads, messageId, receiver.language);
-					if (service == 'firebase') {
+					if (service === 'firebase') {
 						const pushMessage = templatingService.createPushMessage(receiver, device);
 						// FIXME add queuing, add rest route for queue length
 						this.pushService.send(message.platform, pushMessage, device, messageId);

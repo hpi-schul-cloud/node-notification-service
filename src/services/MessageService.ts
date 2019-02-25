@@ -66,7 +66,7 @@ export default class MessageService {
 			throw new Error(errorMessage);
 		}
 		const message = databaseMessage.toObject();
-		if (!message.receivers || message.receivers.filter((receiver: UserResource) => receiver.userId.equals(userId)).length == 0) {
+		if (!message.receivers || message.receivers.filter((receiver: UserResource) => receiver.userId.equals(userId)).length === 0) {
 			const errorMessage = `Could not find Receiver in Message`;
 			winston.error(errorMessage);
 			throw new Error(errorMessage);
@@ -99,10 +99,10 @@ export default class MessageService {
 	}
 
 	/**
-   * populates and cleanup message from other users data like other receivers or callbacks
-   * @param message
-   * @param userId
-   */
+	 * populates and cleanup message from other users data like other receivers or callbacks
+	 * @param message
+	 * @param userId
+	 */
 	private static filter(message: Message, userId: mongoose.Types.ObjectId) {
 		// FIXME decorator pattern?
 		const uid = userId.toString();

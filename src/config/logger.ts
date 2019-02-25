@@ -45,7 +45,7 @@ export class LoggerStream {
 if (process.env.NODE_ENV === 'production') {
 	logger.debug('Logging initialized at production level');
 } else {
-	logger.debug('Logging initialized at development level');
+	logger.debug('Logging initialized at development level, set NODE_ENV === \'production\' for production use.');
 }
 
 export default logger;
