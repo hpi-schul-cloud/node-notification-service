@@ -30,7 +30,7 @@ describe('PushService.send', () => {
 		});
 
 		// Send a push
-		await pushService.send(message.platform, push);
+		await pushService.send(message.platform, push, (push as any).token, 'noId');
 	});
 
 	it('should send a push.', () => {
