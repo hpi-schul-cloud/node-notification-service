@@ -31,7 +31,7 @@ describe('MailService.send', () => {
 		});
 
 		// Send a mail
-		messageInfo = await mailService.send(message.platform, mail, mail.to, 'noId');
+		messageInfo = await mailService.directSend(message.platform, mail, mail.to, 'noId');
 	});
 
 	it('should send an mail, accepted by the receiver.', async () => {

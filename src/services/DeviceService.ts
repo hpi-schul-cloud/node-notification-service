@@ -1,4 +1,3 @@
-import winston from 'winston';
 import DeviceModel from '@/models/device';
 import logger from '@/config/logger';
 import mongoose from 'mongoose';

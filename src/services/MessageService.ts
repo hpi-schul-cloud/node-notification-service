@@ -4,9 +4,9 @@ import MessageModel from '@/models/message';
 import Message from '@/interfaces/Message';
 import mongoose from 'mongoose';
 import axios from 'axios';
-import winston from 'winston';
 import UserResource from '@/interfaces/UserResource';
 import Callback from '@/interfaces/Callback';
+import logger from '@/config/logger';
 
 export default class MessageService {
 	// region public static methods
@@ -62,13 +62,13 @@ export default class MessageService {
 		const databaseMessage = await MessageModel.findById(messageId);
 		if (!databaseMessage) {
 			const errorMessage = `Message (id: ${messageId}) not found.`;
-			winston.error(errorMessage);
+			logger.error(errorMessage);
 			throw new Error(errorMessage);
 		}
 		const message = databaseMessage.toObject();
 		if (!message.receivers || message.receivers.filter((receiver: UserResource) => receiver.userId.equals(userId)).length === 0) {
 			const errorMessage = `Could not find Receiver in Message`;
-			winston.error(errorMessage);
+			logger.error(errorMessage);
 			throw new Error(errorMessage);
 		}
 		if (message.seenCallback.filter((cb: Callback) => cb.userId.equals(userId)).length === 0) {
@@ -83,14 +83,14 @@ export default class MessageService {
 		const message = await MessageModel.findById(messageId);
 		if (!message) {
 			const errorMessage = `Message (id: ${messageId}) not found.`;
-			winston.error(errorMessage);
+			logger.error(errorMessage);
 			throw new Error(errorMessage);
 		}
 
 		const user = message.receivers.find((receiver) => receiver.userId.equals(userId));
 		if (!user) {
 			const errorMessage = `User (userId: ${userId}) not found in Message (id: ${messageId}).`;
-			winston.error(errorMessage);
+			logger.error(errorMessage);
 			throw new Error(errorMessage);
 		}
 

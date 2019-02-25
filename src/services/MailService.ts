@@ -1,6 +1,7 @@
 import nodeMailer, { SentMessageInfo } from 'nodemailer';
 import BaseService from '@/services/BaseService';
 import Mail from '@/interfaces/Mail';
+import Queue from 'bee-queue';
 
 export default class MailService extends BaseService {
 	// region public static methods
@@ -27,6 +28,10 @@ export default class MailService extends BaseService {
 	protected _createTransporter(config: any): nodeMailer.Transporter {
 		// todo check default from becomes defined
 		return nodeMailer.createTransport(config.mail.options, config.mail.defaults);
+	}
+
+	protected _createQueue(config: any): Queue {
+		return new Queue((config.queue.name_prefix || '') + 'mail');
 	}
 
 	// endregion

@@ -1,12 +1,12 @@
 import { messaging as firebaseMessaging } from 'firebase-admin';
 import Mustache from 'mustache';
-import winston from 'winston';
 import Mail from '@/interfaces/Mail';
 import Template from '@/interfaces/Template';
 import LanguagePayload from '@/interfaces/LanguagePayload';
 import UserResource from '@/interfaces/UserResource';
 import Utils from '@/utils';
 import Payload from '@/interfaces/Payload';
+import logger from '@/config/logger';
 
 const MAIL_MESSAGE = 'MAIL';
 const PUSH_MESSAGE = 'PUSH';
@@ -147,7 +147,7 @@ export default class TemplatingService {
 
 		if (!parsedMessageTemplate) {
 			const errorMessage = `Could not find message template for type ${type}`;
-			winston.error(errorMessage);
+			logger.error(errorMessage);
 			throw new Error(errorMessage);
 		}
 
@@ -159,7 +159,7 @@ export default class TemplatingService {
 
 		if (!messagePayload) {
 			const errorMessage = `Could not find message payload for language ${user.language}`;
-			winston.error(errorMessage);
+			logger.error(errorMessage);
 			throw new Error(errorMessage);
 		}
 

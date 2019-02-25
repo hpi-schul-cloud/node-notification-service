@@ -2,6 +2,7 @@ import firebaseAdmin, { messaging as firebaseMessaging } from 'firebase-admin';
 import BaseService from '@/services/BaseService';
 import DeviceService from './DeviceService';
 import mongoose from 'mongoose';
+import Queue from 'bee-queue';
 
 export default class PushService extends BaseService {
 
@@ -40,6 +41,10 @@ export default class PushService extends BaseService {
 			credential: firebaseAdmin.credential.cert(config.push.service_account_object),
 			databaseURL: config.push.databaseURL,
 		}).messaging();
+	}
+
+	protected _createQueue(config: any): Queue {
+		return new Queue((config.queue.name_prefix || '') + 'push');
 	}
 
 	// endregion

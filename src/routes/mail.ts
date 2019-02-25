@@ -1,7 +1,7 @@
-import winston from 'winston';
 import express from 'express';
 import MailService from '@/services/MailService';
 import Mail from '@/interfaces/Mail';
+import logger from '@/config/logger';
 
 const router: express.Router = express.Router();
 const mailService: MailService = new MailService();
@@ -20,10 +20,10 @@ router.post('/', (req, res) => {
 
 	mailService.send(req.body.platformId, mail, req.body.to)
 		.then((response: any) => {
-			winston.info(response);
+			logger.info(response);
 		})
-		.catch((e: Error) => {
-			winston.error(e);
+		.catch((error: Error) => {
+			logger.error({ error, platformId: req.body.platformId, mail, to: req.body.to });
 		});
 
 	res.send('Mail queued.');

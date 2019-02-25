@@ -2,20 +2,25 @@ import yaml from 'js-yaml';
 import fs from 'fs';
 import path from 'path';
 import Template from '@/interfaces/Template';
-import winston from 'winston';
+import logger from './config/logger';
+import defaults from 'defaults-deep';
 
 export default class Utils {
 	public static getPlatformConfig(platformId: string): any {
-		let config = {};
 		try {
-			config = require(`../platforms/${platformId}/config.json`);
-		} catch (err) {
-			winston.error(
-				'config.json missing. copy config.default.json to selected platform folder and rename. use default fallback instead...',
+			let config = require(`../platforms/${platformId}/config.json`) || {};
+			config = defaults(
+				config,
+				require(`../platforms/config.default.json`),
 			);
-			config = require(`../platforms/config.default.json`);
+			logger.debug('config loaded', config);
+			return config;
+		} catch (err) {
+			logger.error(
+				'config.json missing. copy config.default.json to selected platform folder and rename.',
+			);
+			return require(`../platforms/config.default.json`);
 		}
-		return config;
 	}
 
 	public static loadTemplate(
