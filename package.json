@@ -48,6 +48,7 @@
     "mustache": "^2.3.0",
     "nodemailer": "^4.6.5",
     "swagger-ui-express": "^3.0.10",
+    "typescript-tslint-plugin": "^0.3.1",
     "winston": "^3.2.1"
   },
   "devDependencies": {
@@ -66,6 +67,7 @@
     "chai-subset": "^1.6.0",
     "mocha": "^5.2.0",
     "nodemon": "^1.17.5",
+    "pre-commit": "^1.2.2",
     "ts-node": "^7.0.0",
     "tsconfig-paths": "^3.4.2",
     "tslint": "^5.10.0",

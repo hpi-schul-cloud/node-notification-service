@@ -31,5 +31,12 @@
         "ignore-pattern": "^import |^export {(.*?)}"
       }
     ]
+  },
+  "compilerOptions": {
+    "plugins": [
+      {
+        "name": "typescript-tslint-plugin"
+      }
+    ]
   }
 }
