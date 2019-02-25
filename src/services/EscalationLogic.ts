@@ -103,7 +103,7 @@ export default class EscalationLogic {
 
       const mailMessage = templatingService.createMailMessage(receiver);
       // FIXME add queuing, add rest route for queue length
-      this.mailService.send(message.platform, mailMessage, receiver.mail, messageId);
+      this.mailService.send(message.platform, mailMessage, receiver.userId.toString(), messageId);
     }
   }
   // endregion

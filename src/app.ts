@@ -86,7 +86,7 @@ app.get('/users', (req, res) => {
   });
 });
 
-app.use(function (err: HttpException, req: Request, res: Response, next: NextFunction) {
+app.use(function(err: HttpException, req: Request, res: Response, next: NextFunction) {
   // set locals, only providing error in development
   res.locals.message = err.message || 'unknown error';
   res.locals.error = req.app.get('NODE_ENV') !== 'production' ? err : {};

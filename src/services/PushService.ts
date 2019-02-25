@@ -30,7 +30,7 @@ export default class PushService extends BaseService {
       if (error.code === 'messaging/registration-token-not-registered') {
         await DeviceService.removeDevice((push as any).token);
       }
-      return Promise.reject(error.code);
+      return Promise.reject(error);
     });
   }
 

@@ -1,8 +1,7 @@
 import winston from 'winston';
 import DeviceModel from '@/models/device';
-import Device from '../interfaces/Device';
+import logger from '@/config/logger';
 import mongoose from 'mongoose';
-import { error } from 'util';
 
 export default class DeviceService {
   // region public static methods
@@ -34,15 +33,17 @@ export default class DeviceService {
   }
 
   /** removed a device, if only token defined it can remove multiple devices from different users if they have shared one device */
-  public static async removeDevice(token: string, platform?: string, userId?: mongoose.Types.ObjectId ): Promise<String[]> {
+  public static async removeDevice(token: string, platform?: string, userId?: mongoose.Types.ObjectId): Promise<String[]> {
     if (userId && platform) {
       const device = await DeviceModel.findOne({ platform, userId, tokens: token });
       if (device) {
         const deleted = device.tokens.filter((t) => t === token);
         device.tokens = device.tokens.filter((t) => t !== token);
         await device.save();
+        logger.info('devices removed', { deleted, token, userId, platform });
         return deleted;
       }
+      logger.warn('no devices removed', { token, userId, platform });
       return [];
     } else {
       const devices = await DeviceModel.find({ tokens: token });
@@ -54,8 +55,12 @@ export default class DeviceService {
           await device.save();
           return Promise.resolve();
         });
-        return Promise.all(chain).then(() => deleted);
+        return Promise.all(chain).then(() => {
+          logger.debug('devices removed using token', { deleted, token });
+          return deleted
+        });
       }
+      logger.warn('no devices removed using token', { token });
       return [];
     }
 

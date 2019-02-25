@@ -8,7 +8,7 @@ import logger from '@/config/logger';
 
 
 function getType(object: Object | null) {
-  if (object === null) return 'null';
+  if (object === null) { return 'null'; }
   return object.constructor.name;
 }
 
@@ -34,17 +34,21 @@ export default abstract class BaseService {
 
   // region public methods
 
-  public async send(platformId: string, message: Mail | firebaseMessaging.Message, receiver: string, messageId?: string, ): Promise<SentMessageInfo | string> {
-    let transporter = null;
+  public send(platformId: string, message: Mail | firebaseMessaging.Message, receiver: string, messageId?: string): Promise<SentMessageInfo | string> {
+    let transporter: any = null;
     try {
       transporter = this.getTransporter(platformId);
-      const info: SentMessageInfo | string = await this._send(transporter, message);
-      logger.info('message successfully sent', { platformId, transporter: getType(transporter), receiver, messageId });
-      return info;
     } catch (error) {
-      logger.error(error.message, { platformId, transporter: getType(transporter), receiver, messageId });
       return Promise.reject(error);
     }
+    return this._send(transporter, message)
+      .then((info) => {
+        logger.info('message sent', { platformId, transporter: getType(transporter), receiver, messageId });
+        return Promise.resolve(info);
+      }).catch((error) => {
+        logger.error('message not sent', { error, platformId, transporter: getType(transporter), receiver, messageId });
+        return Promise.resolve();
+      });
   }
 
   // endregion
