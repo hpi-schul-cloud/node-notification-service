@@ -3,12 +3,12 @@ import express, { NextFunction, Request, Response } from 'express';
 import bodyParser from 'body-parser';
 import swaggerUi from 'swagger-ui-express';
 import morgan from 'morgan';
-import mjson from 'morgan-json';
+const mjson = require('morgan-json');
 import logger, { LoggerStream } from '@/config/logger';
 
 import mailRouter from '@/routes/mail';
 import pushRouter from '@/routes/push';
-import messageRouter from '@/routes/message';
+import messageRouter, { messageService } from '@/routes/message';
 import deviceRouter from '@/routes/device';
 import HttpException from './exceptions/httpException';
 
@@ -109,9 +109,9 @@ process.on('SIGINT', () => {
 	logger.info('[shutdown] close http connections...');
 	instance.close(() => {
 		logger.info('[shutdown] http connections closed.');
-		logger.info('[shutdown] close open redis queue instances...');
-		messageService.shutdown().then(() => {
-			logger.info('[shutdown] closed open redis queue instances.');
+		logger.info('[shutdown] close message queue instances...');
+		messageService.close().then(() => {
+			logger.info('[shutdown] closed message queue instances.');
 			logger.info('[shutdown] exit...');
 			process.exit();
 		});
