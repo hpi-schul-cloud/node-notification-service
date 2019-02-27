@@ -6,18 +6,28 @@ import UserResource from '@/interfaces/UserResource';
 import TemplatingService from '@/services/TemplatingService';
 import message from '@test/data/message';
 
-// Instantiate the service
-const messageId = 'a1a2a3a4a5a6a7a8a9a0a1a2';
-const templatingService =
-	new TemplatingService(message.platform, message.template, message.payload, message.languagePayloads, messageId);
-const receiver: UserResource = (message.receivers[0] as UserResource);
 
 describe('TemplatingService.createMailMessage', () => {
 
 	let mail: Mail;
+	let messageId: string;
+	let receiver: UserResource;
+	let templatingService: TemplatingService;
 
-	beforeEach('create a mail message.', () => {
-		mail = templatingService.createMailMessage(receiver);
+	before('Instantiate the service', async () => {
+		messageId = 'a1a2a3a4a5a6a7a8a9a0a1a2';
+		templatingService = await TemplatingService.create(
+			message.platform,
+			message.template,
+			message.payload,
+			message.languagePayloads,
+			messageId,
+		);
+		receiver = (message.receivers[0] as UserResource);
+	});
+
+	beforeEach('create a mail message.', async () => {
+		mail = await templatingService.createMailMessage(receiver);
 	});
 
 	it('should create a valid mail.', () => {
@@ -71,9 +81,24 @@ describe('TemplatingService.createMailMessage', () => {
 describe('TemplatingService.createPushMessage', () => {
 
 	let push: firebaseMessaging.Message;
+	let messageId: string;
+	let receiver: UserResource;
+	let templatingService: TemplatingService;
 
-	beforeEach('create a push message.', () => {
-		push = templatingService.createPushMessage(receiver, 'test-device');
+	before('Instantiate the service', async () => {
+		messageId = 'a1a2a3a4a5a6a7a8a9a0a1a3';
+		templatingService = await TemplatingService.create(
+			message.platform,
+			message.template,
+			message.payload,
+			message.languagePayloads,
+			messageId,
+		);
+		receiver = (message.receivers[0] as UserResource);
+	});
+
+	beforeEach('create a push message.', async () => {
+		push = await templatingService.createPushMessage(receiver, 'test-device');
 	});
 
 	it('should create a valid push notification.', () => {
@@ -102,11 +127,25 @@ describe('TemplatingService.createPushMessage', () => {
 describe('TemplatingService.createMailMessage with callbackLink', () => {
 
 	let mail: Mail;
-	const tpls = new TemplatingService(message.platform, 'callback-link', message.payload, message.languagePayloads, messageId);
+	let messageId: string;
+	let receiver: UserResource;
+	let tpls: TemplatingService;
+
+	before('Instantiate the service', async () => {
+		messageId = 'a1a2a3a4a5a6a7a8a9a0a1a4';
+		tpls = await TemplatingService.create(
+			message.platform,
+			'callback-link',
+			message.payload,
+			message.languagePayloads,
+			messageId,
+		);
+		receiver = (message.receivers[0] as UserResource);
+	});
 
 
-	beforeEach('create a mail message.', () => {
-		mail = tpls.createMailMessage(receiver);
+	beforeEach('create a mail message.', async () => {
+		mail = await tpls.createMailMessage(receiver);
 	});
 
 	it('should replace placeholders with payload values (3).', () => {

@@ -9,6 +9,7 @@ import device from '@test/data/device';
 import Utils from '@/utils';
 import config from '@test/config';
 import TestUtils from '@test/test-utils';
+import { clearScreenDown } from 'readline';
 
 // Add extensions to chai
 chai.use(spies);
@@ -19,7 +20,7 @@ const SERVICE = 'firebase';
 describe('EscalationLogic.escalate', () => {
 
 	// Instantiate the service
-	const messageService = new MessageService();
+	let messageService: MessageService;
 
 	before('should establish a database connection.', (done) => {
 		// connect to database
@@ -28,6 +29,7 @@ describe('EscalationLogic.escalate', () => {
 		db.on('error', console.error.bind(console, 'connection error:'));
 		db.once('open', done);
 		mongoose.connect(config.MONGO_DB_PATH);
+		messageService = new MessageService();
 	});
 
 	it('should call the escalation logic.', async () => {
@@ -47,7 +49,7 @@ describe('EscalationLogic.escalate', () => {
 		expect(spyFunctionPush, 'push spy not executed')
 			.to.have.been.called();
 
-		const conf = Utils.getPlatformConfig(message.platform);
+		const conf = await Utils.getPlatformConfig(message.platform);
 
 		await TestUtils.timeout(conf.mail.defaults.delay + 10);
 		expect(spyFunctionMail, 'mail spy not executed')
@@ -56,7 +58,8 @@ describe('EscalationLogic.escalate', () => {
 
 	after('should drop database and close connection', (done) => {
 		mongoose.connection.db.dropDatabase(() => {
-			mongoose.connection.close(done);
+			mongoose.connection.close()
+				.then(() => messageService.close().then(() => done()));
 		});
 	});
 

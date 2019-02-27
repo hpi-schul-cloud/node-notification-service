@@ -169,7 +169,9 @@ describe('MessageService.send', () => {
 
 	after('should drop database and close connection', (done) => {
 		mongoose.connection.db.dropDatabase(() => {
-			mongoose.connection.close(done);
+			mongoose.connection.close().then(() => {
+				messageService.close().then(() => done());
+			});
 		});
 	});
 });

@@ -75,9 +75,9 @@ export default class MessageService {
 		if (message.seenCallback.filter((cb: Callback) => cb.userId.equals(userId)).length === 0) {
 			databaseMessage.seenCallback.push({ userId });
 			return await databaseMessage.save();
-		} else {
-			return message;
 		}
+		return message;
+
 	}
 
 	private static async removeReceiverFromMessage(messageId: string, userId: string) {
@@ -116,9 +116,9 @@ export default class MessageService {
 		const messages = await MessageModel.find({ 'receivers.userId': { $in: userId } }).exec();
 		if (messages && messages.length !== 0) {
 			return messages.map((message) => this.filter(message.toObject(), userId));
-		} else {
-			return [];
 		}
+		return [];
+
 	}
 	// endregion
 
@@ -168,6 +168,10 @@ export default class MessageService {
 						};
 					});
 			}));
+	}
+
+	public close() {
+		return this.escalationLogic.close();
 	}
 	// endregion
 

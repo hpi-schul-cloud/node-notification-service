@@ -51,4 +51,8 @@ describe('MailService.send', () => {
 			.to.have.property('from', mail.from);
 	});
 
+	after('close mail service', () => {
+		return mailService.close();
+	});
+
 });

@@ -1,10 +1,7 @@
-import winston from 'winston';
-import { messaging as firebaseMessaging, FirebaseError } from 'firebase-admin';
+import logger from '@/config/logger';
 import express from 'express';
 import PushService from '@/services/PushService';
 import DeviceService from '@/services/DeviceService';
-import mongoose from 'mongoose';
-import utils from '@/utils';
 import TemplatingService from '@/services/TemplatingService';
 import Utils from '@/utils';
 
@@ -38,7 +35,7 @@ const PromiseAny = (promises: Array<Promise<any>>) => {
 
 router.post('/', (req, res) => {
 
-	if (utils.parametersMissing(['platform', 'template', 'payload', 'languagePayloads', 'receivers'], req.body, res)) { return; }
+	if (Utils.parametersMissing(['platform', 'template', 'payload', 'languagePayloads', 'receivers'], req.body, res)) { return; }
 
 	// Construct Templating Service
 	let templatingService: TemplatingService;
@@ -56,10 +53,10 @@ router.post('/', (req, res) => {
 				const receiverDevices = await DeviceService.getDevices(req.body.platform, receiver.userId, service);
 				for (const device of receiverDevices) {
 					// todo avoid recreation of templatingService for each receiver device/user
-					templatingService = new TemplatingService(req.body.platform, req.body.template,
+					templatingService = await TemplatingService.create(req.body.platform, req.body.template,
 						req.body.payload, req.body.languagePayloads, messageId, receiver.language);
 					if (service === 'firebase') {
-						const pushMessage = templatingService.createPushMessage(receiver, device);
+						const pushMessage = await templatingService.createPushMessage(receiver, device);
 						// FIXME add queuing, add rest route for queue length
 						queuedMessages.push(pushService.send(req.body.platform, pushMessage, device));
 					}
@@ -67,7 +64,7 @@ router.post('/', (req, res) => {
 						// const pushMessage = templatingService.createSafariPushMessage(receiver, device);
 						// // FIXME add queuing, add rest route for queue length
 						// this.pushService.send(message.platform, pushMessage);
-						winston.error('unsupported send service requested: ' + service);
+						logger.error('unsupported send service requested: ' + service);
 					}
 				}
 			});

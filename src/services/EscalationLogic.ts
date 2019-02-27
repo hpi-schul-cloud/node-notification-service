@@ -45,6 +45,13 @@ export default class EscalationLogic {
 		return q;
 	}
 
+	public close = () => {
+		return Promise.all([
+			this.mailService.close(),
+			this.pushService.close(),
+		]);
+	}
+
 	public async escalate(messageId: string) {
 		const databaseMessage = await MessageModel.findById(messageId);
 		if (!databaseMessage) {
@@ -68,10 +75,10 @@ export default class EscalationLogic {
 				const receiverDevices = await DeviceService.getDevices(message.platform, receiver.userId, service);
 				for (const device of receiverDevices) {
 					// todo avoid recreation of templatingService for each receiver device/user
-					templatingService = new TemplatingService(message.platform, message.template,
+					templatingService = await TemplatingService.create(message.platform, message.template,
 						message.payload, message.languagePayloads, messageId, receiver.language);
 					if (service === 'firebase') {
-						const pushMessage = templatingService.createPushMessage(receiver, device);
+						const pushMessage = await templatingService.createPushMessage(receiver, device);
 						// FIXME add queuing, add rest route for queue length
 						this.pushService.send(message.platform, pushMessage, device, messageId);
 					}
@@ -86,7 +93,7 @@ export default class EscalationLogic {
 		}
 
 		// Send mail messages after 4 hours delay
-		const config = Utils.getPlatformConfig(message.platform);
+		const config = await Utils.getPlatformConfig(message.platform);
 		setTimeout(() => { this.sendMailMessages(messageId); }, config.mail.defaults.delay);
 		// todo send mail message without delay if there was no push device registered
 	}
@@ -108,10 +115,10 @@ export default class EscalationLogic {
 				continue;
 			}
 
-			const templatingService = new TemplatingService(message.platform, message.template,
+			const templatingService = await TemplatingService.create(message.platform, message.template,
 				message.payload, message.languagePayloads, messageId, receiver.language);
 
-			const mailMessage = templatingService.createMailMessage(receiver);
+			const mailMessage = await templatingService.createMailMessage(receiver);
 			// FIXME add queuing, add rest route for queue length
 			this.mailService.send(message.platform, mailMessage, receiver.userId.toString(), messageId);
 		}

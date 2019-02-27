@@ -38,4 +38,8 @@ describe('PushService.send', () => {
 			.to.have.been.called();
 	});
 
+	after('close push service', () => {
+		return pushService.close();
+	});
+
 });

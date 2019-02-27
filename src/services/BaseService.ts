@@ -6,7 +6,7 @@ import PlatformPushTransporter from '@/interfaces/PlatformPushTransporter';
 import PlatformQueue from '@/interfaces/PlatformQueue';
 import Utils from '@/utils';
 import logger from '@/config/logger';
-import Queue from 'bee-queue';
+import Queue, { Job } from 'bee-queue';
 
 
 function getType(object: object | null) {
@@ -34,22 +34,31 @@ export default abstract class BaseService {
 
 	// region constructor
 	constructor() {
-		const { platforms_enabled } = Utils.getPlatformConfig();
-		platforms_enabled.map((platform: string) => this.createQueue(platform));
+		Utils.getPlatformIds()
+			.then((platforms) => {
+				platforms.forEach((platform: string) => this.createQueue(platform));
+			});
 	}
 
 	// endregion
 
 	// region public methods
 
-	public send(platformId: string, message: Mail | firebaseMessaging.Message, receiver: string, messageId?: string): Promise<string> {
-		const config = Utils.getPlatformConfig(platformId);
-		const queue = this.getQueue(platformId);
+	public close() {
+		return Promise.all(this.queues.map((pq) => {
+			logger.debug('[queue] ' + pq.queue.name + ' will be closed...');
+			pq.queue.close();
+		}));
+	}
+
+	public async send(platformId: string, message: Mail | firebaseMessaging.Message, receiver: string, messageId?: string): Promise<string> {
+		const config = await Utils.getPlatformConfig(platformId);
+		const queue = await this.getQueue(platformId);
 		return queue.createJob({ platformId, message, receiver, messageId })
 			.retries(config.queue.retries)
 			.timeout(config.queue.timeout)
 			.save()
-			.then((job) => job.id);
+			.then((job: Job) => job.id);
 	}
 
 	public directSend(platformId: string, message: Mail | firebaseMessaging.Message, receiver: string, messageId?: string): Promise<string> {
@@ -65,8 +74,8 @@ export default abstract class BaseService {
 
 	protected abstract _createQueue(config: any): Queue;
 
-	private createTransporter(platformId: string): nodeMailer.Transporter | firebaseMessaging.Messaging {
-		const config = Utils.getPlatformConfig(platformId);
+	private async createTransporter(platformId: string): Promise<nodeMailer.Transporter | firebaseMessaging.Messaging> {
+		const config = await Utils.getPlatformConfig(platformId);
 		const transporter = this._createTransporter(config);
 		const platformPushTransporter = {
 			platformId,
@@ -76,7 +85,7 @@ export default abstract class BaseService {
 		return transporter;
 	}
 
-	private getTransporter(platformId: string): nodeMailer.Transporter | firebaseMessaging.Messaging {
+	private async getTransporter(platformId: string): Promise<nodeMailer.Transporter | firebaseMessaging.Messaging> {
 		const currentTransporter: PlatformMailTransporter | PlatformPushTransporter | undefined = this.transporters.find(
 			(transporter: PlatformMailTransporter | PlatformPushTransporter) => {
 				return transporter.platformId === platformId;
@@ -87,27 +96,27 @@ export default abstract class BaseService {
 			return currentTransporter.transporter;
 		}
 
-		return this.createTransporter(platformId);
+		return await this.createTransporter(platformId);
 	}
 
-	private createQueue(platformId: string): Queue {
-		const config = Utils.getPlatformConfig(platformId);
+	private async createQueue(platformId: string): Promise<Queue> {
+		const config = await Utils.getPlatformConfig(platformId);
 		const queue = this._createQueue(config);
 		queue.on('ready', () => {
-			logger.debug('queue ' + queue.name + ' ready...');
+			logger.debug('[queue] ' + queue.name + ': ready...');
 		});
 		queue.on('retrying', (job, err) => {
-			logger.warn(`Job ${job.id} failed with error ${err.message} but is being retried!`);
+			logger.warn('[queue] ' + queue.name + `: Job ${job.id} failed with error ${err.message} but is being retried!`);
 		});
 		queue.on('failed', (job, err) => {
-			logger.error(`Job ${job.id} failed with error ${err.message}`);
+			logger.error('[queue] ' + queue.name + `: Job ${job.id} failed with error ${err.message}`);
 		});
 		queue.on('stalled', (jobId) => {
-			logger.warn(`Job ${jobId} stalled and will be reprocessed`);
+			logger.warn('[queue] ' + queue.name + `: Job ${jobId} stalled and will be reprocessed`);
 		});
 		queue.process((job: any, done: Queue.DoneCallback<{}>) => {
 			const { message, receiver, messageId } = job.data;
-			logger.debug('queue ' + queue.name + ' processing message' + messageId + ' for receiver ' + receiver);
+			logger.debug('[queue] ' + queue.name + ': processing message' + messageId + ' for receiver ' + receiver);
 			return this.process(platformId, message, receiver, messageId, queue)
 				.then((info) => done(null, info))
 				.catch((error) => done(error));
@@ -120,11 +129,11 @@ export default abstract class BaseService {
 		return queue;
 	}
 
-	private process(platformId: string, message: any, receiver: string, messageId?: string, queue?: Queue) {
-		const transporter = this.getTransporter(platformId);
+	private async process(platformId: string, message: any, receiver: string, messageId?: string, queue?: Queue) {
+		const transporter = await this.getTransporter(platformId);
 		return this._send(transporter, message)
 			.then((info) => {
-				logger.info('message sent', {
+				logger.info('[message] sent', {
 					queue: queue ? queue.name : null,
 					platformId,
 					transporter: getType(transporter),
@@ -133,7 +142,7 @@ export default abstract class BaseService {
 				});
 				return Promise.resolve(info);
 			}).catch((error) => {
-				logger.error('message not sent', {
+				logger.error('[message] not sent', {
 					queue: queue ? queue.name : null,
 					error,
 					platformId,
@@ -145,7 +154,7 @@ export default abstract class BaseService {
 			});
 	}
 
-	private getQueue(platformId: string): Queue {
+	private async getQueue(platformId: string): Promise<Queue> {
 		const currentQueue: any | undefined = this.queues.find(
 			(queue: PlatformQueue) => {
 				return queue.platformId === platformId;
@@ -156,8 +165,10 @@ export default abstract class BaseService {
 			return currentQueue.queue;
 		}
 
-		return this.createQueue(platformId);
+		return await this.createQueue(platformId);
 	}
+
+
 
 	// endregion
 }

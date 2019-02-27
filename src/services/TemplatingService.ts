@@ -1,28 +1,39 @@
-import { messaging as firebaseMessaging } from 'firebase-admin';
-import Mustache from 'mustache';
-import Mail from '@/interfaces/Mail';
-import Template from '@/interfaces/Template';
+import logger from '@/config/logger';
 import LanguagePayload from '@/interfaces/LanguagePayload';
+import Mail from '@/interfaces/Mail';
+import Payload from '@/interfaces/Payload';
+import Template from '@/interfaces/Template';
 import UserResource from '@/interfaces/UserResource';
 import Utils from '@/utils';
-import Payload from '@/interfaces/Payload';
-import logger from '@/config/logger';
+import { messaging as firebaseMessaging } from 'firebase-admin';
+import Mustache from 'mustache';
 
 const MAIL_MESSAGE = 'MAIL';
 const PUSH_MESSAGE = 'PUSH';
 
 export default class TemplatingService {
+
+
+
+
+	public static async create(platformId: string, templateId: string, payload: {}, languagePayloads: LanguagePayload[], messageId: string, language?: string) {
+		const templatingService = new TemplatingService(platformId, messageId);
+		templatingService.parsedMessageTemplates = await TemplatingService.initializeMessageTemplates(platformId, templateId, language);
+		templatingService.messagePayloads = TemplatingService.initializeMessagePayloads(payload, languagePayloads);
+		return templatingService;
+	}
 	// region public static methods
 	// endregion
 
 	// region private static methods
-	private static initializeMessageTemplates(platformId: string, templateId: string, language?: string): Template[] {
+	private static async initializeMessageTemplates(platformId: string, templateId: string, language?: string): Promise<Template[]> {
 		// FIXME fetch all languages and initialize only once
-		return [MAIL_MESSAGE, PUSH_MESSAGE].map((type) => {
-			const messageTemplate = Utils.loadTemplate(platformId, templateId, type, language);
+		const templates = [MAIL_MESSAGE, PUSH_MESSAGE].map(async (type) => {
+			const messageTemplate = await Utils.loadTemplate(platformId, templateId, type, language);
 			TemplatingService.parseMessageTemplate(messageTemplate);
 			return messageTemplate;
 		});
+		return Promise.all(templates);
 	}
 
 	private static parseMessageTemplate(template: Template) {
@@ -39,7 +50,87 @@ export default class TemplatingService {
 		}
 	}
 
-	private static renderMessageTemplate(template: Template, payload: Payload, functions?: any): Template {
+	private static initializeMessagePayloads(payload: any, languagePayloads: LanguagePayload[]): Payload[] {
+		return languagePayloads.map((languagePayload: LanguagePayload): Payload => {
+			return {
+				_id: Utils.guid(),
+				message: payload,
+				languageId: languagePayload.language,
+				language: languagePayload.payload,
+				user: {},
+			};
+		});
+	}
+	// endregion
+
+	// region public members
+	public platform: string;
+	public messageId: string;
+
+	// region public methods
+	// endregion
+
+	// region private members
+
+	private parsedMessageTemplates: Template[];
+	private messagePayloads: Payload[];
+
+	// endregion
+
+	// region constructor
+
+	private constructor(platformId: string, messageId: string) {
+		this.platform = platformId;
+		this.messageId = messageId;
+		this.parsedMessageTemplates = [];
+		this.messagePayloads = [];
+	}
+
+	public async createMailMessage(user: UserResource): Promise<Mail> {
+		const template = this.getTemplate(MAIL_MESSAGE);
+		const payload = this.getUserPayload(user);
+		const functions = await this.getMustacheFunctions(user);
+		const renderedTemplate = this.renderMessageTemplate(template, payload, functions);
+
+		const mail = {
+			from: renderedTemplate.from,
+			to: user.mail,
+			subject: renderedTemplate.subject,
+			text: renderedTemplate.text,
+			html: renderedTemplate.html,
+		};
+		return mail;
+	}
+
+	public async createPushMessage(user: UserResource, device: string): Promise<firebaseMessaging.Message> {
+
+		const template = this.getTemplate(PUSH_MESSAGE);
+		const payload = this.getUserPayload(user);
+		const functions = await this.getMustacheFunctions(user);
+		const renderedTemplate = this.renderMessageTemplate(template, payload, functions);
+		const push = {
+			token: device,
+			data: renderedTemplate.data,
+			notification: renderedTemplate.notification,
+			android: renderedTemplate.android,
+			webpush: renderedTemplate.webpush,
+			apns: renderedTemplate.apns,
+		};
+		return push;
+	}
+
+	public createSafariPushMessage(user: UserResource, device: string): Promise<any> {
+		// FIXME create safari push message type for send interface
+		throw Error('safari push currently not supported');
+	}
+	public async getMustacheFunctions(user: any): Promise<any> {
+		return await Utils.mustacheFunctions(this.platform, this.messageId, user.userId);
+	}
+	// endregion
+
+	// region private methods
+
+	private renderMessageTemplate(template: Template, payload: Payload, functions?: any): any {
 		const enrichedPayload = Object.assign({}, payload, functions ? functions : {});
 		const compiledTemplate = Object.assign({}, template);
 		for (const key in compiledTemplate) {
@@ -54,90 +145,6 @@ export default class TemplatingService {
 			}
 		}
 		return compiledTemplate;
-	}
-
-	private static initializeMessagePayloads(payload: any, languagePayloads: LanguagePayload[]): Payload[] {
-		return languagePayloads.map((languagePayload: LanguagePayload): Payload => {
-			return {
-				_id: Utils.guid(),
-				message: payload,
-				languageId: languagePayload.language,
-				language: languagePayload.payload,
-				user: {},
-			};
-		});
-	}
-	public platform: string;
-	public messageId: string;
-	// endregion
-
-	// region public members
-	// endregion
-
-	// region private members
-
-	private parsedMessageTemplates: Template[];
-	private messagePayloads: Payload[];
-
-	// endregion
-
-	// region constructor
-
-	public constructor(platformId: string, templateId: string, payload: {}, languagePayloads: LanguagePayload[], messageId: string, language?: string) {
-		this.platform = platformId;
-		this.messageId = messageId;
-		this.parsedMessageTemplates = TemplatingService.initializeMessageTemplates(platformId, templateId, language);
-		this.messagePayloads = TemplatingService.initializeMessagePayloads(payload, languagePayloads);
-	}
-
-	// endregion
-
-	// region public methods
-
-	public createMailMessage(user: UserResource): Mail {
-		const template = this.getTemplate(MAIL_MESSAGE);
-		const payload = this.getUserPayload(user);
-		const functions = this.getMustacheFunctions(user);
-		const renderedTemplate = TemplatingService.renderMessageTemplate(template, payload, functions);
-
-		const mail = {
-			from: renderedTemplate.from,
-			to: user.mail,
-			subject: renderedTemplate.subject,
-			text: renderedTemplate.text,
-			html: renderedTemplate.html,
-		};
-		return mail;
-	}
-
-	public createPushMessage(user: UserResource, device: string): firebaseMessaging.Message {
-
-		const template = this.getTemplate(PUSH_MESSAGE);
-		const payload = this.getUserPayload(user);
-		const functions = this.getMustacheFunctions(user);
-		const renderedTemplate = TemplatingService.renderMessageTemplate(template, payload, functions);
-		const push = {
-			token: device,
-			data: renderedTemplate.data,
-			notification: renderedTemplate.notification,
-			android: renderedTemplate.android,
-			webpush: renderedTemplate.webpush,
-			apns: renderedTemplate.apns,
-		};
-		return push;
-	}
-
-	public createSafariPushMessage(user: UserResource, device: string): any {
-		// FIXME create safari push message type for send interface
-		throw Error('safari push currently not supported');
-	}
-
-	// endregion
-
-	// region private methods
-
-	private getMustacheFunctions(user: any): any {
-		return Utils.mustacheFunctions(this.platform, this.messageId, user.userId);
 	}
 
 	private getTemplate(type: string): Template {

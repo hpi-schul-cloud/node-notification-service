@@ -4,31 +4,46 @@ import path from 'path';
 import Template from '@/interfaces/Template';
 import logger from './config/logger';
 import defaults from 'defaults-deep';
+import Cache from '@/config/cache';
 
-export default class Utils {
-	public static getPlatformConfig(platformId?: string): any {
-		try {
-			let config = platformId ? require(`../platforms/${platformId}/config.json`) : {};
-			config = defaults(
-				config,
-				require(`../platforms/config.default.json`),
-			);
-			logger.debug('platform config loaded', { platformId, config });
-			return config;
-		} catch (err) {
-			logger.error(
-				'config.json missing. copy config.default.json to selected platform folder and rename.',
-			);
-			return require(`../platforms/config.default.json`);
-		}
+class Utils {
+
+	private static _getPlatformConfig(platformId?: string): any {
+		return new Promise((resolve: any) => {
+			try {
+				let config: {} = platformId ? require(`../platforms/${platformId}/config.json`) : {};
+				config = defaults(
+					config,
+					require(`../platforms/config.default.json`),
+				);
+				logger.debug('platform config loaded', { platformId, config });
+				resolve(config);
+			} catch (err) {
+				logger.error(
+					'config.json missing. copy config.default.json to selected platform folder and rename.',
+				);
+				resolve(require(`../platforms/config.default.json`));
+			}
+		});
 	}
 
-	public static loadTemplate(
+	private static _getPlatformIds(): Promise<string[]> {
+		return new Promise((resolve: any) => {
+			const platformDir = path.join(__dirname, '..', 'platforms');
+			const files = fs.readdirSync(platformDir);
+			const platformIds = files.filter((file) => fs.lstatSync(path.join(platformDir, file)).isDirectory());
+			logger.debug('platformIds loaded', { platformIds });
+			resolve(platformIds);
+		});
+	}
+
+
+	private static _loadTemplate(
 		platformId: string,
 		templateId: string,
 		type: string,
 		language?: string,
-	): Template {
+	): Promise<Template> {
 		let template: Template;
 		let templatePath = path.join(
 			__dirname,
@@ -58,29 +73,40 @@ export default class Utils {
 		if (language) {
 			template.language = language;
 		}
-		return template;
+		return Promise.resolve(template);
 	}
 
-	public static mustacheFunctions(
+
+	private cache: Cache;
+
+	constructor() {
+		this.cache = new Cache(60);
+	}
+
+	public async getPlatformConfig(platformId?: string): Promise<any> {
+		const platform = platformId || 'default';
+		return this.cache.get('platform_config_' + platform, () => {
+			return Utils._getPlatformConfig();
+		});
+	}
+
+	public async getPlatformIds(): Promise<string[]> {
+		return await this.cache.get('platformIds', () => Utils._getPlatformIds());
+	}
+
+	public loadTemplate(
 		platformId: string,
-		messageId: string,
-		receiverId: string,
-	): any {
-		const config = Utils.getPlatformConfig(platformId);
-		return {
-			callbackLink() {
-				const url = config.callback.url;
-				return (text: any, render: any) => {
-					return url
-						.replace('{RECEIVER_ID}', receiverId)
-						.replace('{MESSAGE_ID}', messageId)
-						.replace('{REDIRECT_URL}', render(text));
-				};
-			},
-		};
+		templateId: string,
+		type: string,
+		language?: string,
+	): Promise<Template> {
+		const cacheKey = `${platformId}_${templateId}_${type}_${language ? language : 'nolanguage'}`;
+		return this.cache.get(cacheKey, () => {
+			return Utils._loadTemplate(platformId, templateId, type, language);
+		});
 	}
 
-	public static guid() {
+	public guid() {
 		function s4() {
 			return Math.floor((1 + Math.random()) * 0x10000)
 				.toString(16)
@@ -102,7 +128,7 @@ export default class Utils {
 		);
 	}
 
-	public static parametersMissing(parametersList: string[], base: any, res: any) {
+	public parametersMissing(parametersList: string[], base: any, res: any) {
 		for (const parameter of parametersList) {
 			if (!base.hasOwnProperty(parameter)) {
 				res.status(400).send('Missing parameter: ' + parameter + '.');
@@ -111,7 +137,29 @@ export default class Utils {
 		}
 	}
 
-	public static serviceEnum() {
+	public serviceEnum() {
 		return ['firebase', 'safari'];
 	}
+
+	public async mustacheFunctions(
+		platformId: string,
+		messageId: string,
+		receiverId: string,
+	): Promise<any> {
+		const config = await this.getPlatformConfig(platformId);
+		return {
+			callbackLink() {
+				const url = config.callback.url;
+				return (text: any, render: any) => {
+					return url
+						.replace('{RECEIVER_ID}', receiverId)
+						.replace('{MESSAGE_ID}', messageId)
+						.replace('{REDIRECT_URL}', render(text));
+				};
+			},
+		};
+	}
+
 }
+
+export default new Utils();

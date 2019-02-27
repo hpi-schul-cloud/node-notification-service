@@ -46,6 +46,7 @@
     "morgan": "^1.9.1",
     "morgan-json": "^1.1.0",
     "mustache": "^2.3.0",
+    "node-cache": "^4.2.0",
     "nodemailer": "^4.6.5",
     "swagger-ui-express": "^3.0.10",
     "typescript-tslint-plugin": "^0.3.1",
@@ -71,6 +72,7 @@
     "ts-node": "^7.0.0",
     "tsconfig-paths": "^3.4.2",
     "tslint": "^5.10.0",
+    "tslint-config-airbnb": "^5.11.1",
     "typescript": "^2.8.3"
   }
 }

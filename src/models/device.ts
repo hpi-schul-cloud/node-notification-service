@@ -6,16 +6,16 @@ export interface IDeviceModel extends Device, Document {
 }
 
 const deviceSchema = new Schema({
-	userId: { type: Types.ObjectId, required: true },
-	platform: { type: String, required: true },
-	service: { type: String, required: true, enum: utils.serviceEnum() },
-	tokens: [String],
+  userId: { type: Types.ObjectId, required: true },
+  platform: { type: String, required: true },
+  service: { type: String, required: true, enum: utils.serviceEnum() },
+  tokens: [String],
 });
 
 deviceSchema.post('save', async (device: IDeviceModel) => {
-	if (device.tokens.length === 0) {
-		await device.remove();
-	}
+  if (device.tokens.length === 0) {
+  await device.remove();
+}
 });
 
 const deviceModel: Model<IDeviceModel> = model('Device', deviceSchema);

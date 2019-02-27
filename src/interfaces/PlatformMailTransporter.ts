@@ -1,6 +1,6 @@
 import nodeMailer from 'nodemailer';
 
 export default interface PlatformMailTransporter {
-	platformId: string;
-	transporter: nodeMailer.Transporter;
+  platformId: string;
+  transporter: nodeMailer.Transporter;
 }

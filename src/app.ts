@@ -3,7 +3,7 @@ import express, { NextFunction, Request, Response } from 'express';
 import bodyParser from 'body-parser';
 import swaggerUi from 'swagger-ui-express';
 import morgan from 'morgan';
-const json = require('morgan-json');
+import mjson from 'morgan-json';
 import logger, { LoggerStream } from '@/config/logger';
 
 import mailRouter from '@/routes/mail';
@@ -16,7 +16,7 @@ const app: express.Application = express();
 
 const port: string = process.env.NOTIFICATION_PORT || '3000';
 
-const format = json(':status :method :url :res[content-length] bytes :response-time ms');
+const format = mjson(':status :method :url :res[content-length] bytes :response-time ms');
 app.use(morgan(format, { stream: new LoggerStream('request') }));
 process.stdout.pipe(logger);
 process.stderr.pipe(logger);
@@ -97,12 +97,25 @@ app.use((err: HttpException, req: Request, res: Response, next: NextFunction) =>
 	res.render('error');
 });
 
-app.listen(port);
-
 const db = mongoose.connection;
 // tslint:disable-next-line: no-console
 db.on('error', console.error.bind(logger, 'connection error:'));
-
 mongoose.connect(`mongodb://${process.env.MONGO_HOST || 'localhost'}/notification-service`);
 
-export default app;
+const instance = app.listen(port);
+
+process.on('SIGINT', () => {
+	logger.info('[shutdown] SIGINT received: gracefully shutting down...)');
+	logger.info('[shutdown] close http connections...');
+	instance.close(() => {
+		logger.info('[shutdown] http connections closed.');
+		logger.info('[shutdown] close open redis queue instances...');
+		messageService.shutdown().then(() => {
+			logger.info('[shutdown] closed open redis queue instances.');
+			logger.info('[shutdown] exit...');
+			process.exit();
+		});
+	});
+});
+
+export default instance;
