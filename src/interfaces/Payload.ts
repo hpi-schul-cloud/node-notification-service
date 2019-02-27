@@ -1,7 +1,7 @@
 export default interface Payload {
-  _id: string;
-  message: {};
-  languageId: string;
-  language: {};
-  user: {};
+	_id: string;
+	message: {};
+	languageId: string;
+	language: {};
+	user: {};
 }

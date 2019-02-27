@@ -21,18 +21,18 @@ export default class MailService extends BaseService {
 
 	// region public methods
 
-  protected _send(transporter: nodeMailer.Transporter, mail: Mail): Promise<SentMessageInfo> {
-  return transporter.sendMail(mail);
-}
+	protected _send(transporter: nodeMailer.Transporter, mail: Mail): Promise<SentMessageInfo> {
+		return transporter.sendMail(mail);
+	}
 
-  protected _createTransporter(config: any): nodeMailer.Transporter {
+	protected _createTransporter(config: any): nodeMailer.Transporter {
 		// todo check default from becomes defined
-  return nodeMailer.createTransport(config.mail.options, config.mail.defaults);
-}
+		return nodeMailer.createTransport(config.mail.options, config.mail.defaults);
+	}
 
-  protected _createQueue(config: any): Queue {
-  return new Queue((config.queue.name_prefix || '') + 'mail');
-}
+	protected _createQueue(config: any): Queue {
+		return new Queue((config.queue.name_prefix || '') + 'mail');
+	}
 
 	// endregion
 
