@@ -66,14 +66,15 @@ export default abstract class BaseService {
 	// region private members
 
 	private transporters: any[] = [];
+	private platforms: string[];
 
 	// endregion
 
 
 	// region constructor
 	protected constructor() {
-		const platforms = Utils.getPlatformIds();
-		for (const platform of platforms) {
+		this.platforms = Utils.getPlatformIds();
+		for (const platform of this.platforms) {
 			logger.debug('[queue] init for platform ' + platform + ' and service ' + this._serviceType());
 			this.getQueue(platform);
 		}
@@ -105,8 +106,8 @@ export default abstract class BaseService {
 	}
 	protected abstract _serviceType(): string;
 
-	private async createTransporter(platformId: string): Promise<nodeMailer.Transporter | firebaseMessaging.Messaging> {
-		const config = await Utils.getPlatformConfig(platformId);
+	private createTransporter(platformId: string): nodeMailer.Transporter | firebaseMessaging.Messaging {
+		const config = Utils.getPlatformConfig(platformId);
 		const transporter = this._createTransporter(config);
 		const platformPushTransporter = {
 			platformId,
@@ -116,7 +117,7 @@ export default abstract class BaseService {
 		return transporter;
 	}
 
-	private async getTransporter(platformId: string): Promise<nodeMailer.Transporter | firebaseMessaging.Messaging> {
+	private getTransporter(platformId: string): nodeMailer.Transporter | firebaseMessaging.Messaging {
 		const currentTransporter: PlatformMailTransporter | PlatformPushTransporter | undefined = this.transporters.find(
 			(transporter: PlatformMailTransporter | PlatformPushTransporter) => {
 				return transporter.platformId === platformId;
@@ -127,7 +128,7 @@ export default abstract class BaseService {
 			return currentTransporter.transporter;
 		}
 
-		return await this.createTransporter(platformId);
+		return this.createTransporter(platformId);
 	}
 
 	private createQueue(platformId: string): Queue {
@@ -148,10 +149,16 @@ export default abstract class BaseService {
 		queue.process((job: any, done: Queue.DoneCallback<{}>) => {
 			// tslint:disable-next-line: no-shadowed-variable
 			const { platformId, message, receiver, messageId } = job.data;
-			logger.debug('[queue] ' + queue.name + ': processing message ' + messageId + ' for receiver ' + receiver);
+			logger.debug('[queue:' + queue.name + '] processing job ' + job.id, { messageId, receiver });
 			return this.process(platformId, message, receiver, messageId, queue)
-				.then((info) => done(null, info))
-				.catch((error) => done(error));
+				.then((info) => {
+					logger.debug('[queue:' + queue.name + '] finished job ' + job.id, { messageId, receiver });
+					done(null, info);
+				})
+				.catch((error) => {
+					logger.error('[queue:' + queue.name + '] failed job ' + job.id, { messageId, receiver });
+					done(error);
+				});
 		});
 		BaseService.queues.push(queue);
 		return queue;

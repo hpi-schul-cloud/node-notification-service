@@ -20,7 +20,7 @@ class Cache {
 		const value = this.cache.get(key);
 		if (value) {
 			logger.debug(`[cache] resolve '${key}' from cache...`);
-			return Promise.resolve(value);
+			return value;
 		}
 
 		logger.debug(`[cache] resolve '${key}' from storeFunction...`);

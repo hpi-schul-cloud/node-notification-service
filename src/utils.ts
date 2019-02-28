@@ -9,22 +9,20 @@ import Cache from '@/config/cache';
 class Utils {
 
 	private static _getPlatformConfig(platformId?: string): any {
-		return new Promise((resolve: any) => {
-			try {
-				let config: {} = platformId ? require(`../platforms/${platformId}/config.json`) : {};
-				config = defaults(
-					config,
-					require(`../platforms/config.default.json`),
-				);
-				logger.debug('platform config loaded', { platformId, config });
-				resolve(config);
-			} catch (err) {
-				logger.error(
-					'config.json missing. copy config.default.json to selected platform folder and rename.',
-				);
-				resolve(require(`../platforms/config.default.json`));
-			}
-		});
+		try {
+			let config: {} = platformId ? require(`../platforms/${platformId}/config.json`) : {};
+			config = defaults(
+				config,
+				require(`../platforms/config.default.json`),
+			);
+			logger.debug('platform config loaded', { platformId, config });
+			return (config);
+		} catch (err) {
+			logger.error(
+				'config.json missing. copy config.default.json to selected platform folder and rename.',
+			);
+			return (require(`../platforms/config.default.json`));
+		}
 	}
 
 	private static _getPlatformIds(): string[] {
@@ -83,10 +81,10 @@ class Utils {
 		this.platformIds = Utils._getPlatformIds();
 	}
 
-	public getPlatformConfig(platformId?: string): Promise<any> {
+	public getPlatformConfig(platformId?: string): any {
 		const platform = platformId || 'default';
 		return this.cache.get('platform_config_' + platform, () => {
-			return Utils._getPlatformConfig();
+			return Promise.resolve(Utils._getPlatformConfig(platformId));
 		});
 	}
 
