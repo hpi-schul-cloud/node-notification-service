@@ -33,12 +33,7 @@
     "url": "http://localhost:3100/notification/callback/{MESSAGE_ID}/seenBy/{RECEIVER_ID}/?redirect={REDIRECT_URL}"
   },
   "queue": {
-    "name_prefix": "test_",
     "timeout": "10000",
     "retries": 2
-  },
-  "platforms_enabled": [
-    "schul-cloud",
-    "testplatform"
-  ]
+  }
 }
