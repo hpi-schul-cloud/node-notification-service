@@ -6,6 +6,7 @@ import morgan from 'morgan';
 const mjson = require('morgan-json');
 import logger, { LoggerStream } from '@/config/logger';
 
+import statisticRouter from '@/routes/statistic';
 import mailRouter from '@/routes/mail';
 import pushRouter from '@/routes/push';
 import messageRouter from '@/routes/message';
@@ -26,6 +27,7 @@ process.stderr.pipe(logger);
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+app.use('/statistic', statisticRouter);
 app.use('/mails', mailRouter);
 app.use('/push', pushRouter);
 app.use('/messages', messageRouter);

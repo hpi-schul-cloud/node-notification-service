@@ -2,7 +2,6 @@ import express from 'express';
 import MessageService from '@/services/MessageService';
 import RequestMessage from '@/interfaces/RequestMessage';
 import utils from '@/utils';
-import BaseService from '@/services/BaseService';
 
 const router: express.Router = express.Router();
 
@@ -79,15 +78,6 @@ router.post('/:messageId/remove/:userId', async (req, res) => {
 		const message = await messageService
 			.remove(req.params.messageId, req.params.userId);
 		res.send(message);
-	} catch (e) {
-		res.status(400).send(e.message);
-	}
-});
-
-router.get('/health', async (req, res) => {
-	try {
-		const health = await BaseService.healthState();
-		res.send(health);
 	} catch (e) {
 		res.status(400).send(e.message);
 	}
