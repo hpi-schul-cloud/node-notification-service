@@ -150,13 +150,13 @@ export default abstract class BaseService {
 			// tslint:disable-next-line: no-shadowed-variable
 			const { platformId, message, receiver, messageId } = job.data;
 			logger.debug('[queue:' + queue.name + '] processing job ' + job.id, { messageId, receiver });
-			return this.process(platformId, message, receiver, messageId, queue)
+			this.process(platformId, message, receiver, messageId, queue)
 				.then((info) => {
-					logger.debug('[queue:' + queue.name + '] finished job ' + job.id, { messageId, receiver });
+					logger.debug('[processing queue:' + queue.name + '] finished job ' + job.id, { messageId, receiver });
 					done(null, info);
 				})
 				.catch((error) => {
-					logger.error('[queue:' + queue.name + '] failed job ' + job.id, { messageId, receiver });
+					logger.error('[processing queue:' + queue.name + '] failed job ' + job.id, { messageId, receiver });
 					done(error);
 				});
 		});
