@@ -3,7 +3,6 @@ import { messaging as firebaseMessaging } from 'firebase-admin';
 import Mail from '@/interfaces/Mail';
 import PlatformMailTransporter from '@/interfaces/PlatformMailTransporter';
 import PlatformPushTransporter from '@/interfaces/PlatformPushTransporter';
-import PlatformQueue from '@/interfaces/PlatformQueue';
 import Utils from '@/utils';
 import logger from '@/config/logger';
 import Queue, { Job } from 'bee-queue';
@@ -16,44 +15,73 @@ function getType(object: object | null) {
 
 export default abstract class BaseService {
 	// region public static methods
-	// endregion
+	public static getQueues(): Queue[] {
+		return this.queues;
+	}
+	public static healthState() {
+		return Promise.all(BaseService.queues
+			.map((queue: Queue) => {
+				return queue.checkHealth()
+					.then((health: any) => {
+						return {
+							queue: queue.name,
+							health,
+						};
+					});
+			}),
+		);
+	}
 
-	// region private static methods
-	// endregion
-
-	// region public members
-	public readonly queues: PlatformQueue[] = [];
-	// endregion
-
-	// region private members
-
-	private readonly transporters: any[] = [];
-
-	// endregion
-
-
-	// region constructor
-	constructor() {
-		Utils.getPlatformIds()
-			.then((platforms) => {
-				platforms.forEach((platform: string) => this.createQueue(platform));
-			});
+	public static close() {
+		if (BaseService.queues.length === 0) {
+			logger.debug('[queue] no queues to be closed...');
+			return Promise.resolve();
+		}
+		return Promise.all(BaseService.queues.map(async (queue) => {
+			logger.debug('[queue] ' + queue.name + ' will be closed...');
+			try {
+				await queue.close();
+				return Promise.resolve();
+			} catch (error) {
+				logger.error('[queue] failed to gracefully shut down queue ' + queue.name, error);
+				return Promise.reject();
+			}
+		})).then(() => Promise.resolve());
 	}
 
 	// endregion
 
 	// region public methods
 
-	public close() {
-		return Promise.all(this.queues.map((pq) => {
-			logger.debug('[queue] ' + pq.queue.name + ' will be closed...');
-			pq.queue.close();
-		}));
+
+	// endregion
+
+	// region private static methods
+	// endregion
+
+	// region public members
+	private static queues: Queue[] = [];
+	// endregion
+
+	// region private members
+
+	private transporters: any[] = [];
+
+	// endregion
+
+
+	// region constructor
+	protected constructor() {
+		const platforms = Utils.getPlatformIds();
+		for (const platform of platforms) {
+			logger.debug('[queue] init for platform ' + platform + ' and service ' + this._serviceType());
+			this.getQueue(platform);
+		}
 	}
 
 	public async send(platformId: string, message: Mail | firebaseMessaging.Message, receiver: string, messageId?: string): Promise<string> {
 		const config = await Utils.getPlatformConfig(platformId);
-		const queue = await this.getQueue(platformId);
+		const queue = this.getQueue(platformId);
 		return queue.createJob({ platformId, message, receiver, messageId })
 			.retries(config.queue.retries)
 			.timeout(config.queue.timeout)
@@ -72,7 +100,10 @@ export default abstract class BaseService {
 
 	protected abstract _createTransporter(config: any): nodeMailer.Transporter | firebaseMessaging.Messaging;
 
-	protected abstract _createQueue(config: any): Queue;
+	protected _createQueueName(platformId: string): string {
+		return platformId + '_' + this._serviceType();
+	}
+	protected abstract _serviceType(): string;
 
 	private async createTransporter(platformId: string): Promise<nodeMailer.Transporter | firebaseMessaging.Messaging> {
 		const config = await Utils.getPlatformConfig(platformId);
@@ -99,11 +130,11 @@ export default abstract class BaseService {
 		return await this.createTransporter(platformId);
 	}
 
-	private async createQueue(platformId: string): Promise<Queue> {
-		const config = await Utils.getPlatformConfig(platformId);
-		const queue = this._createQueue(config);
+	private createQueue(platformId: string): Queue {
+		logger.debug('[setup] initialize service queue: ' + this._createQueueName(platformId));
+		const queue = new Queue(this._createQueueName(platformId));
 		queue.on('ready', () => {
-			logger.debug('[queue] ' + queue.name + ': ready...');
+			logger.debug('[queue] ' + queue.name + ': ready... execute BaseService.close() for graceful shutdown.');
 		});
 		queue.on('retrying', (job, err) => {
 			logger.warn('[queue] ' + queue.name + `: Job ${job.id} failed with error ${err.message} but is being retried!`);
@@ -115,22 +146,20 @@ export default abstract class BaseService {
 			logger.warn('[queue] ' + queue.name + `: Job ${jobId} stalled and will be reprocessed`);
 		});
 		queue.process((job: any, done: Queue.DoneCallback<{}>) => {
-			const { message, receiver, messageId } = job.data;
-			logger.debug('[queue] ' + queue.name + ': processing message' + messageId + ' for receiver ' + receiver);
+			// tslint:disable-next-line: no-shadowed-variable
+			const { platformId, message, receiver, messageId } = job.data;
+			logger.debug('[queue] ' + queue.name + ': processing message ' + messageId + ' for receiver ' + receiver);
 			return this.process(platformId, message, receiver, messageId, queue)
 				.then((info) => done(null, info))
 				.catch((error) => done(error));
 		});
-		const platformQueue: PlatformQueue = {
-			platformId,
-			queue,
-		};
-		this.queues.push(platformQueue);
+		BaseService.queues.push(queue);
 		return queue;
 	}
 
 	private async process(platformId: string, message: any, receiver: string, messageId?: string, queue?: Queue) {
 		const transporter = await this.getTransporter(platformId);
+		logger.debug('send message...', { transporter, platformId, receiver, messageId, queue: queue ? queue.name : null });
 		return this._send(transporter, message)
 			.then((info) => {
 				logger.info('[message] sent', {
@@ -154,18 +183,18 @@ export default abstract class BaseService {
 			});
 	}
 
-	private async getQueue(platformId: string): Promise<Queue> {
-		const currentQueue: any | undefined = this.queues.find(
-			(queue: PlatformQueue) => {
-				return queue.platformId === platformId;
+	private getQueue(platformId: string): Queue {
+		const currentQueue: any | undefined = BaseService.queues.find(
+			(queue: Queue) => {
+				return queue.name === this._createQueueName(platformId);
 			},
 		);
 
 		if (currentQueue) {
-			return currentQueue.queue;
+			return currentQueue;
 		}
 
-		return await this.createQueue(platformId);
+		return this.createQueue(platformId);
 	}
 
 

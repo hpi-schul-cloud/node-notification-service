@@ -8,7 +8,7 @@ import message from '@test/data/message';
 describe('MailService.send', () => {
 
 	// Instantiate the service
-	const mailService = new MailService();
+	const mailService: MailService = new MailService();
 	let messageInfo: any;
 
 	before('should send an mail.', async () => {
@@ -49,10 +49,6 @@ describe('MailService.send', () => {
 	it('should send an mail, from the given sender.', async () => {
 		expect(messageInfo.envelope)
 			.to.have.property('from', mail.from);
-	});
-
-	after('close mail service', () => {
-		return mailService.close();
 	});
 
 });

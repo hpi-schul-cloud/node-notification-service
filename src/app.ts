@@ -8,9 +8,11 @@ import logger, { LoggerStream } from '@/config/logger';
 
 import mailRouter from '@/routes/mail';
 import pushRouter from '@/routes/push';
-import messageRouter, { messageService } from '@/routes/message';
+import messageRouter from '@/routes/message';
 import deviceRouter from '@/routes/device';
 import HttpException from './exceptions/httpException';
+import BaseService from './services/BaseService';
+
 
 const app: express.Application = express();
 
@@ -107,15 +109,13 @@ const instance = app.listen(port);
 process.on('SIGINT', () => {
 	logger.info('[shutdown] SIGINT received: gracefully shutting down...)');
 	logger.info('[shutdown] close http connections...');
-	instance.close(() => {
+	instance.close(async () => {
 		logger.info('[shutdown] http connections closed.');
 		logger.info('[shutdown] close message queue instances...');
-		messageService.close().then(() => {
-			logger.info('[shutdown] closed message queue instances.');
-			logger.info('[shutdown] exit...');
-			process.exit();
-		});
+		await BaseService.close();
+		logger.info('[shutdown] closed message queue instances.');
+		logger.info('[shutdown] exit...');
+		process.exit();
+
 	});
 });
-
-export default instance;

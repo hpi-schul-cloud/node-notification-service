@@ -2,13 +2,8 @@ import firebaseAdmin, { messaging as firebaseMessaging } from 'firebase-admin';
 import BaseService from '@/services/BaseService';
 import DeviceService from './DeviceService';
 import mongoose from 'mongoose';
-import Queue from 'bee-queue';
 
 export default class PushService extends BaseService {
-
-	public removeToken(platform: string, userId: string, device: string): any {
-		return DeviceService.removeDevice(device, platform, mongoose.Types.ObjectId(userId));
-	}
 	// region public static methods
 	// endregion
 
@@ -22,9 +17,14 @@ export default class PushService extends BaseService {
 	// endregion
 
 	// region constructor
+	public constructor() { super(); }
 	// endregion
 
 	// region public methods
+
+	public removeToken(platform: string, userId: string, device: string): any {
+		return DeviceService.removeDevice(device, platform, mongoose.Types.ObjectId(userId));
+	}
 
 	protected _send(transporter: firebaseMessaging.Messaging, push: firebaseMessaging.Message): Promise<string> {
 		return transporter.send(push).catch(async (error) => {
@@ -43,8 +43,8 @@ export default class PushService extends BaseService {
 		}).messaging();
 	}
 
-	protected _createQueue(config: any): Queue {
-		return new Queue((config.queue.name_prefix || '') + 'push');
+	protected _serviceType(): string {
+		return 'push';
 	}
 
 	// endregion

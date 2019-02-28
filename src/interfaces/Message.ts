@@ -1,7 +1,6 @@
 import UserResource from '@/interfaces/UserResource';
 import LanguagePayload from '@/interfaces/LanguagePayload';
 import Callback from '@/interfaces/Callback';
-import { Types } from 'mongoose';
 
 export default interface Message {
 	platform: string;

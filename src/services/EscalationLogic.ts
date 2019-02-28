@@ -6,9 +6,6 @@ import MessageModel from '@/models/message';
 import Utils from '@/utils';
 import DeviceService from '@/services/DeviceService';
 import Message from '@/interfaces/Message';
-import { Document } from 'mongoose';
-import PlatformQueue from '@/interfaces/PlatformQueue';
-import { runInThisContext } from 'vm';
 
 export default class EscalationLogic {
 	// region public static methods
@@ -22,35 +19,16 @@ export default class EscalationLogic {
 
 	// region private members
 
-	private mailService: MailService;
-	private pushService: PushService;
+	private mailService = new MailService();
+	private pushService = new PushService();
 
 	// endregion
 
 	// region constructor
 
-	public constructor() {
-		this.mailService = new MailService();
-		this.pushService = new PushService();
-	}
-
 	// endregion
 
 	// region public methods
-
-	public queues = () => {
-		const q: PlatformQueue[] = [];
-		q.push(...this.mailService.queues);
-		q.push(...this.pushService.queues);
-		return q;
-	}
-
-	public close = () => {
-		return Promise.all([
-			this.mailService.close(),
-			this.pushService.close(),
-		]);
-	}
 
 	public async escalate(messageId: string) {
 		const databaseMessage = await MessageModel.findById(messageId);
@@ -71,7 +49,7 @@ export default class EscalationLogic {
 				continue;
 			}
 			const services = Utils.serviceEnum();
-			services.forEach(async (service) => {
+			for (const service of services) {
 				const receiverDevices = await DeviceService.getDevices(message.platform, receiver.userId, service);
 				for (const device of receiverDevices) {
 					// todo avoid recreation of templatingService for each receiver device/user
@@ -80,7 +58,7 @@ export default class EscalationLogic {
 					if (service === 'firebase') {
 						const pushMessage = await templatingService.createPushMessage(receiver, device);
 						// FIXME add queuing, add rest route for queue length
-						this.pushService.send(message.platform, pushMessage, device, messageId);
+						(await this.pushService).send(message.platform, pushMessage, device, messageId);
 					}
 					if (service === 'safari') {
 						// const pushMessage = templatingService.createSafariPushMessage(receiver, device);
@@ -89,7 +67,7 @@ export default class EscalationLogic {
 						logger.error('unsupported send service requested: ' + service);
 					}
 				}
-			});
+			}
 		}
 
 		// Send mail messages after 4 hours delay
@@ -120,7 +98,7 @@ export default class EscalationLogic {
 
 			const mailMessage = await templatingService.createMailMessage(receiver);
 			// FIXME add queuing, add rest route for queue length
-			this.mailService.send(message.platform, mailMessage, receiver.userId.toString(), messageId);
+			(await this.mailService).send(message.platform, mailMessage, receiver.userId.toString(), messageId);
 		}
 	}
 	// endregion

@@ -16,6 +16,7 @@ describe('PushService.send', () => {
 	const spyFunction = chai.spy();
 
 	before('should create a mock push transporter.', async () => {
+
 		const transporter = {
 			send() {
 				spyFunction();
@@ -36,10 +37,6 @@ describe('PushService.send', () => {
 	it('should send a push.', () => {
 		expect(spyFunction)
 			.to.have.been.called();
-	});
-
-	after('close push service', () => {
-		return pushService.close();
 	});
 
 });

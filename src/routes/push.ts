@@ -6,7 +6,8 @@ import TemplatingService from '@/services/TemplatingService';
 import Utils from '@/utils';
 
 const router: express.Router = express.Router();
-const pushService: PushService = new PushService();
+
+const pushService = new PushService();
 
 const PromiseAny = (promises: Array<Promise<any>>) => {
 	return new Promise((resolve, reject) => {
@@ -33,7 +34,7 @@ const PromiseAny = (promises: Array<Promise<any>>) => {
 	});
 };
 
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
 
 	if (Utils.parametersMissing(['platform', 'template', 'payload', 'languagePayloads', 'receivers'], req.body, res)) { return; }
 

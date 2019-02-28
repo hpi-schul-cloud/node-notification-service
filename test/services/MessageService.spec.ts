@@ -10,6 +10,9 @@ import MessageService from '@/services/MessageService';
 import message from '@test/data/message';
 import config from '@test/config';
 import logger from '@/config/logger';
+import BaseService from '@/services/BaseService';
+import MailService from '@/services/MailService';
+import PushService from '@/services/PushService';
 
 // Add extensions to chai
 chai.use(spies);
@@ -18,9 +21,10 @@ chai.use(asPromised);
 
 const expect = chai.expect;
 
+// Instantiate the service
+const messageService = new MessageService();
+
 describe('MessageService.send', () => {
-	// Instantiate the service
-	const messageService = new MessageService();
 
 	before('should establish a database connection.', (done) => {
 		// connect to database
@@ -162,16 +166,15 @@ describe('MessageService.send', () => {
 	});
 
 	it('should report health statistics for all queues', async () => {
-		await messageService.send(message);
-		const health = await messageService.health();
-		expect(health.length).to.be.greaterThan(0);
+		const mailService = new MailService();
+		const pushService = new PushService();
+		const health = await BaseService.healthState();
+		expect(health.length).to.be.greaterThan(1);
 	});
 
 	after('should drop database and close connection', (done) => {
 		mongoose.connection.db.dropDatabase(() => {
-			mongoose.connection.close().then(() => {
-				messageService.close().then(() => done());
-			});
+			mongoose.connection.close(done);
 		});
 	});
 });

@@ -2,6 +2,7 @@ import express from 'express';
 import MessageService from '@/services/MessageService';
 import RequestMessage from '@/interfaces/RequestMessage';
 import utils from '@/utils';
+import BaseService from '@/services/BaseService';
 
 const router: express.Router = express.Router();
 
@@ -85,7 +86,7 @@ router.post('/:messageId/remove/:userId', async (req, res) => {
 
 router.get('/health', async (req, res) => {
 	try {
-		const health = await messageService.health();
+		const health = await BaseService.healthState();
 		res.send(health);
 	} catch (e) {
 		res.status(400).send(e.message);

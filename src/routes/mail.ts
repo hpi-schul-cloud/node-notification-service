@@ -3,8 +3,9 @@ import MailService from '@/services/MailService';
 import Mail from '@/interfaces/Mail';
 import logger from '@/config/logger';
 
-const router: express.Router = express.Router();
-const mailService: MailService = new MailService();
+const router = express.Router();
+const mailService = new MailService();
+
 
 router.post('/', (req, res) => {
 	const mail: Mail = {
@@ -17,7 +18,6 @@ router.post('/', (req, res) => {
 	if (req.body.from) {
 		mail.from = req.body.from;
 	}
-
 	mailService.send(req.body.platformId, mail, req.body.to)
 		.then((response: any) => {
 			logger.info(response);

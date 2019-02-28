@@ -27,14 +27,12 @@ class Utils {
 		});
 	}
 
-	private static _getPlatformIds(): Promise<string[]> {
-		return new Promise((resolve: any) => {
-			const platformDir = path.join(__dirname, '..', 'platforms');
-			const files = fs.readdirSync(platformDir);
-			const platformIds = files.filter((file) => fs.lstatSync(path.join(platformDir, file)).isDirectory());
-			logger.debug('platformIds loaded', { platformIds });
-			resolve(platformIds);
-		});
+	private static _getPlatformIds(): string[] {
+		const platformDir = path.join(__dirname, '..', 'platforms');
+		const files = fs.readdirSync(platformDir);
+		const platformIds = files.filter((file) => fs.lstatSync(path.join(platformDir, file)).isDirectory());
+		logger.debug('platformIds loaded: ', { platformIds });
+		return platformIds;
 	}
 
 
@@ -78,20 +76,22 @@ class Utils {
 
 
 	private cache: Cache;
+	private platformIds: string[];
 
 	constructor() {
 		this.cache = new Cache(60);
+		this.platformIds = Utils._getPlatformIds();
 	}
 
-	public async getPlatformConfig(platformId?: string): Promise<any> {
+	public getPlatformConfig(platformId?: string): Promise<any> {
 		const platform = platformId || 'default';
 		return this.cache.get('platform_config_' + platform, () => {
 			return Utils._getPlatformConfig();
 		});
 	}
 
-	public async getPlatformIds(): Promise<string[]> {
-		return await this.cache.get('platformIds', () => Utils._getPlatformIds());
+	public getPlatformIds(): string[] {
+		return this.platformIds;
 	}
 
 	public loadTemplate(

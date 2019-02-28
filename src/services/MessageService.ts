@@ -7,7 +7,6 @@ import axios from 'axios';
 import UserResource from '@/interfaces/UserResource';
 import Callback from '@/interfaces/Callback';
 import logger from '@/config/logger';
-import PlatformQueue from '@/interfaces/PlatformQueue';
 
 export default class MessageService {
 	// region public static methods
@@ -136,6 +135,7 @@ export default class MessageService {
 	// endregion
 
 	// region public methods
+
 	public async send(message: RequestMessage): Promise<string> {
 		const messageId = await MessageService.save(message);
 		await this.escalationLogic.escalate(messageId);
@@ -157,22 +157,6 @@ export default class MessageService {
 		return await MessageService.messagesByUser(mongoose.Types.ObjectId(userId));
 	}
 
-	public async health() {
-		return Promise.all(this.escalationLogic.queues()
-			.map(async (platformQueue: PlatformQueue) => {
-				return platformQueue.queue.checkHealth()
-					.then((health: any) => {
-						return {
-							queue: platformQueue.queue.name,
-							health,
-						};
-					});
-			}));
-	}
-
-	public close() {
-		return this.escalationLogic.close();
-	}
 	// endregion
 
 	// region private methods

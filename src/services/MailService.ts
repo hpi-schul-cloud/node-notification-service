@@ -1,9 +1,12 @@
 import nodeMailer, { SentMessageInfo } from 'nodemailer';
 import BaseService from '@/services/BaseService';
 import Mail from '@/interfaces/Mail';
-import Queue from 'bee-queue';
 
 export default class MailService extends BaseService {
+	// endregion
+
+	// region public methods
+
 	// region public static methods
 	// endregion
 
@@ -17,9 +20,9 @@ export default class MailService extends BaseService {
 	// endregion
 
 	// region constructor
-	// endregion
-
-	// region public methods
+	public constructor() {
+		super();
+	}
 
 	protected _send(transporter: nodeMailer.Transporter, mail: Mail): Promise<SentMessageInfo> {
 		return transporter.sendMail(mail);
@@ -30,8 +33,8 @@ export default class MailService extends BaseService {
 		return nodeMailer.createTransport(config.mail.options, config.mail.defaults);
 	}
 
-	protected _createQueue(config: any): Queue {
-		return new Queue((config.queue.name_prefix || '') + 'mail');
+	protected _serviceType(): string {
+		return 'mail';
 	}
 
 	// endregion

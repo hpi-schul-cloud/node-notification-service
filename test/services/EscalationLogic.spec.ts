@@ -9,7 +9,6 @@ import device from '@test/data/device';
 import Utils from '@/utils';
 import config from '@test/config';
 import TestUtils from '@test/test-utils';
-import { clearScreenDown } from 'readline';
 
 // Add extensions to chai
 chai.use(spies);
@@ -20,7 +19,7 @@ const SERVICE = 'firebase';
 describe('EscalationLogic.escalate', () => {
 
 	// Instantiate the service
-	let messageService: MessageService;
+	const messageService = new MessageService();
 
 	before('should establish a database connection.', (done) => {
 		// connect to database
@@ -29,8 +28,8 @@ describe('EscalationLogic.escalate', () => {
 		db.on('error', console.error.bind(console, 'connection error:'));
 		db.once('open', done);
 		mongoose.connect(config.MONGO_DB_PATH);
-		messageService = new MessageService();
 	});
+
 
 	it('should call the escalation logic.', async () => {
 		// add test device
@@ -39,27 +38,26 @@ describe('EscalationLogic.escalate', () => {
 		// use spies for push and mail service
 		const spyFunctionPush = chai.spy();
 		const spyFunctionMail = chai.spy();
-		(messageService as any).escalationLogic.pushService.send = spyFunctionPush;
-		(messageService as any).escalationLogic.mailService.send = spyFunctionMail;
+		(await (messageService as any).escalationLogic.pushService).send = spyFunctionPush;
+		(await (messageService as any).escalationLogic.mailService).send = spyFunctionMail;
 
 		await messageService.send(message);
 
 		// wait for async calls have been called
-		await TestUtils.timeout(500);
+		await TestUtils.timeout(2000);
 		expect(spyFunctionPush, 'push spy not executed')
 			.to.have.been.called();
 
 		const conf = await Utils.getPlatformConfig(message.platform);
 
-		await TestUtils.timeout(conf.mail.defaults.delay + 10);
+		await TestUtils.timeout(conf.mail.defaults.delay + 1000);
 		expect(spyFunctionMail, 'mail spy not executed')
 			.to.have.been.called();
 	});
 
 	after('should drop database and close connection', (done) => {
 		mongoose.connection.db.dropDatabase(() => {
-			mongoose.connection.close()
-				.then(() => messageService.close().then(() => done()));
+			mongoose.connection.close(done);
 		});
 	});
 
