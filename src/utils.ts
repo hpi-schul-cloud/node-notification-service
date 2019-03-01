@@ -2,9 +2,9 @@ import yaml from 'js-yaml';
 import fs from 'fs';
 import path from 'path';
 import Template from '@/interfaces/Template';
-import logger from './config/logger';
+import logger from './helper/logger';
 import defaults from 'defaults-deep';
-import Cache from '@/config/cache';
+import Cache from '@/helper/cache';
 
 class Utils {
 
@@ -15,7 +15,7 @@ class Utils {
 				config,
 				require(`../platforms/config.default.json`),
 			);
-			logger.debug('platform config loaded', { platformId, config });
+			logger.silly('platform config loaded', { platformId, config });
 			return (config);
 		} catch (err) {
 			logger.error(
@@ -75,21 +75,34 @@ class Utils {
 
 	private cache: Cache;
 	private platformIds: string[];
+	private platformConfigs: any;
 
 	constructor() {
 		this.cache = new Cache(60);
 		this.platformIds = Utils._getPlatformIds();
+		this.platformConfigs = {};
 	}
 
 	public getPlatformConfig(platformId?: string): any {
 		const platform = platformId || 'default';
-		return this.cache.get('platform_config_' + platform, () => {
-			return Promise.resolve(Utils._getPlatformConfig(platformId));
-		});
+		if (platform in this.platformConfigs) {
+			return this.platformConfigs[platform];
+		}
+		const config = Utils._getPlatformConfig(platformId);
+		this.platformConfigs[platform] = config;
+		return config;
 	}
 
 	public getPlatformIds(): string[] {
 		return this.platformIds;
+	}
+
+	public getRedisOptions(platformId?: string) {
+		const platformConfig = this.getPlatformConfig(platformId);
+		const options = platformConfig.queue.defaults;
+		options.redis.host = process.env.REDIS_HOST || '127.0.0.1';
+		options.redis.port = process.env.REDIS_PORT || 6379;
+		return options;
 	}
 
 	public loadTemplate(
@@ -157,7 +170,6 @@ class Utils {
 			},
 		};
 	}
-
 }
 
 export default new Utils();

@@ -1,5 +1,5 @@
 import DeviceModel from '@/models/device';
-import logger from '@/config/logger';
+import logger from '@/helper/logger';
 import mongoose from 'mongoose';
 
 export default class DeviceService {

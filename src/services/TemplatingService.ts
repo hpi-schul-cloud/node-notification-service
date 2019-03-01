@@ -1,4 +1,4 @@
-import logger from '@/config/logger';
+import logger from '@/helper/logger';
 import LanguagePayload from '@/interfaces/LanguagePayload';
 import Mail from '@/interfaces/Mail';
 import Payload from '@/interfaces/Payload';

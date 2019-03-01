@@ -1,7 +1,7 @@
 import express from 'express';
 import MailService from '@/services/MailService';
 import Mail from '@/interfaces/Mail';
-import logger from '@/config/logger';
+import logger from '@/helper/logger';
 
 const router = express.Router();
 const mailService = new MailService();

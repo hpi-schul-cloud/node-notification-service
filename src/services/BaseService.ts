@@ -4,7 +4,7 @@ import Mail from '@/interfaces/Mail';
 import PlatformMailTransporter from '@/interfaces/PlatformMailTransporter';
 import PlatformPushTransporter from '@/interfaces/PlatformPushTransporter';
 import Utils from '@/utils';
-import logger from '@/config/logger';
+import logger from '@/helper/logger';
 import Queue, { Job } from 'bee-queue';
 
 
@@ -41,6 +41,7 @@ export default abstract class BaseService {
 			logger.debug('[queue] ' + queue.name + ' will be closed...');
 			try {
 				await queue.close();
+				logger.debug('[queue] ' + queue.name + ' has been closed.');
 				return Promise.resolve();
 			} catch (error) {
 				logger.error('[queue] failed to gracefully shut down queue ' + queue.name, error);
@@ -64,7 +65,7 @@ export default abstract class BaseService {
 	// endregion
 
 	// region private members
-
+	private platformConfig: any;
 	private transporters: any[] = [];
 	private platforms: string[];
 
@@ -133,7 +134,8 @@ export default abstract class BaseService {
 
 	private createQueue(platformId: string): Queue {
 		logger.debug('[setup] initialize service queue: ' + this._createQueueName(platformId));
-		const queue = new Queue(this._createQueueName(platformId));
+		const redisOptions = Utils.getRedisOptions(platformId);
+		const queue = new Queue(this._createQueueName(platformId), redisOptions);
 		queue.on('ready', () => {
 			logger.debug('[queue] ' + queue.name + ': ready... execute BaseService.close() for graceful shutdown.');
 		});

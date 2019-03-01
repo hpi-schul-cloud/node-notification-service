@@ -9,7 +9,7 @@ import messageModel, { MessageModel } from '@/models/message';
 import MessageService from '@/services/MessageService';
 import message from '@test/data/message';
 import config from '@test/config';
-import logger from '@/config/logger';
+import logger from '@/helper/logger';
 import BaseService from '@/services/BaseService';
 import MailService from '@/services/MailService';
 import PushService from '@/services/PushService';

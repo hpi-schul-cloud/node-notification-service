@@ -1,4 +1,4 @@
-import logger from '@/config/logger';
+import logger from '@/helper/logger';
 import MailService from '@/services/MailService';
 import PushService from '@/services/PushService';
 import TemplatingService from '@/services/TemplatingService';

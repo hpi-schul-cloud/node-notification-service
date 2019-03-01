@@ -7,7 +7,7 @@ import DeviceModel from '@/models/device';
 import DeviceService from '@/services/DeviceService';
 import device from '@test/data/device';
 import config from '@test/config';
-import logger from '@/config/logger';
+import logger from '@/helper/logger';
 
 // Add extensions to chai
 chai.use(subset);

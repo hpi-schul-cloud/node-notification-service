@@ -1,5 +1,5 @@
-import BaseService from '@/services/BaseService';
-import logger from '@/config/logger';
+import Shutdown from '@/helper/shutdown';
+import logger from '@/helper/logger';
 
 after('should drop database and close queue connections', (done) => {
 	logger.info('global disconnect queues...');
@@ -7,7 +7,5 @@ after('should drop database and close queue connections', (done) => {
 		logger.info('global disconnect queues finished');
 		done();
 	}
-	BaseService.close().then(() => {
-		disconnected();
-	});
+	Shutdown.queueShutdown().then(() => disconnected());
 });

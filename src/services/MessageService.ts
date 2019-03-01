@@ -6,7 +6,7 @@ import mongoose from 'mongoose';
 import axios from 'axios';
 import UserResource from '@/interfaces/UserResource';
 import Callback from '@/interfaces/Callback';
-import logger from '@/config/logger';
+import logger from '@/helper/logger';
 
 export default class MessageService {
 	// region public static methods

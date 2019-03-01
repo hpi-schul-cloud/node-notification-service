@@ -30,14 +30,17 @@ const logger = createLogger({
 
 export class LoggerStream {
 	public name: string;
-	constructor(name: string) {
+	public level: string;
+
+	constructor(name: string, level?: string) {
 		this.name = name;
+		this.level = level || 'info';
 	}
 	public write(message: string) {
 		if (this.name) {
-			logger.info(this.name + ' ' + message);
+			logger.log(this.level, this.name + ' ' + message);
 		} else {
-			logger.info(message);
+			logger.info(this.level, message);
 		}
 	}
 }

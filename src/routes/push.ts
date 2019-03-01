@@ -1,4 +1,4 @@
-import logger from '@/config/logger';
+import logger from '@/helper/logger';
 import express from 'express';
 import PushService from '@/services/PushService';
 import DeviceService from '@/services/DeviceService';
