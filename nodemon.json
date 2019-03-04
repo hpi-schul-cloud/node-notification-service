@@ -9,5 +9,6 @@
         "build"
     ],
     "exec": "node --inspect=5859 -r tsconfig-paths/register -r ts-node/register build/app.js",
-    "ext": "js"
+    "ext": "js",
+    "delay": "2500"
 }
