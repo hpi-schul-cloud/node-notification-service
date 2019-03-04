@@ -1,6 +1,6 @@
 # notification-service
 
-[![Greenkeeper badge](https://badges.greenkeeper.io/schul-cloud/node-notification-service.svg)](https://greenkeeper.io/)
+[![Greenkeeper badge](https://badges.greenkeeper.io/schul-cloud/node-notification-service.svg)](https://greenkeeper.io/) [![Build Status](https://travis-ci.org/schul-cloud/node-notification-service.svg?branch=master)](https://travis-ci.org/schul-cloud/node-notification-service)
 
 ## Deployment
 
