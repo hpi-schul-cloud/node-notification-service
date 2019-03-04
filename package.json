@@ -21,11 +21,6 @@
     "start": "node -r ts-node/register -r tsconfig-paths/register build/app.js",
     "test": "mocha -t 30000 -r tsconfig-paths/register -r ts-node/register test/**/*.spec.ts"
   },
-  "pre-commit": [
-    "lint",
-    "build",
-    "test"
-  ],
   "dependencies": {
     "@types/app-root-path": "^1.2.4",
     "@types/chai-as-promised": "^7.1.0",
