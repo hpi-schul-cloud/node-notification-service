@@ -1,5 +1,7 @@
 # notification-service
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/schul-cloud/node-notification-service.svg)](https://greenkeeper.io/)
+
 ## Deployment
 
 1. Download the <a href="https://github.com/schul-cloud/node-notification-service/blob/master-v4/docker-compose.yml" download>docker-compose.yml</a>.
