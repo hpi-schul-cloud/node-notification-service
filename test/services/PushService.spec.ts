@@ -11,28 +11,32 @@ const expect = chai.expect;
 
 describe('PushService.send', () => {
 
-  // Instantiate the service
-  const pushService = new PushService();
-  const spyFunction = chai.spy();
+	// Instantiate the service
+	const pushService = new PushService();
+	const spyFunction = chai.spy();
 
-  before('should create a mock push transporter.', async () => {
-    const transporter = {
-      send: spyFunction,
-  };
+	before('should create a mock push transporter.', async () => {
 
-    // Add the custom transporter
-    (pushService as any).transporters.push({
-      platformId: message.platform,
-      transporter,
-    });
+		const transporter = {
+			send() {
+				spyFunction();
+				return Promise.resolve();
+			},
+		};
 
-    // Send a push
-    await pushService.send(message.platform, push);
-  });
+		// Add the custom transporter
+		(pushService as any).transporters.push({
+			platformId: message.platform,
+			transporter,
+		});
 
-  it('should send a push.', () => {
-    expect(spyFunction)
-      .to.have.been.called();
-  });
+		// Send a push
+		await pushService.directSend(message.platform, push, (push as any).token, 'noId');
+	});
+
+	it('should send a push.', () => {
+		expect(spyFunction)
+			.to.have.been.called();
+	});
 
 });

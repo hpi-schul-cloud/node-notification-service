@@ -1,4 +1,5 @@
 {
+  "compileOnSave": true,
   "compilerOptions": {
     "outDir": "./build",
     "esModuleInterop": true,
@@ -8,11 +9,23 @@
     "sourceMap": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": [ "src/*", "build/*" ],
-      "@test/*": [ "test/*" ]
+      "@/*": [
+        "src/*",
+        "build/*"
+      ],
+      "@test/*": [
+        "test/*"
+      ]
     },
     "lib": [
       "es2015"
-    ]
-  }
+    ],
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/*.spec.ts"
+  ]
 }

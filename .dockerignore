@@ -1,7 +1,5 @@
 node_modules
 build
+logs/*
 .DS_Store
-package-lock.json
-platforms/*
-
 \.vscode/

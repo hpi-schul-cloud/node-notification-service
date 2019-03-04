@@ -1,30 +1,80 @@
-import winston from 'winston';
-import { messaging as firebaseMessaging } from 'firebase-admin';
+import logger from '@/helper/logger';
 import express from 'express';
 import PushService from '@/services/PushService';
+import DeviceService from '@/services/DeviceService';
+import TemplatingService from '@/services/TemplatingService';
+import Utils from '@/utils';
 
 const router: express.Router = express.Router();
-const pushService: PushService = new PushService();
 
-router.post('/', (req, res) => {
-  const push: firebaseMessaging.Message = {
-    token: req.body.token,
-    data: req.body.data,
-    notification: req.body.notification,
-    android: req.body.android,
-    webpush: req.body.webpush,
-    apns: req.body.apns,
-  };
+const pushService = new PushService();
 
-  pushService.send(req.body.platformId, push)
-    .then((response: any) => {
-      winston.info(response);
-    })
-    .catch((e: Error) => {
-      winston.error(e);
-    });
+const PromiseAny = (promises: Array<Promise<any>>) => {
+	return new Promise((resolve, reject) => {
+		let count = promises.length;
+		let resolved = false;
+		if (count === 0) {
+			reject(new Error('No promises resolved successfully.'));
+		}
+		promises.forEach((p) => {
+			Promise.resolve(p).then(
+				(value) => {
+					resolved = true;
+					count--;
+					resolve(value);
+				},
+				() => {
+					count--;
+					if (count === 0 && !resolved) {
+						reject(new Error('No promises resolved successfully.'));
+					}
+				},
+			);
+		});
+	});
+};
 
-  res.send('Push queued.');
+router.post('/', async (req, res) => {
+
+	if (Utils.parametersMissing(['platform', 'template', 'payload', 'languagePayloads', 'receivers'], req.body, res)) { return; }
+
+	// Construct Templating Service
+	let templatingService: TemplatingService;
+	const messageId = Utils.guid();
+	const queuedMessages: Array<Promise<any>> = [];
+
+	try {
+		// Send push messages
+		for (const receiver of req.body.receivers) {
+			if (!receiver.preferences.push) {
+				continue;
+			}
+			const services = Utils.serviceEnum();
+			services.forEach(async (service) => {
+				const receiverDevices = await DeviceService.getDevices(req.body.platform, receiver.userId, service);
+				for (const device of receiverDevices) {
+					// todo avoid recreation of templatingService for each receiver device/user
+					templatingService = await TemplatingService.create(req.body.platform, req.body.template,
+						req.body.payload, req.body.languagePayloads, messageId, receiver.language);
+					if (service === 'firebase') {
+						const pushMessage = await templatingService.createPushMessage(receiver, device);
+						// FIXME add queuing, add rest route for queue length
+						queuedMessages.push(pushService.send(req.body.platform, pushMessage, device));
+					}
+					if (service === 'safari') {
+						// const pushMessage = templatingService.createSafariPushMessage(receiver, device);
+						// // FIXME add queuing, add rest route for queue length
+						// this.pushService.send(message.platform, pushMessage);
+						logger.error('unsupported send service requested: ' + service);
+					}
+				}
+			});
+		}
+		PromiseAny(queuedMessages)
+			.then(() => res.send('Push queued.'));
+	} catch (err) {
+		res.status(500).send(err);
+	}
 });
 
 export default router;
