@@ -1,90 +1,72 @@
 import mongoose from 'mongoose';
-import express from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import bodyParser from 'body-parser';
 import swaggerUi from 'swagger-ui-express';
+import morgan from 'morgan';
+const mjson = require('morgan-json');
+import logger, { LoggerStream } from '@/helper/logger';
+
 import mailRouter from '@/routes/mail';
 import pushRouter from '@/routes/push';
 import messageRouter from '@/routes/message';
 import deviceRouter from '@/routes/device';
+import statisticRouter from '@/routes/statistic';
+import HttpException from './exceptions/httpException';
+import Shutdown from '@/helper/shutdown';
 
-function startApiServer() {
-  const app: express.Application = express();
-  const port: string = process.env.NOTIFICATION_PORT || '3000';
+const app: express.Application = express();
 
-  app.use(bodyParser.urlencoded({ extended: true }));
-  app.use(bodyParser.json());
+const NOTIFICATION_PORT: string = process.env.NOTIFICATION_PORT || '3031';
 
-  app.use('/mails', mailRouter);
-  app.use('/push', pushRouter);
-  app.use('/messages', messageRouter);
-  app.use('/devices', deviceRouter);
+const format = mjson(':status :method :url :res[content-length] bytes :response-time ms');
+app.use(morgan(format, { stream: new LoggerStream('request', 'debug') }));
 
-  app.get('/', (req, res) => {
-    res.send('hello world!');
-  });
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
-  app.use('/docs', swaggerUi.serve, swaggerUi.setup(require('../swagger.json')));
+app.use('/mails', mailRouter);
+app.use('/push', pushRouter);
+app.use('/messages', messageRouter);
+app.use('/devices', deviceRouter);
+app.use('/statistic', statisticRouter);
 
-  // Test Endpoint for user pagination
-  app.get('/users', (req, res) => {
-    const users = [
-      {
-        name: 'Bob',
-        mail: 'bob@bob.bob',
-        payload: {
-          course: 'Bobs Course',
-          week: 6,
-        },
-        language: 'en',
-        preferences: {
-          push: true,
-          mail: true,
-        },
-      },
-      {
-        name: 'Alice',
-        mail: 'alice@alice.alice',
-        payload: {
-          course: 'Alices Course',
-          week: 4,
-        },
-        language: 'de',
-        preferences: {
-          push: true,
-          mail: true,
-        },
-      },
-    ];
+app.head('/', (req, res) => {
+	res.send(200);
+});
 
-    if (!req.query.page) {
-      res.json({
-        data: users,
-      });
-      return;
-    }
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(require('../swagger.json')));
 
-    if (req.query.page >= users.length) {
-      res.json({
-        data: [],
-      });
-      return;
-    }
+app.use((err: HttpException, req: Request, res: Response, next: NextFunction) => {
+	// set locals, only providing error in development
+	res.locals.message = err.message || 'unknown error';
+	res.locals.error = req.app.get('NODE_ENV') !== 'production' ? err : {};
+	const status = err.status || 500;
 
-    const links = {
-      next: `http://localhost:3000/users?page=${parseInt(req.query.page, 10) + 1}`,
-    };
-
-    res.json({
-      data: [users[req.query.page]],
-      links: req.query.page + 1 >= users.length ? {} : links,
-    });
-  });
-
-  app.listen(port);
-}
+	// render the error page
+	res.status(status);
+	res.render('error');
+});
 
 const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', startApiServer);
+// tslint:disable-next-line: no-console
+db.on('error', console.error.bind(logger, 'connection error:'));
+const mongoHost = `mongodb://${process.env.MONGO_HOST || 'localhost'}/notification-service`;
+logger.info('mongo host', {mongoHost});
+mongoose.connect(mongoHost);
 
-mongoose.connect(`mongodb://${process.env.MONGO_HOST || 'localhost'}/notification-service`);
+logger.info('listen on port ' + NOTIFICATION_PORT + '. Set NOTIFICATION_PORT for change');
+const instance = app.listen(NOTIFICATION_PORT);
+
+process.on('SIGINT', () => {
+	logger.info('[shutdown] SIGINT received: gracefully shutting down...)');
+
+
+	Promise.all([
+		Shutdown.httpShutdown(instance),
+		Shutdown.queueShutdown(),
+	]).then(() => {
+		logger.info('[shutdown] gracefully closed all connections...');
+		process.exit();
+	});
+
+});

@@ -1,8 +1,6 @@
 {
   "defaultSeverity": "warning",
-  "extends": [
-    "tslint:recommended"
-  ],
+  "extends": "tslint:recommended",
   "linterOptions": {
     "exclude": [
       "node_modules/**"
@@ -15,20 +13,28 @@
     ],
     "indent": [
       true,
-      "spaces",
-      2
+      "tabs"
     ],
+    "match-default-export-name": false,
     "interface-name": false,
     "ordered-imports": false,
     "object-literal-sort-keys": false,
     "no-consecutive-blank-lines": false,
     "unified-signatures": false,
     "no-var-requires": false,
+    "no-unused-expression": false,
     "max-line-length": [
       true,
       {
         "limit": 180,
         "ignore-pattern": "^import |^export {(.*?)}"
+      }
+    ]
+  },
+  "compilerOptions": {
+    "plugins": [
+      {
+        "name": "typescript-tslint-plugin"
       }
     ]
   }

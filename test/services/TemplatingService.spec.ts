@@ -6,47 +6,57 @@ import UserResource from '@/interfaces/UserResource';
 import TemplatingService from '@/services/TemplatingService';
 import message from '@test/data/message';
 
-// Instantiate the service
-const messageId = 'a1a2a3a4a5a6a7a8a9a0a1a2';
-const templatingService =
-  new TemplatingService(message.platform, message.template, message.payload, message.languagePayloads, messageId);
-const receiver: UserResource = (message.receivers[0] as UserResource);
 
 describe('TemplatingService.createMailMessage', () => {
 
-  let mail: Mail;
+	let mail: Mail;
+	let messageId: string;
+	let receiver: UserResource;
+	let templatingService: TemplatingService;
 
-  beforeEach('create a mail message.', () => {
-    mail = templatingService.createMailMessage(receiver);
-  });
+	before('Instantiate the service', async () => {
+		messageId = 'a1a2a3a4a5a6a7a8a9a0a1a2';
+		templatingService = await TemplatingService.create(
+			message.platform,
+			message.template,
+			message.payload,
+			message.languagePayloads,
+			messageId,
+		);
+		receiver = (message.receivers[0] as UserResource);
+	});
 
-  it('should create a valid mail.', () => {
+	beforeEach('create a mail message.', async () => {
+		mail = await templatingService.createMailMessage(receiver);
+	});
 
-    expect(mail)
-      .to.have.keys('from', 'to', 'subject', 'text', 'html');
+	it('should create a valid mail.', () => {
 
-    expect(mail.to)
-      .to.not.to.have.lengthOf(0);
+		expect(mail)
+			.to.have.keys('from', 'to', 'subject', 'text', 'html');
 
-    expect(mail.subject)
-      .to.not.to.have.lengthOf(0);
+		expect(mail.to)
+			.to.not.to.have.lengthOf(0);
 
-    expect(mail.text)
-      .to.not.to.have.lengthOf(0);
+		expect(mail.subject)
+			.to.not.to.have.lengthOf(0);
 
-    expect(mail.html)
-      .to.not.to.have.lengthOf(0);
-  });
+		expect(mail.text)
+			.to.not.to.have.lengthOf(0);
 
-  it('should replace placeholders with payload values (1).', () => {
+		expect(mail.html)
+			.to.not.to.have.lengthOf(0);
+	});
 
-    expect(mail.subject)
-      .to.equal(message.payload.title);
+	it('should replace placeholders with payload values (1).', () => {
 
-    expect(mail.text)
-      .to.equal(`Greetings ${receiver.payload.name}!`);
+		expect(mail.subject)
+			.to.equal(message.payload.title);
 
-    const html = `
+		expect(mail.text)
+			.to.equal(`Greetings ${receiver.payload.name}!`);
+
+		const html = `
       <!DOCTYPE html>
       <html>
         <head>
@@ -60,64 +70,93 @@ describe('TemplatingService.createMailMessage', () => {
         </body>
       </html>`;
 
-    const regex = /[\s\n\r\t\0]/g;
+		const regex = /[\s\n\r\t\0]/g;
 
-    expect(mail.html.replace(regex, ''))
-      .to.equal(html.replace(regex, ''));
-  });
+		expect(mail.html.replace(regex, ''))
+			.to.equal(html.replace(regex, ''));
+	});
 
 });
 
 describe('TemplatingService.createPushMessage', () => {
 
-  let push: firebaseMessaging.Message;
+	let push: firebaseMessaging.Message;
+	let messageId: string;
+	let receiver: UserResource;
+	let templatingService: TemplatingService;
 
-  beforeEach('create a push message.', () => {
-    push = templatingService.createPushMessage(receiver, 'test-device');
-  });
+	before('Instantiate the service', async () => {
+		messageId = 'a1a2a3a4a5a6a7a8a9a0a1a3';
+		templatingService = await TemplatingService.create(
+			message.platform,
+			message.template,
+			message.payload,
+			message.languagePayloads,
+			messageId,
+		);
+		receiver = (message.receivers[0] as UserResource);
+	});
 
-  it('should create a valid push notification.', () => {
+	beforeEach('create a push message.', async () => {
+		push = await templatingService.createPushMessage(receiver, 'test-device');
+	});
 
-    expect(push)
-      .to.have.keys('token', 'data', 'notification', 'android', 'webpush', 'apns');
+	it('should create a valid push notification.', () => {
 
-  });
+		expect(push)
+			.to.have.keys('token', 'data', 'notification', 'android', 'webpush', 'apns');
 
-  it('should replace placeholders with payload values (2).', () => {
+	});
 
-    if (!push.notification) {
-      expect(push.notification, 'Push template has no notification.').not.to.be.undefined;
-      return;
-    }
+	it('should replace placeholders with payload values (2).', () => {
 
-    expect(push.notification.title)
-      .to.equal(message.payload.title);
+		if (!push.notification) {
+			expect(push.notification, 'Push template has no notification.').not.to.be.undefined;
+			return;
+		}
 
-    expect(push.notification.body)
-      .to.equal(message.languagePayloads[0].payload.description);
-  });
+		expect(push.notification.title)
+			.to.equal(message.payload.title);
+
+		expect(push.notification.body)
+			.to.equal(message.languagePayloads[0].payload.description);
+	});
 
 });
 
 describe('TemplatingService.createMailMessage with callbackLink', () => {
 
-  let mail: Mail;
-  let templatingService = new TemplatingService(message.platform, 'callback-link', message.payload, message.languagePayloads, messageId);
+	let mail: Mail;
+	let messageId: string;
+	let receiver: UserResource;
+	let tpls: TemplatingService;
+
+	before('Instantiate the service', async () => {
+		messageId = 'a1a2a3a4a5a6a7a8a9a0a1a4';
+		tpls = await TemplatingService.create(
+			message.platform,
+			'callback-link',
+			message.payload,
+			message.languagePayloads,
+			messageId,
+		);
+		receiver = (message.receivers[0] as UserResource);
+	});
 
 
-  beforeEach('create a mail message.', () => {
-    mail = templatingService.createMailMessage(receiver);
-  });
+	beforeEach('create a mail message.', async () => {
+		mail = await tpls.createMailMessage(receiver);
+	});
 
-  it('should replace placeholders with payload values (3).', () => {
+	it('should replace placeholders with payload values (3).', () => {
 
-    expect(mail.subject)
-      .to.equal(message.payload.title);
+		expect(mail.subject)
+			.to.equal(message.payload.title);
 
-    expect(mail.text)
-      .to.equal(`Greetings ${receiver.payload.name}!`);
+		expect(mail.text)
+			.to.equal(`Greetings ${receiver.payload.name}!`);
 
-    const html = `
+		const html = `
       <!DOCTYPE html>
       <html>
         <head>
@@ -126,16 +165,16 @@ describe('TemplatingService.createMailMessage with callbackLink', () => {
         </head>
         <body>
           <h1>${ message.payload.title}</h1>
-          <a href="http://localhost:3100/notification/callback/${messageId}/seenBy/${receiver.id}/?redirect=${message.payload.url}">Test Description</a>
+          <a href="http://localhost:3100/notification/callback/${messageId}/seenBy/${receiver.userId}/?redirect=${message.payload.url}">Test Description</a>
           <p>Greetings ${ receiver.payload.name}!</p>
         </body>
       </html>
       `;
 
-    const regex = /[\s\n\r\t\0]/g;
+		const regex = /[\s\n\r\t\0]/g;
 
-    expect(mail.html.replace(regex, ''))
-      .to.equal(html.replace(regex, ''));
-  });
+		expect(mail.html.replace(regex, ''))
+			.to.equal(html.replace(regex, ''));
+	});
 
 });

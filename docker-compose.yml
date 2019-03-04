@@ -1,14 +1,44 @@
 version: '3'
 services:
   notification-service:
-    image: friedow/node-notification-service:latest
+    #image: friedow/node-notification-service:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: notification-service
+    restart: always
     ports:
-      - 3000:3000
+      - 3031:3031
     links:
-      - mongo:mongo
+      - mongo
+      - redis
     environment:
       - MONGO_HOST=mongo
+      - REDIS_HOST=redis
+      #- NOTIFICATION_PORT=3031
+      # - NODE_ENV=production
     volumes:
-      - /home/user/platforms:/usr/src/notification-service/platforms
+      - ./logs:/usr/src/app/logs
+    depends_on:
+      - mongo
+      - redis
+
   mongo:
     image: mongo:3
+    restart: always
+
+  redis:
+    image: redis:5.0.3
+    restart: always
+
+  redis-commander:
+    container_name: redis-commander
+    hostname: redis-commander
+    image: rediscommander/redis-commander:latest
+    restart: always
+    environment:
+    - REDIS_HOSTS=local:redis:6379
+    ports:
+    - "8081:8081"
+    depends_on:
+      - redis
