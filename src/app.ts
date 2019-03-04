@@ -20,8 +20,6 @@ const NOTIFICATION_PORT: string = process.env.NOTIFICATION_PORT || '3031';
 
 const format = mjson(':status :method :url :res[content-length] bytes :response-time ms');
 app.use(morgan(format, { stream: new LoggerStream('request', 'debug') }));
-process.stdout.pipe(logger);
-process.stderr.pipe(logger);
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -52,7 +50,9 @@ app.use((err: HttpException, req: Request, res: Response, next: NextFunction) =>
 const db = mongoose.connection;
 // tslint:disable-next-line: no-console
 db.on('error', console.error.bind(logger, 'connection error:'));
-mongoose.connect(`mongodb://${process.env.MONGO_HOST || 'localhost'}/notification-service`);
+const mongoHost = `mongodb://${process.env.MONGO_HOST || 'localhost'}/notification-service`;
+logger.info('mongo host', {mongoHost});
+mongoose.connect(mongoHost);
 
 logger.info('listen on port ' + NOTIFICATION_PORT + '. Set NOTIFICATION_PORT for change');
 const instance = app.listen(NOTIFICATION_PORT);

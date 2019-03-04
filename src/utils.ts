@@ -5,6 +5,7 @@ import Template from '@/interfaces/Template';
 import logger from './helper/logger';
 import defaults from 'defaults-deep';
 import Cache from '@/helper/cache';
+import { QueueSettings } from 'bee-queue';
 
 class Utils {
 
@@ -99,9 +100,11 @@ class Utils {
 
 	public getRedisOptions(platformId?: string) {
 		const platformConfig = this.getPlatformConfig(platformId);
-		const options = platformConfig.queue.defaults;
+		const options: QueueSettings = platformConfig.queue.defaults;
+		if (!options.redis) {options.redis = {}; }
 		options.redis.host = process.env.REDIS_HOST || '127.0.0.1';
-		options.redis.port = process.env.REDIS_PORT || 6379;
+		options.redis.port = parseInt(process.env.REDIS_PORT || '6379', undefined);
+		logger.debug('redis config: ', options);
 		return options;
 	}
 
