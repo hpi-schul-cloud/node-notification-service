@@ -62,8 +62,11 @@ router.post('/user', async (req, res) => {
 
 	if (utils.parametersMissing(['userId'], req.params, res)) { return; }
 
+	const limit = utils.integerInRange(req.body.limit, {min: 1, max: 100, default: 10});
+	const skip = utils.integerInRange(req.body.skip, {min: 0, default: 0});
+
 	try {
-		const messages = await messageService.byUser(req.params.userId);
+		const messages = await messageService.byUser(req.params.userId, skip, limit);
 		res.send(messages);
 	} catch (e) {
 		res.status(400).send(e.message);

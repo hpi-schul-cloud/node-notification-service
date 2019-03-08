@@ -6,8 +6,10 @@ import logger from './helper/logger';
 import defaults from 'defaults-deep';
 import Cache from '@/helper/cache';
 import { QueueSettings } from 'bee-queue';
+import { isNullOrUndefined } from 'util';
 
 class Utils {
+
 
 	private static _getPlatformConfig(platformId?: string): any {
 		try {
@@ -155,7 +157,20 @@ class Utils {
 		return ['firebase', 'safari'];
 	}
 
-	public async mustacheFunctions(
+	public integerInRange(value: number, options: any) {
+		let retValue = value;
+		if (!Number.isInteger(value)) {throw new Error('Integer value expected.'); }
+		if (isNullOrUndefined(retValue)) { retValue = options.default; }
+		if (options.min && retValue < options.min) {
+			throw new Error('Value min is ' + options.min);
+		}
+		if (options.max && retValue > options.max) {
+			throw new Error('Value max is ' + options.max);
+		}
+		return retValue;
+		}
+
+public async mustacheFunctions(
 		platformId: string,
 		messageId: string,
 		receiverId: string,

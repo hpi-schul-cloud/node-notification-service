@@ -122,7 +122,7 @@ describe('MessageService.send', () => {
 		const userId = receivers[0].userId;
 		await messageService.seen(messageId, userId);
 		await messageService.seen(messageId, receivers[1].userId);
-		const messages = await messageService.byUser(userId);
+		const messages = await messageService.byUser(userId, 100, 0);
 		expect(messages.length).to.be.greaterThan(0);
 		const dbMessages: MessageModel[] = messages
 			.filter((msg: MessageModel) =>
@@ -138,7 +138,7 @@ describe('MessageService.send', () => {
 	});
 
 	async function getMessage(messageId: string, userId: string) {
-		const messages = await messageService.byUser(userId);
+		const messages = await messageService.byUser(userId, 100, 0);
 		const msg = messages.filter((m: any) => m._id.equals(messageId))[0];
 		return msg;
 	}

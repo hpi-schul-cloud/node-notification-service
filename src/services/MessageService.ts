@@ -111,8 +111,11 @@ export default class MessageService {
 		return message;
 	}
 
-	private static async messagesByUser(userId: mongoose.Types.ObjectId) {
-		const messages = await MessageModel.find({ 'receivers.userId': { $in: userId } }).exec();
+	private static async messagesByUser(userId: mongoose.Types.ObjectId, limit: number, skip: number) {
+		const messages = await MessageModel.find({ 'receivers.userId': { $in: userId } })
+		.skip(skip)
+		.limit(limit)
+		.exec();
 		if (messages && messages.length !== 0) {
 			return messages.map((message) => this.filter(message.toObject(), userId));
 		}
@@ -152,9 +155,9 @@ export default class MessageService {
 		return MessageService.filter(message, mongoose.Types.ObjectId(userId));
 	}
 
-	public async byUser(userId: string): Promise<any> {
+	public async byUser(userId: string, limit: number, skip: number): Promise<any> {
 		// todo add paging
-		return await MessageService.messagesByUser(mongoose.Types.ObjectId(userId));
+		return await MessageService.messagesByUser(mongoose.Types.ObjectId(userId), limit, skip);
 	}
 
 	// endregion
