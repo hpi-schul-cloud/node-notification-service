@@ -58,7 +58,7 @@ router.post('/:messageId/seen', async (req, res) => {
 	}
 });
 
-router.post('/user', async (req, res) => {
+router.post('/user/:userId', async (req, res) => {
 
 	if (utils.parametersMissing(['userId'], req.params, res)) { return; }
 
@@ -66,7 +66,7 @@ router.post('/user', async (req, res) => {
 	const skip = utils.integerInRange(req.body.skip, {min: 0, default: 0});
 
 	try {
-		const messages = await messageService.byUser(req.params.userId, skip, limit);
+		const messages = await messageService.byUser(req.params.userId, limit, skip);
 		res.send(messages);
 	} catch (e) {
 		res.status(400).send(e.message);
