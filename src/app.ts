@@ -5,6 +5,7 @@ import swaggerUi from 'swagger-ui-express';
 import morgan from 'morgan';
 const mjson = require('morgan-json');
 import logger, { LoggerStream } from '@/helper/logger';
+const path = require('path');
 
 import mailRouter from '@/routes/mail';
 import pushRouter from '@/routes/push';
@@ -23,6 +24,10 @@ app.use(morgan(format, { stream: new LoggerStream('request', 'debug') }));
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+// view engine setup
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'pug');
 
 app.use('/mails', mailRouter);
 app.use('/push', pushRouter);
