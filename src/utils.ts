@@ -158,9 +158,9 @@ class Utils {
 	}
 
 	public integerInRange(value: number, options: any) {
-		let retValue = value;
+		const retValue = value;
+		if (isNullOrUndefined(retValue)) { return options.default; }
 		if (!Number.isInteger(value)) {throw new Error('Integer value expected.'); }
-		if (isNullOrUndefined(retValue)) { retValue = options.default; }
 		if (options.min && retValue < options.min) {
 			throw new Error('Value min is ' + options.min);
 		}
