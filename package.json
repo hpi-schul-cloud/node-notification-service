@@ -41,7 +41,7 @@
     "morgan-json": "^1.1.0",
     "mustache": "^3.0.1",
     "node-cache": "^4.2.0",
-    "nodemailer": "^4.6.5",
+    "nodemailer": "^6.0.0",
     "swagger-ui-express": "^4.0.1",
     "ts-node": "^8.0.3",
     "tsconfig-paths": "^3.4.2",
