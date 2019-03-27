@@ -122,9 +122,9 @@ describe('MessageService.send', () => {
 		const userId = receivers[0].userId;
 		await messageService.seen(messageId, userId);
 		await messageService.seen(messageId, receivers[1].userId);
-		const messages = await messageService.byUser(userId);
-		expect(messages.length).to.be.greaterThan(0);
-		const dbMessages: MessageModel[] = messages
+		const messages = await messageService.byUser(userId, 100, 0);
+		expect(messages.data.length).to.be.greaterThan(0);
+		const dbMessages: MessageModel[] = messages.data
 			.filter((msg: MessageModel) =>
 				mongoose.Types.ObjectId(messageId).equals(msg._id));
 		expect(dbMessages.length).to.be.equal(1);
@@ -138,8 +138,8 @@ describe('MessageService.send', () => {
 	});
 
 	async function getMessage(messageId: string, userId: string) {
-		const messages = await messageService.byUser(userId);
-		const msg = messages.filter((m: any) => m._id.equals(messageId))[0];
+		const messages = await messageService.byUser(userId, 100, 0);
+		const msg = messages.data.filter((m: any) => m._id.equals(messageId))[0];
 		return msg;
 	}
 

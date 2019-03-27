@@ -58,13 +58,29 @@ router.post('/:messageId/seen', async (req, res) => {
 	}
 });
 
-router.post('/user', async (req, res) => {
+router.post('/user/:userId', async (req, res) => {
 
 	if (utils.parametersMissing(['userId'], req.params, res)) { return; }
 
+	const limit = utils.integerInRange(req.body.limit, {min: 1, max: 100, default: 10});
+	const skip = utils.integerInRange(req.body.skip, {min: 0, default: 0});
+
 	try {
-		const messages = await messageService.byUser(req.params.userId);
+		const messages = await messageService.byUser(req.params.userId, limit, skip);
 		res.send(messages);
+	} catch (e) {
+		res.status(400).send(e.message);
+	}
+});
+
+router.post('/user/:userId/message/:messageId', async (req, res) => {
+	if (utils.parametersMissing(['userId', 'messageId'], req.params, res)) { return; }
+	try {
+		const message = await messageService.byUserAndMessageId(req.params.userId, req.params.messageId);
+		if (message.data === null) {
+			return res.send(404);
+		}
+		res.send(message);
 	} catch (e) {
 		res.status(400).send(e.message);
 	}
