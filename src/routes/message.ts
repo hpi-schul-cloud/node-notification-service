@@ -73,6 +73,19 @@ router.post('/user/:userId', async (req, res) => {
 	}
 });
 
+router.post('/user/:userId/message/:messageId', async (req, res) => {
+	if (utils.parametersMissing(['userId', 'messageId'], req.params, res)) { return; }
+	try {
+		const message = await messageService.byUserAndMessageId(req.params.userId, req.params.messageId);
+		if (message.data === null) {
+			return res.send(404);
+		}
+		res.send(message);
+	} catch (e) {
+		res.status(400).send(e.message);
+	}
+});
+
 router.post('/:messageId/remove/:userId', async (req, res) => {
 
 	if (utils.parametersMissing(['messageId', 'userId'], req.params, res)) { return; }

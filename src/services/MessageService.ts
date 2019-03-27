@@ -113,14 +113,47 @@ export default class MessageService {
 
 	private static async messagesByUser(userId: mongoose.Types.ObjectId, limit: number, skip: number) {
 		const messages = await MessageModel.find({ 'receivers.userId': { $in: userId } })
-		.skip(skip)
-		.limit(limit)
-		.exec();
+			.skip(skip)
+			.limit(limit)
+			.exec();
 		if (messages && messages.length !== 0) {
 			return messages.map((message) => this.filter(message.toObject(), userId));
 		}
 		return [];
+	}
 
+	private static async messageByUserAndMessageId(userId: mongoose.Types.ObjectId, messageId: mongoose.Types.ObjectId) {
+		const message = await MessageModel.findOne({
+			$and: [
+				{_id: { $eq: messageId }},
+				{'receivers.userId': { $in: userId }},
+			]}).exec();
+		if (message === null) {
+				return message;
+			}
+		return this.filter(message.toObject(), userId);
+	}
+
+	private static async unreadMessagesByUser(userId: mongoose.Types.ObjectId) {
+		const amount = await MessageModel.count({
+			$and: [
+				{ 'receivers.userId': { $in: userId }},
+				{ 'seenCallback.userId' : {$nin: userId} },
+			]}).exec();
+	 return amount;
+	}
+
+	private static async countMessagesByUser(userId: mongoose.Types.ObjectId) {
+		const amount = await MessageModel.count(
+			{ 'receivers.userId': { $in: userId }},
+		).exec();
+	 return amount;
+	}
+
+	private static async userMetadata(userId: mongoose.Types.ObjectId) {
+		const count = await MessageService.countMessagesByUser(userId);
+		const unread = await MessageService.unreadMessagesByUser(userId);
+  return {unread, count};
 	}
 	// endregion
 
@@ -156,9 +189,18 @@ export default class MessageService {
 	}
 
 	public async byUser(userId: string, limit: number, skip: number): Promise<any> {
-		// todo add paging
-		return await MessageService.messagesByUser(mongoose.Types.ObjectId(userId), limit, skip);
+		const data =  await MessageService.messagesByUser(mongoose.Types.ObjectId(userId), limit, skip);
+		const meta = await MessageService.userMetadata(mongoose.Types.ObjectId(userId));
+		return {data, meta};
 	}
+
+	public async byUserAndMessageId(userId: string, messageId: string): Promise<any> {
+		const data =  await MessageService.messageByUserAndMessageId(mongoose.Types.ObjectId(userId), mongoose.Types.ObjectId(messageId));
+		const meta = await MessageService.userMetadata(mongoose.Types.ObjectId(userId));
+		return {data, meta};
+	}
+
+
 
 	// endregion
 
