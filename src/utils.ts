@@ -103,7 +103,7 @@ class Utils {
 	public getRedisOptions(platformId?: string) {
 		const platformConfig = this.getPlatformConfig(platformId);
 		const options: QueueSettings = platformConfig.queue.defaults;
-		if (!options.redis) {options.redis = {}; }
+		if (!options.redis) { options.redis = {}; }
 		options.redis.host = process.env.REDIS_HOST || '127.0.0.1';
 		options.redis.port = parseInt(process.env.REDIS_PORT || '6379', undefined);
 		logger.debug('redis config: ', options);
@@ -157,10 +157,9 @@ class Utils {
 		return ['firebase', 'safari'];
 	}
 
-	public integerInRange(value: number, options: any) {
-		const retValue = value;
+	public integerInRange(value: string, options: any) {
+		const retValue = parseInt(value, 10);
 		if (isNullOrUndefined(retValue)) { return options.default; }
-		if (!Number.isInteger(value)) {throw new Error('Integer value expected.'); }
 		if (options.min && retValue < options.min) {
 			throw new Error('Value min is ' + options.min);
 		}
@@ -168,9 +167,9 @@ class Utils {
 			throw new Error('Value max is ' + options.max);
 		}
 		return retValue;
-		}
+	}
 
-public async mustacheFunctions(
+	public async mustacheFunctions(
 		platformId: string,
 		messageId: string,
 		receiverId: string,
