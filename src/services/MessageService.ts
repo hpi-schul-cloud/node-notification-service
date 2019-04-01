@@ -14,7 +14,6 @@ export default class MessageService {
 
 	// region private static methods
 	private static async save(message: RequestMessage): Promise<string> {
-
 		const messageModel = new MessageModel({
 			platform: message.platform,
 			template: message.template,
@@ -54,11 +53,13 @@ export default class MessageService {
 			);
 
 			pageUrl = response.data.links.next;
-
 		} while (pageUrl);
 	}
 
-	private static async messageSeen(messageId: string, userId: mongoose.Types.ObjectId) {
+	private static async messageSeen(
+		messageId: string,
+		userId: mongoose.Types.ObjectId,
+	) {
 		const databaseMessage = await MessageModel.findById(messageId);
 		if (!databaseMessage) {
 			const errorMessage = `Message (id: ${messageId}) not found.`;
@@ -66,20 +67,30 @@ export default class MessageService {
 			throw new Error(errorMessage);
 		}
 		const message = databaseMessage.toObject();
-		if (!message.receivers || message.receivers.filter((receiver: UserResource) => receiver.userId.equals(userId)).length === 0) {
+		if (
+			!message.receivers ||
+			message.receivers.filter((receiver: UserResource) =>
+				receiver.userId.equals(userId),
+			).length === 0
+		) {
 			const errorMessage = `Could not find Receiver in Message`;
 			logger.error(errorMessage);
 			throw new Error(errorMessage);
 		}
-		if (message.seenCallback.filter((cb: Callback) => cb.userId.equals(userId)).length === 0) {
+		if (
+			message.seenCallback.filter((cb: Callback) => cb.userId.equals(userId))
+				.length === 0
+		) {
 			databaseMessage.seenCallback.push({ userId });
 			return await databaseMessage.save();
 		}
 		return message;
-
 	}
 
-	private static async removeReceiverFromMessage(messageId: string, userId: string) {
+	private static async removeReceiverFromMessage(
+		messageId: string,
+		userId: string,
+	) {
 		const message = await MessageModel.findById(messageId);
 		if (!message) {
 			const errorMessage = `Message (id: ${messageId}) not found.`;
@@ -87,7 +98,9 @@ export default class MessageService {
 			throw new Error(errorMessage);
 		}
 
-		const user = message.receivers.find((receiver) => receiver.userId.equals(userId));
+		const user = message.receivers.find((receiver) =>
+			receiver.userId.equals(userId),
+		);
 		if (!user) {
 			const errorMessage = `User (userId: ${userId}) not found in Message (id: ${messageId}).`;
 			logger.error(errorMessage);
@@ -106,13 +119,23 @@ export default class MessageService {
 	private static filter(message: Message, userId: mongoose.Types.ObjectId) {
 		// FIXME decorator pattern?
 		const uid = userId.toString();
-		message.receivers = message.receivers.filter((receiver) => receiver.userId.toString() === uid);
-		message.seenCallback = message.seenCallback.filter((callback) => callback.userId.toString() === uid);
+		message.receivers = message.receivers.filter(
+			(receiver) => receiver.userId.toString() === uid,
+		);
+		message.seenCallback = message.seenCallback.filter(
+			(callback) => callback.userId.toString() === uid,
+		);
 		return message;
 	}
 
-	private static async messagesByUser(userId: mongoose.Types.ObjectId, limit: number, skip: number) {
-		const messages = await MessageModel.find({ 'receivers.userId': { $in: userId } })
+	private static async messagesByUser(
+		userId: mongoose.Types.ObjectId,
+		limit: number,
+		skip: number,
+	) {
+		const messages = await MessageModel.find({
+			'receivers.userId': { $in: userId },
+		})
 			.skip(skip)
 			.limit(limit)
 			.exec();
@@ -122,38 +145,43 @@ export default class MessageService {
 		return [];
 	}
 
-	private static async messageByUserAndMessageId(userId: mongoose.Types.ObjectId, messageId: mongoose.Types.ObjectId) {
+	private static async messageByUserAndMessageId(
+		userId: mongoose.Types.ObjectId,
+		messageId: mongoose.Types.ObjectId,
+	) {
 		const message = await MessageModel.findOne({
 			$and: [
-				{_id: { $eq: messageId }},
-				{'receivers.userId': { $in: userId }},
-			]}).exec();
+				{ _id: { $eq: messageId } },
+				{ 'receivers.userId': { $in: userId } },
+			],
+		}).exec();
 		if (message === null) {
-				return message;
-			}
+			return message;
+		}
 		return this.filter(message.toObject(), userId);
 	}
 
 	private static async unreadMessagesByUser(userId: mongoose.Types.ObjectId) {
 		const amount = await MessageModel.count({
 			$and: [
-				{ 'receivers.userId': { $in: userId }},
-				{ 'seenCallback.userId' : {$nin: userId} },
-			]}).exec();
-	 return amount;
+				{ 'receivers.userId': { $in: userId } },
+				{ 'seenCallback.userId': { $nin: userId } },
+			],
+		}).exec();
+		return amount;
 	}
 
 	private static async countMessagesByUser(userId: mongoose.Types.ObjectId) {
-		const amount = await MessageModel.count(
-			{ 'receivers.userId': { $in: userId }},
-		).exec();
-	 return amount;
+		const amount = await MessageModel.count({
+			'receivers.userId': { $in: userId },
+		}).exec();
+		return amount;
 	}
 
 	private static async userMetadata(userId: mongoose.Types.ObjectId) {
 		const count = await MessageService.countMessagesByUser(userId);
 		const unread = await MessageService.unreadMessagesByUser(userId);
-  return {unread, count};
+		return { unread, count };
 	}
 	// endregion
 
@@ -179,28 +207,50 @@ export default class MessageService {
 	}
 
 	public async seen(messageId: string, userId: string) {
-		const message = await MessageService.messageSeen(messageId, mongoose.Types.ObjectId(userId));
+		const message = await MessageService.messageSeen(
+			messageId,
+			mongoose.Types.ObjectId(userId),
+		);
 		return MessageService.filter(message, mongoose.Types.ObjectId(userId));
 	}
 
 	public async remove(messageId: string, userId: string) {
-		const message = await MessageService.removeReceiverFromMessage(messageId, userId);
+		const message = await MessageService.removeReceiverFromMessage(
+			messageId,
+			userId,
+		);
 		return MessageService.filter(message, mongoose.Types.ObjectId(userId));
 	}
 
-	public async byUser(userId: string, limit: number, skip: number): Promise<any> {
-		const data =  await MessageService.messagesByUser(mongoose.Types.ObjectId(userId), limit, skip);
-		const meta = await MessageService.userMetadata(mongoose.Types.ObjectId(userId));
-		return {data, meta};
+	public async byUser(
+		userId: string,
+		limit: number,
+		skip: number,
+	): Promise<any> {
+		const data = await MessageService.messagesByUser(
+			mongoose.Types.ObjectId(userId),
+			limit,
+			skip,
+		);
+		const meta = await MessageService.userMetadata(
+			mongoose.Types.ObjectId(userId),
+		);
+		return { data, meta };
 	}
 
-	public async byUserAndMessageId(userId: string, messageId: string): Promise<any> {
-		const data =  await MessageService.messageByUserAndMessageId(mongoose.Types.ObjectId(userId), mongoose.Types.ObjectId(messageId));
-		const meta = await MessageService.userMetadata(mongoose.Types.ObjectId(userId));
-		return {data, meta};
+	public async byUserAndMessageId(
+		userId: string,
+		messageId: string,
+	): Promise<any> {
+		const data = await MessageService.messageByUserAndMessageId(
+			mongoose.Types.ObjectId(userId),
+			mongoose.Types.ObjectId(messageId),
+		);
+		const meta = await MessageService.userMetadata(
+			mongoose.Types.ObjectId(userId),
+		);
+		return { data, meta };
 	}
-
-
 
 	// endregion
 
