@@ -14,7 +14,6 @@ import logger from '@/helper/logger';
 import BaseService from '@/services/BaseService';
 import MailService from '@/services/MailService';
 import PushService from '@/services/PushService';
-import { doesNotThrow } from 'assert';
 
 // Add extensions to chai
 chai.use(spies);
