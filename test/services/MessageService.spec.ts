@@ -5,6 +5,7 @@ import subset from 'chai-subset';
 import asPromised = require('chai-as-promised');
 import mongoose from 'mongoose';
 import Message from '@/interfaces/Message';
+import Callback from '@/interfaces/Callback';
 import messageModel, { MessageModel } from '@/models/message';
 import MessageService from '@/services/MessageService';
 import message from '@test/data/message';
@@ -13,6 +14,7 @@ import logger from '@/helper/logger';
 import BaseService from '@/services/BaseService';
 import MailService from '@/services/MailService';
 import PushService from '@/services/PushService';
+import { doesNotThrow } from 'assert';
 
 // Add extensions to chai
 chai.use(spies);
@@ -23,6 +25,13 @@ const expect = chai.expect;
 
 // Instantiate the service
 const messageService = new MessageService();
+
+const times = (x: any) => (f: any) => {
+	if (x > 0) {
+		f();
+		times(x - 1)(f);
+	}
+};
 
 describe('MessageService.send', () => {
 
@@ -137,6 +146,26 @@ describe('MessageService.send', () => {
 			.to.be.equal(1);
 	});
 
+	it('should mark all user messages as seen', async () => {
+		const spyFunction = chai.spy();
+		(messageService as any).escalationLogic.escalate = spyFunction;
+		const messageIds: any[] = [];
+		times(5)(() => messageIds.push(messageService.send(message)));
+		return Promise.all(messageIds).then(async (ids) => {
+			const userId = (message.receivers[0] as any).userId;
+			await messageService.readAll(userId);
+			const messages: any = await messageService.byUser(userId, 10, 0);
+			const ok = messages.data.map((m: Message) => {
+				expect(m.seenCallback.length).to.be.greaterThan(0);
+				expect(m.seenCallback.filter((e) => {
+					return e.userId.toString() === userId.toString();
+				}).length).to.be.equal(1);
+				return Promise.resolve();
+			});
+			return Promise.all(ok);
+		});
+	});
+
 	async function getMessage(messageId: string, userId: string) {
 		const messages = await messageService.byUser(userId, 100, 0);
 		const msg = messages.data.filter((m: any) => m._id.equals(messageId))[0];
@@ -163,6 +192,27 @@ describe('MessageService.send', () => {
 		expect(removed).to.not.containSubset({ receivers: [{ userId }] });
 		dbMessage = await messageModel.findById(messageId).exec();
 		expect(dbMessage).to.be.equal(null);
+	});
+
+	it('seenCallback should be removed on receiver removal', async () => {
+		const messageId = await messageService.send(message);
+		const receivers: any = message.receivers;
+		expect(receivers.length).to.be.greaterThan(1);
+		const userId = receivers[0].userId.toString();
+		await messageService.seen(messageId, userId);
+		const secondUserId = receivers[1].userId.toString();
+		let dbMessage = await messageModel.findById(messageId);
+		expect(dbMessage, 'message has been stored').not.to.be.null;
+		if (dbMessage != null) {
+			expect((dbMessage.seenCallback || []).filter((cb: Callback) => cb.userId.toString() === userId)).not.to.be.empty;
+			await messageService.remove(messageId, userId);
+			dbMessage = await messageModel.findById(messageId);
+			expect(dbMessage, 'message still exist because of second user').not.to.be.null;
+			if (dbMessage === null || dbMessage.seenCallback === null) {
+				throw new Error('seenCallback missing');
+			}
+			expect(dbMessage.seenCallback.filter((cb: Callback) => cb.userId.toString() === userId)).to.be.empty;
+		}
 	});
 
 	it('should report health statistics for all queues', async () => {

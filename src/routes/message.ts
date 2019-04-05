@@ -131,4 +131,34 @@ router.post('/:messageId/remove/:userId', async (req, res) => {
 	}
 });
 
+router.post('/user/:userId/removeAll', async (req, res) => {
+	if (utils.parametersMissing(['userId'], req.params, res)) {
+		return;
+	}
+
+	try {
+		const messages = await messageService.removeAll(
+			req.params.userId,
+		);
+		res.send(messages);
+	} catch (e) {
+		res.status(400).send(e.message);
+	}
+});
+
+router.post('/user/:userId/readAll', async (req, res) => {
+	if (utils.parametersMissing(['userId'], req.params, res)) {
+		return;
+	}
+
+	try {
+		const messages = await messageService.readAll(
+			req.params.userId,
+		);
+		res.send(messages);
+	} catch (e) {
+		res.status(400).send(e.message);
+	}
+});
+
 export default router;
