@@ -63,7 +63,7 @@
     "chai-spies": "^1.0.0",
     "chai-subset": "^1.6.0",
     "concurrently": "^4.1.0",
-    "mocha": "^5.2.0",
+    "mocha": "^6.2.1",
     "nodemon": "^1.17.5",
     "tslint": "^5.10.0",
     "tslint-config-airbnb": "^5.11.1",
