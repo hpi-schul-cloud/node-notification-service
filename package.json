@@ -27,7 +27,7 @@
     "@types/defaults-deep": "^0.2.0",
     "@types/morgan": "^1.7.35",
     "@types/redis": "^2.8.10",
-    "app-root-path": "^2.1.0",
+    "app-root-path": "^3.0.0",
     "axios": "^0.18.0",
     "bee-queue": "^1.2.2",
     "body-parser": "^1.18.3",
