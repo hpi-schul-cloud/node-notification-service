@@ -49,7 +49,7 @@
       "sendEvents": true,
       "storeJobs": true,
       "ensureScripts": true,
-      "activateDelayedJobs": false,
+      "activateDelayedJobs": true,
       "removeOnSuccess": true,
       "removeOnFailure": false,
       "redisScanCount": 100
