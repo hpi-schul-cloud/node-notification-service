@@ -33,10 +33,10 @@
     "url": "http://localhost:3100/notification/callback/{MESSAGE_ID}/seenBy/{RECEIVER_ID}/?redirect={REDIRECT_URL}"
   },
   "queue": {
-    "timeout": "10000",
-    "retries": 2,
+    "timeout": 10000,
+    "retries": 1000,
     "defaults": {
-      "prefix": "",
+      "prefix": "notification",
       "stallInterval": 5000,
       "nearTermWindow": 1200000,
       "delayedDebounce": 1000,
@@ -49,8 +49,8 @@
       "sendEvents": true,
       "storeJobs": true,
       "ensureScripts": true,
-      "activateDelayedJobs": false,
-      "removeOnSuccess": false,
+      "activateDelayedJobs": true,
+      "removeOnSuccess": true,
       "removeOnFailure": false,
       "redisScanCount": 100
     }

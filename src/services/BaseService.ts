@@ -85,6 +85,7 @@ export default abstract class BaseService {
 		const config = await Utils.getPlatformConfig(platformId);
 		const queue = this.getQueue(platformId);
 		return queue.createJob({ platformId, message, receiver, messageId })
+			.backoff('exponential', 1000)
 			.retries(config.queue.retries)
 			.timeout(config.queue.timeout)
 			.save()
