@@ -4,4 +4,5 @@ export default interface Mail {
 	subject: string;
 	text: string;
 	html: string;
+	attachments?: {content: Buffer|string, filename: string}[];
 }
