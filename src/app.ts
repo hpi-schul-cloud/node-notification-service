@@ -23,7 +23,9 @@ const format = mjson(':status :method :url :res[content-length] bytes :response-
 app.use(morgan(format, { stream: new LoggerStream('request', 'debug') }));
 
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(bodyParser.json({
+	limit: (10 * 1024 * 1024), // 10MB
+}));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -46,6 +48,9 @@ app.use((err: HttpException, req: Request, res: Response, next: NextFunction) =>
 	res.locals.message = err.message || 'unknown error';
 	res.locals.error = req.app.get('NODE_ENV') !== 'production' ? err : {};
 	const status = err.status || 500;
+
+	// tslint:disable-next-line no-console
+	console.error(err);
 
 	// render the error page
 	res.status(status);

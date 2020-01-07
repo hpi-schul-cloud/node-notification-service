@@ -204,6 +204,10 @@
         "html": {
           "type": "string",
           "description": "HTML content of mail"
+        },
+        "attachments": {
+          "type": "array",
+          "description": "Attachments of the mail"
         }
       },
       "example": {
@@ -211,7 +215,13 @@
         "to": "sample@sample.org",
         "subject": "New foo bar available",
         "text": "Order our new foo bar for only $42.",
-        "html": "<html>Order our new foo bar for only $42.</html>"
+        "html": "<html>Order our new foo bar for only $42.</html>",
+        "attachments": [
+          {
+            "filename": "base64EncodedContent.gif",
+            "content": "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+          }
+        ]
       }
     },
     "Push": {

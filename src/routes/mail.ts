@@ -13,6 +13,7 @@ router.post('/', (req, res) => {
 		subject: req.body.subject,
 		text: req.body.text,
 		html: req.body.html,
+		attachments: req.body.attachments,
 	};
 
 	if (req.body.from) {
