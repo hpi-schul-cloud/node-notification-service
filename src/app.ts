@@ -24,7 +24,7 @@ app.use(morgan(format, { stream: new LoggerStream('request', 'debug') }));
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json({
-	limit: (10 * 1024 * 1024) // 10MB
+	limit: (10 * 1024 * 1024), // 10MB
 }));
 
 // view engine setup
@@ -49,7 +49,8 @@ app.use((err: HttpException, req: Request, res: Response, next: NextFunction) =>
 	res.locals.error = req.app.get('NODE_ENV') !== 'production' ? err : {};
 	const status = err.status || 500;
 
-	console.error(err)
+	// tslint:disable-next-line no-console
+	console.error(err);
 
 	// render the error page
 	res.status(status);

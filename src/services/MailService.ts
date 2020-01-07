@@ -26,14 +26,14 @@ export default class MailService extends BaseService {
 
 	protected _send(transporter: nodeMailer.Transporter, mail: Mail): Promise<SentMessageInfo> {
 
-    if(mail.attachments){
-      const decodeFiles = (files: {content: any, filename: string}[]) => files.map(({ content, filename }) => ({
-        filename,
-        content: Buffer.from(content, 'base64'),
-      }));
-      const decodedAttachments = decodeFiles(mail.attachments);
-      mail.attachments = decodedAttachments
-    }
+		if (mail.attachments) {
+			const decodeFiles = (files: Array<{content: any, filename: string}>) => files.map(({ content, filename }) => ({
+				filename,
+				content: Buffer.from(content, 'base64'),
+			}));
+			const decodedAttachments = decodeFiles(mail.attachments);
+			mail.attachments = decodedAttachments;
+		}
 
 		return transporter.sendMail(mail);
 	}
