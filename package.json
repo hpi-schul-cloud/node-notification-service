@@ -39,7 +39,7 @@
     "mongoose": "^5.1.6",
     "morgan": "^1.9.1",
     "morgan-json": "^1.1.0",
-    "mustache": "^3.0.1",
+    "mustache": "^4.0.0",
     "node-cache": "^5.0.0",
     "nodemailer": "^6.0.0",
     "swagger-ui-express": "^4.0.1",
