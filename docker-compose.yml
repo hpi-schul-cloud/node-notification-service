@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 services:
   notification-service:
     #image: friedow/node-notification-service:latest
@@ -18,10 +18,12 @@ services:
       #- NOTIFICATION_PORT=3031
       # - NODE_ENV=production
     volumes:
-      - ./logs:/usr/src/app/logs
+      # - ./logs:/usr/src/app/logs
+      - ./:/usr/src/app
     depends_on:
       - mongo
       - redis
+    command: npm run debug
 
   mongo:
     image: mongo:3
@@ -37,8 +39,13 @@ services:
     image: rediscommander/redis-commander:latest
     restart: always
     environment:
-    - REDIS_HOSTS=local:redis:6379
+      - REDIS_HOSTS=local:redis:6379
     ports:
-    - "8081:8081"
+      - "8081:8081"
     depends_on:
       - redis
+
+  mail:
+    image: schickling/mailcatcher
+    ports:
+      - 1080:1080
