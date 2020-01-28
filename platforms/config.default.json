@@ -1,9 +1,9 @@
 {
   "mail": {
     "options": {
-      "host": "",
-      "port": 465,
-      "secure": true,
+      "host": "mail",
+      "port": 1025,
+      "secure": false,
       "auth": {
         "user": "",
         "pass": ""
