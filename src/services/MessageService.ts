@@ -8,6 +8,15 @@ import UserResource from '@/interfaces/UserResource';
 import Callback from '@/interfaces/Callback';
 import logger from '@/helper/logger';
 
+const UNREAD_MESSAGES_BY_USER = (userId: string) => {
+	return {
+		$and: [
+			{ 'receivers.userId': { $in: userId } },
+			{ 'seenCallback.userId': { $nin: userId } },
+		],
+	};
+};
+
 export default class MessageService {
 	// region public static methods
 	// endregion
@@ -90,7 +99,7 @@ export default class MessageService {
 	private static async removeReceiverFromMessage(
 		messageId: string,
 		userId: string,
-	) {
+	): Promise<Message> {
 		const message = await MessageModel.findById(messageId);
 		if (!message) {
 			const errorMessage = `Message (id: ${messageId}) not found.`;
@@ -108,7 +117,49 @@ export default class MessageService {
 		}
 
 		message.receivers.pull(user);
+
+		const seenCallback = message.seenCallback.find((callback) => callback.userId.equals(userId));
+		if (seenCallback) {
+			message.seenCallback.pull(seenCallback);
+		}
+
 		return await message.save();
+	}
+
+	private static async removeAllMessagesFrom(
+		userId: string,
+	): Promise<Message[]> {
+		const messageIds = await MessageModel
+			.find({ 'receivers.userId': { $in: userId } })
+			.select({ _id: 1 })
+			.exec();
+		const chain: Array<Promise<Message>> = [];
+		if (messageIds && messageIds.length !== 0) {
+			messageIds.forEach((m) => chain.push(
+				this.removeReceiverFromMessage(
+					m._id.toString(),
+					userId,
+				)));
+		}
+		return await Promise.all(chain);
+	}
+
+	private static async readAllMessagesFrom(
+		userId: string,
+	): Promise<Message[]> {
+		const messageIds = await MessageModel
+			.find(UNREAD_MESSAGES_BY_USER(userId))
+			.select({ _id: 1 })
+			.exec();
+		const chain: Array<Promise<Message>> = [];
+		if (messageIds && messageIds.length !== 0) {
+			messageIds.forEach((m) => chain.push(
+				this.messageSeen(
+					m._id.toString(),
+					mongoose.Types.ObjectId(userId),
+				)));
+		}
+		return await Promise.all(chain);
 	}
 
 	/**
@@ -136,6 +187,7 @@ export default class MessageService {
 		const messages = await MessageModel.find({
 			'receivers.userId': { $in: userId },
 		})
+			.sort('-createdAt')
 			.skip(skip)
 			.limit(limit)
 			.exec();
@@ -162,12 +214,7 @@ export default class MessageService {
 	}
 
 	private static async unreadMessagesByUser(userId: mongoose.Types.ObjectId) {
-		const amount = await MessageModel.count({
-			$and: [
-				{ 'receivers.userId': { $in: userId } },
-				{ 'seenCallback.userId': { $nin: userId } },
-			],
-		}).exec();
+		const amount = await MessageModel.count(UNREAD_MESSAGES_BY_USER(userId.toString())).exec();
 		return amount;
 	}
 
@@ -220,6 +267,20 @@ export default class MessageService {
 			userId,
 		);
 		return MessageService.filter(message, mongoose.Types.ObjectId(userId));
+	}
+
+	public async removeAll(userId: string) {
+		const messages: Message[] = await MessageService.removeAllMessagesFrom(
+			userId,
+		);
+		return messages.map((message: Message) => MessageService.filter(message, mongoose.Types.ObjectId(userId)));
+	}
+
+	public async readAll(userId: string) {
+		const messages: Message[] = await MessageService.readAllMessagesFrom(
+			userId,
+		);
+		return messages.map((message: Message) => MessageService.filter(message, mongoose.Types.ObjectId(userId)));
 	}
 
 	public async byUser(

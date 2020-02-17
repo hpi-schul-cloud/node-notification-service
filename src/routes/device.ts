@@ -1,6 +1,8 @@
 import express from 'express';
 import DeviceService from '@/services/DeviceService';
 import Utils from '@/utils';
+import mongoose from 'mongoose';
+
 const router: express.Router = express.Router();
 
 router.post('/', async (req, res) => {
@@ -22,7 +24,7 @@ router.get('/:platform/:userId', async (req, res) => {
 	try {
 		const devices: string[] = [];
 		const chain = Utils.serviceEnum().map((service) => {
-			return DeviceService.getDevices(req.params.platform, req.params.userId, service);
+			return DeviceService.getDevices(req.params.platform, mongoose.Types.ObjectId(req.params.userId), service);
 		});
 		Promise.all(chain).then((tokens) => {
 			tokens.forEach((serviceTokens) => { devices.push(...serviceTokens); });
@@ -38,7 +40,7 @@ router.delete('/:platform/:userId/:token', async (req, res) => {
 	if (Utils.parametersMissing(['platform', 'userId', 'token'], req.params, res)) { return; }
 
 	try {
-		const devices = await DeviceService.removeDevice(req.params.token, req.params.platform, req.params.userId);
+		const devices = await DeviceService.removeDevice(req.params.token, req.params.platform, mongoose.Types.ObjectId(req.params.userId));
 		res.send(devices);
 	} catch (e) {
 		res.status(500).send(e.message);
