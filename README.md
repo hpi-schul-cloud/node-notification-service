@@ -2,6 +2,8 @@
 
 
 [![Build Status](https://travis-ci.org/schul-cloud/node-notification-service.svg?branch=master)](https://travis-ci.org/schul-cloud/node-notification-service)
+![Node.js CI](https://github.com/schul-cloud/node-notification-service/workflows/Node.js%20CI/badge.svg)
+![Node.js CI](https://github.com/schul-cloud/node-notification-service/workflows/Node.js%20CI/badge.svg?branch=develop)
 
 
 ## Deployment
