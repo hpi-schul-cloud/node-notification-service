@@ -13,15 +13,17 @@ describe('MailService.send', () => {
 
 	before('should send an mail.', async () => {
 		// Create ethereal mail account
-		const account = await nodeMailer.createTestAccount();
+		const account: any = await nodeMailer.createTestAccount();
+		// console.log({ smpt: account.smtp, user: account.user, pass: account.pass });
+		const { host, port, secure } = account.smtp;
 		const transporter = nodeMailer.createTransport({
-			host: 'smtp.ethereal.email',
-			port: 587,
-			secure: false,
+			host,
+			port,
+			secure,
 			auth: {
 				user: account.user,
-				pass: account.pass,
-			},
+				pass: account.pass
+			}
 		});
 
 		// Add the custom transporter

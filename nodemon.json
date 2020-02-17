@@ -6,7 +6,8 @@
         "node_modules"
     ],
     "watch": [
-        "build"
+        "build",
+        "platforms"
     ],
     "exec": "node --inspect=5859 -r tsconfig-paths/register -r ts-node/register build/app.js",
     "ext": "js",
