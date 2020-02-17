@@ -10,6 +10,7 @@ const mailService = new MailService();
 router.post('/', (req, res) => {
 	const mail: Mail = {
 		to: req.body.to,
+		replyTo: req.body.replyTo,
 		subject: req.body.subject,
 		text: req.body.text,
 		html: req.body.html,
