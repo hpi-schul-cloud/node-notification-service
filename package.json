@@ -36,7 +36,7 @@
     "firebase-admin": "^8.0.0",
     "husky": "^4.2.3",
     "js-yaml": "^3.13.1",
-    "mongoose": "^5.7.5",
+    "mongoose": "^5.9.1",
     "morgan": "^1.9.1",
     "morgan-json": "^1.1.0",
     "mustache": "^3.0.1",
