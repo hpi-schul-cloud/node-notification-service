@@ -49,3 +49,4 @@ services:
     image: schickling/mailcatcher
     ports:
       - 1080:1080
+      - 1025:1025

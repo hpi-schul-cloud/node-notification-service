@@ -22,7 +22,7 @@ class Utils {
 			return (config);
 		} catch (err) {
 			logger.error(
-				'config.json missing. copy config.default.json to selected platform folder and rename.',
+				'config.json missing. copy config.default.json to selected platform-folder "platforms/' + platformId + '" and update it.',
 			);
 			return (require(`../platforms/config.default.json`));
 		}
