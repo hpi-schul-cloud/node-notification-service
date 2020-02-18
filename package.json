@@ -1,6 +1,6 @@
 {
   "name": "notification-service",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A notification service for mails and push notifications build with Typescript on top of Node and Express.js.",
   "homepage": "https://github.com/schul-cloud/node-notification-service",
   "bugs": {
