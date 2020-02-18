@@ -19,7 +19,7 @@
     "debug": "concurrently \"tsc -w\" \"nodemon build/app.js\"",
     "lint": "tslint -p tsconfig.json --fix",
     "start": "node -r ts-node/register -r tsconfig-paths/register build/app.js",
-    "test": "mocha -t 30000 -r tsconfig-paths/register -r ts-node/register test/**/*.spec.ts"
+    "test": "mocha -t 30000 -r tsconfig-paths/register -r ts-node/register test/**/*.spec.ts --exit"
   },
   "dependencies": {
     "@types/app-root-path": "^1.2.4",
