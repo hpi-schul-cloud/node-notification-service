@@ -3,5 +3,4 @@ services:
   - mongodb
   - redis-server
 before_install:
-  - nvm install $(cat .nvmrc)
   - docker run --name mailcatcher --publish 1025:1025 --detach schickling/mailcatcher
