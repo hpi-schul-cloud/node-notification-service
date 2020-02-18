@@ -15,18 +15,20 @@ jobs:
     steps:
      - name: Git checkout
        uses: actions/checkout@v1
-     - name: MongoDB 
+     - name: Start Mailcatcher
+       run: docker run --name mailcatcher --publish 1025:1025 --detach schickling/mailcatcher
+     - name: Start MongoDB 
        uses: supercharge/mongodb-github-action@1.1.0
-     - name: Use Node.js ${{ matrix.node-version }}
-       uses: actions/setup-node@v1
-       with:
-         node-version: ${{ matrix.node-version }}
      - name: Start Redis
        uses: supercharge/redis-github-action@1.1.0
        with:
          redis-version: ${{ matrix.redis-version }}
+     - name: Use Node.js ${{ matrix.node-version }}
+       uses: actions/setup-node@v1
+       with:
+         node-version: ${{ matrix.node-version }}
      - run: npm install
-     - run: npm run build --if-present
+     - run: npm run build
      - run: npm test
        env:
          CI: true
