@@ -1,5 +1,7 @@
 # notification-service
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/schul-cloud/node-notification-service.svg)](https://greenkeeper.io/)
+
 ![Node.js CI](https://github.com/schul-cloud/node-notification-service/workflows/Node.js%20CI/badge.svg)
 ![Node.js CI](https://github.com/schul-cloud/node-notification-service/workflows/Node.js%20CI/badge.svg?branch=develop)
 ![Mergify Enabled](https://img.shields.io/endpoint.svg?url=https://dashboard.mergify.io/badges/schul-cloud/node-notification-service&style=flat)
