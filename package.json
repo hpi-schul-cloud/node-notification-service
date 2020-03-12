@@ -33,7 +33,7 @@
     "body-parser": "^1.19.0",
     "defaults-deep": "^0.2.4",
     "express": "^4.17.1",
-    "firebase-admin": "^8.0.0",
+    "firebase-admin": "^8.10.0",
     "husky": "^4.2.3",
     "js-yaml": "^3.13.1",
     "mongoose": "^5.7.5",
