@@ -37,7 +37,7 @@
     "husky": "^4.2.3",
     "js-yaml": "^3.13.1",
     "mongoose": "^5.7.5",
-    "morgan": "^1.9.1",
+    "morgan": "^1.10.0",
     "morgan-json": "^1.1.0",
     "mustache": "^3.0.1",
     "node-cache": "^5.0.0",
