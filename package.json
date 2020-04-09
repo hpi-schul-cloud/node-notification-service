@@ -34,7 +34,7 @@
     "defaults-deep": "^0.2.4",
     "express": "^4.17.1",
     "firebase-admin": "^8.10.0",
-    "husky": "^4.2.3",
+    "husky": "^4.2.5",
     "js-yaml": "^3.13.1",
     "mongoose": "^5.7.5",
     "morgan": "^1.10.0",
