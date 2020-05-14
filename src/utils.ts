@@ -113,7 +113,7 @@ class Utils {
 				logger.error('Unable to connect to the Redis server - Notification Service is going to exit!');
 				process.exit(1);
 			}
-			return 1000;
+			return (opts.attempt + 1) * 1000;
 		};
 		logger.debug('redis config: ', options);
 		return options;
