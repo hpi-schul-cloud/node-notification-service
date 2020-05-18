@@ -104,10 +104,8 @@ class Utils {
 		const platformConfig = this.getPlatformConfig(platformId);
 		const options: QueueSettings = platformConfig.queue.defaults;
 		if (!options.redis) { options.redis = {}; }
-		if (!options.redis.url) {
-			options.redis.host = process.env.REDIS_HOST || '127.0.0.1';
-			options.redis.port = parseInt(process.env.REDIS_PORT || '6379', undefined);
-		}
+		options.redis.host = process.env.REDIS_HOST || '127.0.0.1';
+		options.redis.port = parseInt(process.env.REDIS_PORT || '6379', undefined);
 		options.redis.retry_strategy = (opts) => {
 			if (opts.attempt === 3) {
 				logger.error('Unable to connect to the Redis server - Notification Service is going to exit!');

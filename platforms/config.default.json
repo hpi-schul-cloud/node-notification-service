@@ -42,8 +42,7 @@
       "delayedDebounce": 1000,
       "redis": {
         "db": 0,
-		"options": {},
-		"url": null
+		"options": {}
       },
       "isWorker": true,
       "getEvents": true,
