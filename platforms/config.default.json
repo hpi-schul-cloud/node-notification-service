@@ -41,7 +41,7 @@
       "nearTermWindow": 1200000,
       "delayedDebounce": 1000,
       "redis": {
-        "db": 0,
+		"db": 0,
 		"options": {}
       },
       "isWorker": true,
