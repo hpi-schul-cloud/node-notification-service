@@ -7,6 +7,8 @@ on:
       - develop
       - release/*
       - hotfix/*
+    paths-ignore:
+      - '\.github/**'
 
   pull_request:
 
