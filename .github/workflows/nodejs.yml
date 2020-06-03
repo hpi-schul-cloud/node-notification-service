@@ -1,7 +1,19 @@
 name: Node.js CI
 
-on: [push]
+on:
+  push:
+    branches:
+      - master
+      - develop
+      - release/*
+      - hotfix/*
+    paths-ignore:
+      - '/.github/**'
 
+  pull_request:
+    paths-ignore:
+      - '/.github/**'
+      
 jobs:
   build:
 
@@ -14,7 +26,7 @@ jobs:
 
     steps:
      - name: Git checkout
-       uses: actions/checkout@v1
+       uses: actions/checkout@v2
      - name: Start Mailcatcher
        run: docker run --name mailcatcher --publish 1025:1025 --detach schickling/mailcatcher
      - name: Start MongoDB 

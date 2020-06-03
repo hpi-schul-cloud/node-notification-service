@@ -8,9 +8,11 @@ on:
       - release/*
       - hotfix/*
     paths-ignore:
-      - '\.github/**'
+      - '/.github/**'
 
   pull_request:
+    paths-ignore:
+      - '/.github/**'
 
 jobs:
   build_and_push:
