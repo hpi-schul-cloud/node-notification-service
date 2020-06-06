@@ -111,25 +111,30 @@ export default abstract class BaseService {
 	private createTransporter(platformId: string): nodeMailer.Transporter | firebaseMessaging.Messaging {
 		const config = Utils.getPlatformConfig(platformId);
 		const transporter = this._createTransporter(config);
-		const platformPushTransporter = {
-			platformId,
-			transporter,
-		};
-		this.transporters.push(platformPushTransporter);
+		// do not store transporter on multiple config
+		if (config.hasMultipleAccounts !== true) {
+			const platformPushTransporter = {
+				platformId,
+				transporter,
+			};
+			this.transporters.push(platformPushTransporter);
+		}
 		return transporter;
 	}
 
 	private getTransporter(platformId: string): nodeMailer.Transporter | firebaseMessaging.Messaging {
-		const currentTransporter: PlatformMailTransporter | PlatformPushTransporter | undefined = this.transporters.find(
-			(transporter: PlatformMailTransporter | PlatformPushTransporter) => {
-				return transporter.platformId === platformId;
-			},
-		);
+		const config = Utils.getPlatformConfig(platformId);
+		if (config.hasMultipleAccounts !== true) {
+			const currentTransporter: PlatformMailTransporter | PlatformPushTransporter | undefined = this.transporters.find(
+				(transporter: PlatformMailTransporter | PlatformPushTransporter) => {
+					return transporter.platformId === platformId;
+				},
+			);
 
-		if (currentTransporter) {
-			return currentTransporter.transporter;
+			if (currentTransporter) {
+				return currentTransporter.transporter;
+			}
 		}
-
 		return this.createTransporter(platformId);
 	}
 

@@ -10,16 +10,18 @@ import { isNullOrUndefined } from 'util';
 
 class Utils {
 
-
 	private static _getPlatformConfig(platformId?: string): any {
 		try {
-			let config: {} = platformId ? require(`../platforms/${platformId}/config.json`) : {};
-			config = defaults(
-				config,
+			let config:{} = platformId ? require(`../platforms/${platformId}/config.json`) : {};
+			// this is a workaround, otherwise the config object is cached 
+			delete require.cache[require.resolve(`../platforms/${platformId}/config.json`)]
+			const configSample = this._getConfigWithRandomMailConfig(config);
+			const result = defaults(
+				configSample,
 				require(`../platforms/config.default.json`),
 			);
-			logger.silly('platform config loaded', { platformId, config });
-			return (config);
+			logger.info('platform config loaded', { platformId, result });
+			return (result);
 		} catch (err) {
 			logger.error(
 				'config.json missing. copy config.default.json to selected platform-folder "platforms/' + platformId + '" and update it.',
@@ -75,6 +77,19 @@ class Utils {
 		return Promise.resolve(template);
 	}
 
+	private static _getConfigWithRandomMailConfig(config:any): any {
+		if (Array.isArray(config.mail) ){
+			config.hasMultipleAccounts = true;
+			config.mail = this._getRandomElementfromList(config.mail);
+		}
+		return config;
+	}
+
+	private static  _getRandomElementfromList (array: Array<any>) {
+		const randPos:number = Math.floor((Math.random()*array.length));
+		return array[randPos];
+	}
+
 
 	private cache: Cache;
 	private platformIds: string[];
@@ -87,12 +102,16 @@ class Utils {
 	}
 
 	public getPlatformConfig(platformId?: string): any {
+		logger.info("get platform config for " + platformId);
 		const platform = platformId || 'default';
 		if (platform in this.platformConfigs) {
 			return this.platformConfigs[platform];
 		}
 		const config = Utils._getPlatformConfig(platformId);
-		this.platformConfigs[platform] = config;
+		if (config.hasMultipleAccounts !== true){
+			logger.info("cache platform config for " + platformId);
+			this.platformConfigs[platform] = config;
+		}
 		return config;
 	}
 
