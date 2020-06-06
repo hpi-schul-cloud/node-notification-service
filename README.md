@@ -52,6 +52,31 @@ We also have the device service: this service is only responsible for managing t
 
 External services can mark specific messages as seen to disable the escalation logic for a specific user. If the push message was delivered and this message was marked as seen via the respective API call, the mail message will not be sent.
 
+## Config
+To use multiple Mail Configs (for example for load balancing) just use an array of config
+
+```
+{
+  "mail":[
+    {
+        "options": {
+          "host": "mail",
+          "port": 1025,
+          "secure": false,
+          "auth": {
+            "user": "def",
+            "pass": ""
+          }
+        },
+        "defaults": {
+          "from": "Sample Service 222 <sample@sample.org>",
+          "delay": 0
+        }
+    },
+    ...
+  ]
+```
+
 ## Docs
 
 A Swagger Docs is available at ```/docs```

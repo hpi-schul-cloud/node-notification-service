@@ -1,19 +1,5 @@
 {
-  "mail": [{
-    "options": {
-      "host": "mail",
-      "port": 1025,
-      "secure": false,
-      "auth": {
-        "user": "abc",
-        "pass": ""
-      }
-    },
-    "defaults": {
-      "from": "Sample Service 111<sample@sample.org>",
-      "delay": 0
-    }
-  },
+  "mail":
   {
     "options": {
       "host": "mail",
@@ -28,7 +14,7 @@
       "from": "Sample Service 222 <sample@sample.org>",
       "delay": 0
     }
-  }],
+  },
   "push": {
     "service_account_object": {
       "type": "",
