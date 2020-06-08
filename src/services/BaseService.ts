@@ -1,12 +1,9 @@
-import { SentMessageInfo } from 'nodemailer';
-import { messaging as firebaseMessaging } from 'firebase-admin';
-import Mail from '@/interfaces/Mail';
-import PlatformMailTransporter from '@/interfaces/PlatformMailTransporter';
-import PlatformPushTransporter from '@/interfaces/PlatformPushTransporter';
+import {SentMessageInfo} from 'nodemailer';
 import Utils from '@/utils';
 import logger from '@/helper/logger';
-import Queue, { Job } from 'bee-queue';
-import PlatformTransporter from "@/interfaces/PlatformTransporter";
+import Queue, {Job} from 'bee-queue';
+import PlatformTransporter from '@/interfaces/PlatformTransporter';
+import {PlatformMessage} from '@/interfaces/PlatformMessage';
 
 
 function getType(object: object | null) {
@@ -63,44 +60,48 @@ export default abstract class BaseService {
 
 	// region public members
 	private static queues: Queue[] = [];
+
+	private static selectTransporter(availableTransporters: PlatformTransporter[]): PlatformTransporter {
+		const randPos: number = Math.floor((Math.random() * availableTransporters.length));
+		return availableTransporters[randPos];
+	}
 	// endregion
 
 	// region private members
-	private platformConfig: any;
 	private transporters: PlatformTransporter[] = [];
-	private platforms: string[];
-
 	// endregion
 
 
 	// region constructor
 	protected constructor() {
-		this.platforms = Utils.getPlatformIds();
-		for (const platform of this.platforms) {
+		const platforms = Utils.getPlatformIds();
+		for (const platform of platforms) {
 			logger.debug('[queue] init for platform ' + platform + ' and service ' + this._serviceType());
 			this.getQueue(platform);
 		}
 	}
+	// endregion
 
-	public async send(platformId: string, message: Mail | firebaseMessaging.Message, receiver: string, messageId?: string): Promise<string> {
+	// region public methods
+	public async send(platformId: string, message: PlatformMessage, receiver: string, messageId?: string): Promise<string> {
 		const config = await Utils.getPlatformConfig(platformId);
 		const queue = this.getQueue(platformId);
 		return queue.createJob({ platformId, message, receiver, messageId })
-			.backoff('fixed', 2000*60) // 2min
+			.backoff('fixed', 2000 * 60) // 2min
 			.retries(config.queue.retries)
 			.timeout(config.queue.timeout)
 			.save()
 			.then((job: Job) => job.id);
 	}
 
-	public directSend(platformId: string, message: Mail | firebaseMessaging.Message, receiver: string, messageId?: string): Promise<string> {
+	public directSend(platformId: string, message: PlatformMessage, receiver: string, messageId?: string): Promise<string> {
 		return this.process(platformId, message, receiver, messageId);
 	}
 	// endregion
 
 	// region private methods
 
-	protected abstract _send(transporter: PlatformTransporter, message: Mail | firebaseMessaging.Message): Promise<SentMessageInfo | string>;
+	protected abstract _send(transporter: PlatformTransporter, message: PlatformMessage): Promise<SentMessageInfo | string>;
 
 	protected abstract _createTransporters(platformId: string, config: any): PlatformTransporter[];
 
@@ -112,13 +113,17 @@ export default abstract class BaseService {
 	private createTransporters(platformId: string): PlatformTransporter[] {
 		const config = Utils.getPlatformConfig(platformId);
 		const newTransporters = this._createTransporters(platformId, config);
-		this.transporters.push.apply(newTransporters);
+
+		for (const transporter of newTransporters) {
+			this.transporters.push(transporter);
+		}
+
 		return newTransporters;
 	}
 
 	private getTransporter(platformId: string): PlatformTransporter {
 		let availableTransporters: PlatformTransporter[] = this.transporters.filter(
-			(transporter: PlatformMailTransporter | PlatformPushTransporter) => {
+			(transporter: PlatformTransporter) => {
 				return transporter.platformId === platformId;
 			},
 		);
@@ -127,8 +132,7 @@ export default abstract class BaseService {
 			availableTransporters = this.createTransporters(platformId);
 		}
 
-		// ToDo: randomize selection
-		return availableTransporters[0];
+		return BaseService.selectTransporter(availableTransporters);
 	}
 
 	private createQueue(platformId: string): Queue {

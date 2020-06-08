@@ -13,7 +13,7 @@ class Utils {
 
 	private static _getPlatformConfig(platformId?: string): any {
 		try {
-			let config: {} = platformId ? require(`../platforms/${platformId}/config.json`) : {};
+			const config: {} = platformId ? require(`../platforms/${platformId}/config.json`) : {};
 			const result = defaults(
 				config,
 				require(`../platforms/config.default.json`),

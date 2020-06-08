@@ -1,7 +1,7 @@
 import nodeMailer, { SentMessageInfo } from 'nodemailer';
 import BaseService from '@/services/BaseService';
 import Mail from '@/interfaces/Mail';
-import PlatformMailTransporter from "@/interfaces/PlatformMailTransporter";
+import PlatformMailTransporter from '@/interfaces/PlatformMailTransporter';
 
 export default class MailService extends BaseService {
 	// endregion
@@ -24,7 +24,9 @@ export default class MailService extends BaseService {
 	public constructor() {
 		super();
 	}
+	// endregion
 
+	// region public methods
 	protected _send(transporter: PlatformMailTransporter, mail: Mail): Promise<SentMessageInfo> {
 		if (mail.attachments) {
 			const decodeFiles = (files: Array<{content: any, filename: string}>) => files.map(({ content, filename }) => ({
@@ -49,7 +51,7 @@ export default class MailService extends BaseService {
 			return {
 				platformId,
 				transporter,
-			}
+			};
 		});
 	}
 

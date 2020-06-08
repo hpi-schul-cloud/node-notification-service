@@ -72,7 +72,7 @@ export default class EscalationLogic {
 
 		// Send mail messages after 4 hours delay
 		const config = await Utils.getPlatformConfig(message.platform);
-		const delay = Array.isArray(config.mail) ? config.mail[0].defaults.delay : config.mail.defaults.delay
+		const delay = Array.isArray(config.mail) ? config.mail[0].defaults.delay : config.mail.defaults.delay;
 		setTimeout(() => { this.sendMailMessages(messageId); }, delay);
 		// todo send mail message without delay if there was no push device registered
 	}

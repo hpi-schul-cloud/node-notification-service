@@ -2,7 +2,7 @@ import firebaseAdmin, { messaging as firebaseMessaging } from 'firebase-admin';
 import BaseService from '@/services/BaseService';
 import DeviceService from './DeviceService';
 import mongoose from 'mongoose';
-import PlatformPushTransporter from "@/interfaces/PlatformPushTransporter";
+import PlatformPushTransporter from '@/interfaces/PlatformPushTransporter';
 
 export default class PushService extends BaseService {
 	// region public static methods
@@ -22,7 +22,6 @@ export default class PushService extends BaseService {
 	// endregion
 
 	// region public methods
-
 	public removeToken(platform: string, userId: string, device: string): any {
 		return DeviceService.removeDevice(device, platform, mongoose.Types.ObjectId(userId));
 	}
