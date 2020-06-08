@@ -64,12 +64,12 @@ To use multiple Mail Configs (for example for load balancing) just use an array 
           "port": 1025,
           "secure": false,
           "auth": {
-            "user": "def",
+            "user": "",
             "pass": ""
           }
         },
         "defaults": {
-          "from": "Sample Service 222 <sample@sample.org>",
+          "from": "Sample Service <sample@sample.org>",
           "delay": 0
         }
     },

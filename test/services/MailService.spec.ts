@@ -28,7 +28,7 @@ const getTestEmailAccount = async ({ EMAIL_SERVICE }: any) => {
 		);
 	} else {
 		account = SMTP_MAILCATCHER;
-		logger.info('using mailcatcheer for receiving emails in tests')
+		logger.info('using mailcatcher for receiving emails in tests')
 	}
 	return account;
 }
