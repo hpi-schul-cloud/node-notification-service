@@ -96,49 +96,6 @@ describe('MailService.send', () => {
 			.to.have.property('from', mail.from);
 	});
 
-	it('should send all mails using transporterTwo.', async () => {
-		// Create mail accounts
-		const transporterOne: PlatformMailTransporter = await configureEmailAccount(mailService);
-		const transporterTwo: PlatformMailTransporter = await configureEmailAccount(mailService);
-
-		// make one account unavailable
-		transporterOne.unavailableSince = new Date();
-
-		// Send mails
-		await mailService.directSend(message.platform, mail, mail.to, 'noId');
-		await mailService.directSend(message.platform, mail, mail.to, 'noId');
-		await mailService.directSend(message.platform, mail, mail.to, 'noId');
-
-		// all Mails have been send using transporterTwo
-		expect(transporterTwo.lastSuccessAt)
-			.to.be.an('Date');
-		expect(transporterOne.lastSuccessAt)
-			.to.be.undefined;
-	});
-
-	it('should reactivate transporterOne', async () => {
-		// Create mail accounts
-		const transporterOne: PlatformMailTransporter = await configureEmailAccount(mailService);
-		const transporterTwo: PlatformMailTransporter = await configureEmailAccount(mailService);
-
-		// make both account unavailable
-		transporterOne.unavailableSince = new Date(new Date().getTime() - (2 * 60 * 60 * 1000)); // 2 hours ago
-		transporterTwo.unavailableSince = new Date();
-
-		// Send a mails
-		await mailService.directSend(message.platform, mail, mail.to, 'noId');
-		await mailService.directSend(message.platform, mail, mail.to, 'noId');
-		await mailService.directSend(message.platform, mail, mail.to, 'noId');
-
-		// all Mails have been send using transporterOne
-		expect(transporterOne.lastSuccessAt)
-			.to.be.an('Date');
-		expect(transporterOne.unavailableSince)
-			.to.be.undefined;
-		expect(transporterTwo.lastSuccessAt)
-			.to.be.undefined;
-	});
-
 	it('should reactivate a random transporter', async () => {
 		// Create mail accounts
 		const transporterOne: PlatformMailTransporter = await configureEmailAccount(mailService);
@@ -157,5 +114,49 @@ describe('MailService.send', () => {
 		console.log('transporterOne.lastSuccessAt', transporterOne.lastSuccessAt);
 		console.log('transporterTwo.lastSuccessAt', transporterTwo.lastSuccessAt);
 	});
+
+	// TODO: Enable again when logic to avoid using unavailable transporters for one hour was activated
+	// it('should send all mails using transporterTwo.', async () => {
+	// 	// Create mail accounts
+	// 	const transporterOne: PlatformMailTransporter = await configureEmailAccount(mailService);
+	// 	const transporterTwo: PlatformMailTransporter = await configureEmailAccount(mailService);
+	//
+	// 	// make one account unavailable
+	// 	transporterOne.unavailableSince = new Date();
+	//
+	// 	// Send mails
+	// 	await mailService.directSend(message.platform, mail, mail.to, 'noId');
+	// 	await mailService.directSend(message.platform, mail, mail.to, 'noId');
+	// 	await mailService.directSend(message.platform, mail, mail.to, 'noId');
+	//
+	// 	// all Mails have been send using transporterTwo
+	// 	expect(transporterTwo.lastSuccessAt)
+	// 		.to.be.an('Date');
+	// 	expect(transporterOne.lastSuccessAt)
+	// 		.to.be.undefined;
+	// });
+	//
+	// it('should reactivate transporterOne', async () => {
+	// 	// Create mail accounts
+	// 	const transporterOne: PlatformMailTransporter = await configureEmailAccount(mailService);
+	// 	const transporterTwo: PlatformMailTransporter = await configureEmailAccount(mailService);
+	//
+	// 	// make both account unavailable
+	// 	transporterOne.unavailableSince = new Date(new Date().getTime() - (2 * 60 * 60 * 1000)); // 2 hours ago
+	// 	transporterTwo.unavailableSince = new Date();
+	//
+	// 	// Send a mails
+	// 	await mailService.directSend(message.platform, mail, mail.to, 'noId');
+	// 	await mailService.directSend(message.platform, mail, mail.to, 'noId');
+	// 	await mailService.directSend(message.platform, mail, mail.to, 'noId');
+	//
+	// 	// all Mails have been send using transporterOne
+	// 	expect(transporterOne.lastSuccessAt)
+	// 		.to.be.an('Date');
+	// 	expect(transporterOne.unavailableSince)
+	// 		.to.be.undefined;
+	// 	expect(transporterTwo.lastSuccessAt)
+	// 		.to.be.undefined;
+	// });
 
 });

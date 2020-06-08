@@ -39,14 +39,15 @@ export default class MailService extends BaseService {
 		return transporter.transporter.sendMail(mail);
 	}
 
-	protected _createTransporter(config: any): nodeMailer.Transporter {
+	protected _createTransporter(options: any, defaults: any): nodeMailer.Transporter {
 		// todo check default from becomes defined
-		return nodeMailer.createTransport(config.options, config.defaults);
+		return nodeMailer.createTransport(options, defaults);
 	}
 
 	protected _createTransporters(platformId: string, config: any): PlatformMailTransporter[] {
-		const configs = Array.isArray(config.mail) ? config.mail : [config.mail];
-		const transporters = configs.map(this._createTransporter);
+		const options = Array.isArray(config.mail.options) ? config.mail.options : [config.mail.options];
+		const defaults = config.mail.defaults;
+		const transporters = options.map((option: any) => this._createTransporter(option, defaults));
 		return transporters.map((transporter: nodeMailer.Transporter) => {
 			return {
 				platformId,

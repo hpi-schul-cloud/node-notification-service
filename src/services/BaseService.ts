@@ -61,26 +61,26 @@ export default abstract class BaseService {
 	// region public members
 	private static queues: Queue[] = [];
 
-	private static inLastHour(moment: Date): boolean {
-		const timeDifference = new Date().getTime() - moment.getTime();
-		return timeDifference < 1000 * 60 * 60; // 1 hour in milliseconds
-	}
-
 	private static selectRandomFromArray(array: any[]): any {
 		const randPos: number = Math.floor((Math.random() * array.length));
 		return array[randPos];
 	}
 
 	private static selectTransporter(platformTransporters: PlatformTransporter[]): PlatformTransporter {
-		const healthyTransporters = platformTransporters.filter((transporter) => {
-			return !(transporter.unavailableSince && BaseService.inLastHour(transporter.unavailableSince));
-		});
+		// TODO: Enable logic to avoid using unavailable transporters for one hour
+		// function inLastHour(moment: Date): boolean {
+		// 	const timeDifference = new Date().getTime() - moment.getTime();
+		// 	return timeDifference < 1000 * 60 * 60; // 1 hour in milliseconds
+		// }
+		// const healthyTransporters = platformTransporters.filter((transporter) => {
+		// 	return !(transporter.unavailableSince && BaseService.inLastHour(transporter.unavailableSince));
+		// });
+		//
+		// if (healthyTransporters.length > 0) {
+		// 	return BaseService.selectRandomFromArray(healthyTransporters);
+		// }
 
-		if (healthyTransporters.length > 0) {
-			return BaseService.selectRandomFromArray(healthyTransporters);
-		} else {
-			return BaseService.selectRandomFromArray(platformTransporters);
-		}
+		return BaseService.selectRandomFromArray(platformTransporters);
 	}
 	// endregion
 
