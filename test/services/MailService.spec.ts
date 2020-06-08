@@ -92,7 +92,7 @@ describe('MailService.send', () => {
 		const messageInfo : any = await mailService.directSend(message.platform, mail, mail.to, 'noId');
 
 		expect(messageInfo.envelope)
-			.to.have.property('from', mail.from);
+			.to.have.property('from', 'bounce@sample.org');
 	});
 
 	it('should reactivate a random transporter', async () => {

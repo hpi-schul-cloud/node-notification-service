@@ -11,6 +11,9 @@
     }],
     "defaults": {
       "from": "Sample Service <sample@sample.org>",
+      "envelope": {
+        "from": "Bounces, <bounce@sample.org>"
+      },
       "delay": 0
     }
   },
