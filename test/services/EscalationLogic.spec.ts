@@ -49,8 +49,8 @@ describe('EscalationLogic.escalate', () => {
 			.to.have.been.called();
 
 		const conf = await Utils.getPlatformConfig(message.platform);
-
-		await TestUtils.timeout(conf.mail.defaults.delay + 1000);
+		const delay = Array.isArray(conf.mail) ? conf.mail[0].defaults.delay : conf.mail.defaults.delay
+		await TestUtils.timeout(delay + 1000);
 		expect(spyFunctionMail, 'mail spy not executed')
 			.to.have.been.called();
 	});

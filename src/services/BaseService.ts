@@ -1,4 +1,4 @@
-import nodeMailer, { SentMessageInfo } from 'nodemailer';
+import { SentMessageInfo } from 'nodemailer';
 import { messaging as firebaseMessaging } from 'firebase-admin';
 import Mail from '@/interfaces/Mail';
 import PlatformMailTransporter from '@/interfaces/PlatformMailTransporter';
@@ -6,6 +6,7 @@ import PlatformPushTransporter from '@/interfaces/PlatformPushTransporter';
 import Utils from '@/utils';
 import logger from '@/helper/logger';
 import Queue, { Job } from 'bee-queue';
+import PlatformTransporter from "@/interfaces/PlatformTransporter";
 
 
 function getType(object: object | null) {
@@ -66,7 +67,7 @@ export default abstract class BaseService {
 
 	// region private members
 	private platformConfig: any;
-	private transporters: any[] = [];
+	private transporters: PlatformTransporter[] = [];
 	private platforms: string[];
 
 	// endregion
@@ -99,43 +100,35 @@ export default abstract class BaseService {
 
 	// region private methods
 
-	protected abstract _send(transporter: nodeMailer.Transporter | firebaseMessaging.Messaging, message: Mail | firebaseMessaging.Message): Promise<SentMessageInfo | string>;
+	protected abstract _send(transporter: PlatformTransporter, message: Mail | firebaseMessaging.Message): Promise<SentMessageInfo | string>;
 
-	protected abstract _createTransporter(config: any): nodeMailer.Transporter | firebaseMessaging.Messaging;
+	protected abstract _createTransporters(platformId: string, config: any): PlatformTransporter[];
 
 	protected _createQueueName(platformId: string): string {
 		return platformId + '_' + this._serviceType();
 	}
 	protected abstract _serviceType(): string;
 
-	private createTransporter(platformId: string): nodeMailer.Transporter | firebaseMessaging.Messaging {
+	private createTransporters(platformId: string): PlatformTransporter[] {
 		const config = Utils.getPlatformConfig(platformId);
-		const transporter = this._createTransporter(config);
-		// do not store transporter on multiple config
-		if (config.hasMultipleAccounts !== true) {
-			const platformPushTransporter = {
-				platformId,
-				transporter,
-			};
-			this.transporters.push(platformPushTransporter);
-		}
-		return transporter;
+		const newTransporters = this._createTransporters(platformId, config);
+		this.transporters.push.apply(newTransporters);
+		return newTransporters;
 	}
 
-	private getTransporter(platformId: string): nodeMailer.Transporter | firebaseMessaging.Messaging {
-		const config = Utils.getPlatformConfig(platformId);
-		if (config.hasMultipleAccounts !== true) {
-			const currentTransporter: PlatformMailTransporter | PlatformPushTransporter | undefined = this.transporters.find(
-				(transporter: PlatformMailTransporter | PlatformPushTransporter) => {
-					return transporter.platformId === platformId;
-				},
-			);
+	private getTransporter(platformId: string): PlatformTransporter {
+		let availableTransporters: PlatformTransporter[] = this.transporters.filter(
+			(transporter: PlatformMailTransporter | PlatformPushTransporter) => {
+				return transporter.platformId === platformId;
+			},
+		);
 
-			if (currentTransporter) {
-				return currentTransporter.transporter;
-			}
+		if (availableTransporters.length === 0) {
+			availableTransporters = this.createTransporters(platformId);
 		}
-		return this.createTransporter(platformId);
+
+		// ToDo: randomize selection
+		return availableTransporters[0];
 	}
 
 	private createQueue(platformId: string): Queue {
