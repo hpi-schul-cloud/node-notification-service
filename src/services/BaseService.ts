@@ -61,9 +61,26 @@ export default abstract class BaseService {
 	// region public members
 	private static queues: Queue[] = [];
 
-	private static selectTransporter(availableTransporters: PlatformTransporter[]): PlatformTransporter {
-		const randPos: number = Math.floor((Math.random() * availableTransporters.length));
-		return availableTransporters[randPos];
+	private static inLastHour(moment: Date): boolean {
+		const timeDifference = new Date().getTime() - moment.getTime();
+		return timeDifference < 1000 * 60 * 60; // 1 hour in milliseconds
+	}
+
+	private static selectRandomFromArray(array: any[]): any {
+		const randPos: number = Math.floor((Math.random() * array.length));
+		return array[randPos];
+	}
+
+	private static selectTransporter(platformTransporters: PlatformTransporter[]): PlatformTransporter {
+		const healthyTransporters = platformTransporters.filter((transporter) => {
+			return !(transporter.unavailableSince && BaseService.inLastHour(transporter.unavailableSince));
+		});
+
+		if (healthyTransporters.length > 0) {
+			return BaseService.selectRandomFromArray(healthyTransporters);
+		} else {
+			return BaseService.selectRandomFromArray(platformTransporters);
+		}
 	}
 	// endregion
 
@@ -122,17 +139,17 @@ export default abstract class BaseService {
 	}
 
 	private getTransporter(platformId: string): PlatformTransporter {
-		let availableTransporters: PlatformTransporter[] = this.transporters.filter(
+		let platformTransporters: PlatformTransporter[] = this.transporters.filter(
 			(transporter: PlatformTransporter) => {
 				return transporter.platformId === platformId;
 			},
 		);
 
-		if (availableTransporters.length === 0) {
-			availableTransporters = this.createTransporters(platformId);
+		if (platformTransporters.length === 0) {
+			platformTransporters = this.createTransporters(platformId);
 		}
 
-		return BaseService.selectTransporter(availableTransporters);
+		return BaseService.selectTransporter(platformTransporters);
 	}
 
 	private createQueue(platformId: string): Queue {
@@ -177,20 +194,41 @@ export default abstract class BaseService {
 				logger.info('[message] sent', {
 					queue: queue ? queue.name : null,
 					platformId,
-					transporter: getType(transporter),
+					transporter: getType(transporter.transporter),
 					receiver,
 					messageId,
 				});
+
+				// update transporter
+				transporter.lastSuccessAt = new Date();
+				transporter.unavailableSince = undefined;
+
 				return Promise.resolve(info);
 			}).catch((error) => {
 				logger.error('[message] not sent', {
 					queue: queue ? queue.name : null,
 					error,
 					platformId,
-					transporter: getType(transporter),
+					transporter: getType(transporter.transporter),
 					receiver,
 					messageId,
 				});
+
+				// update transporter
+				transporter.lastErrorAt = new Date();
+				transporter.lastError = error;
+
+				// Known E-Mail Errors:
+				// - 450: Mail send limit exceeded
+				//   {"code":"EENVELOPE","response":"450-Requested mail action not taken: mailbox unavailable\n450 Mail send limit exceeded.",
+				//    "responseCode":450,"command":"RCPT TO","rejected":["XXX"],"rejectedErrors":[{...}]}
+				// - 550: Mailbox unavailable
+				//   {"code":"EENVELOPE","response":"550-Requested action not taken: mailbox unavailable\n550 invalid DNS MX or A/AAAA resource record",
+				//    "responseCode":550,"command":"RCPT TO","rejected":["XXX"],"rejectedErrors":[{...}]}
+				if (error && error.responseCode && (error.responseCode === 450 || error.responseCode === 550)) {
+					transporter.unavailableSince = new Date();
+				}
+
 				return Promise.reject(error);
 			});
 	}
