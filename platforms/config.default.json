@@ -1,6 +1,6 @@
 {
   "mail": {
-    "options": {
+    "options": [{
       "host": "mail",
       "port": 1025,
       "secure": false,
@@ -8,9 +8,12 @@
         "user": "",
         "pass": ""
       }
-    },
+    }],
     "defaults": {
       "from": "Sample Service <sample@sample.org>",
+      "envelope": {
+        "from": "Bounces, <bounce@sample.org>"
+      },
       "delay": 0
     }
   },
