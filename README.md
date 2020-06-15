@@ -14,7 +14,7 @@
 
 1. Change the mounted directory inside the docker-compose.yml matching your path.
 
-1. Deploy the service using docker compose / stack: 
+1. Deploy the service using docker compose / stack:
   ```docker-compose up``` or ```docker stack -c docker-compose.yml```.
 
 ## Getting Started
@@ -72,6 +72,9 @@ To use multiple Mail Configs (for example for load balancing) just use an array 
     ],
     "defaults": {
       "from": "Sample Service <sample@sample.org>",
+      "envelope": {
+        "from": "Bounce <bounce@sample.org>"
+      },
       "delay": 0
     }
   }
