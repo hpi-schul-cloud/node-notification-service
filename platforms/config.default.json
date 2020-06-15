@@ -12,7 +12,7 @@
     "defaults": {
       "from": "Sample Service <sample@sample.org>",
       "envelope": {
-        "from": "Bounces, <bounce@sample.org>"
+        "from": "Bounce <bounce@sample.org>"
       },
       "delay": 0
     }
