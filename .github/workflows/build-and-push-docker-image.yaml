@@ -8,7 +8,7 @@ on:
       - release/*
       - hotfix/*
     tags:
-      - '**'
+      - '[0-9]*'
 
   pull_request:
 
