@@ -7,6 +7,8 @@ on:
       - develop
       - release/*
       - hotfix/*
+    tags:
+      - '**'
 
   pull_request:
 
