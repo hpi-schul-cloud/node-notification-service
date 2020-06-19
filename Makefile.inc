@@ -41,3 +41,7 @@ endif
 ifeq ($(patsubst hotfix%,hotfix,$(GIT_BRANCH)),hotfix)
 deploy:: --deploy-staging
 endif
+
+.PHONY: clean
+clean::
+	npm run clean
