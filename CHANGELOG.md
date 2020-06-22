@@ -1,3 +1,10 @@
+# Release 1.1.1
+
+## Features
+
+- Removed file log handler. (OPS-746)
+- Added multi-stages to Dockerfile. (OPS-746)
+
 # Release 1.1.0
 
 ## Features
