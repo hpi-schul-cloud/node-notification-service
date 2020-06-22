@@ -1,3 +1,4 @@
+---
 name: Build and push Docker image
 
 on:
@@ -5,6 +6,7 @@ on:
     branches:
       - master
       - develop
+      - feature/*
       - release/*
       - hotfix/*
     tags:
