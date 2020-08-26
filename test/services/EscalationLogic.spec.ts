@@ -48,9 +48,8 @@ describe('EscalationLogic.escalate', () => {
 		expect(spyFunctionPush, 'push spy not executed')
 			.to.have.been.called();
 
-		const conf = await Utils.getPlatformConfig(message.platform);
-
-		await TestUtils.timeout(conf.mail.defaults.delay + 1000);
+		const config = await Utils.getPlatformConfig(message.platform);
+		await TestUtils.timeout(config.mail.defaults.delay + 1000);
 		expect(spyFunctionMail, 'mail spy not executed')
 			.to.have.been.called();
 	});
