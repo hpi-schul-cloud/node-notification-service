@@ -13,13 +13,13 @@ class Utils {
 
 	private static _getPlatformConfig(platformId?: string): any {
 		try {
-			let config: {} = platformId ? require(`../platforms/${platformId}/config.json`) : {};
-			config = defaults(
+			const config: {} = platformId ? require(`../platforms/${platformId}/config.json`) : {};
+			const result = defaults(
 				config,
 				require(`../platforms/config.default.json`),
 			);
-			logger.silly('platform config loaded', { platformId, config });
-			return (config);
+			logger.info('platform config loaded', { platformId, result });
+			return (result);
 		} catch (err) {
 			logger.error(
 				'config.json missing. copy config.default.json to selected platform-folder "platforms/' + platformId + '" and update it.',
@@ -106,6 +106,13 @@ class Utils {
 		if (!options.redis) { options.redis = {}; }
 		options.redis.host = process.env.REDIS_HOST || '127.0.0.1';
 		options.redis.port = parseInt(process.env.REDIS_PORT || '6379', undefined);
+		options.redis.retry_strategy = (opts) => {
+			if (opts.attempt >= parseInt(process.env.REDIS_RETRY_ATTEMPTS || '3', 10)) {
+				logger.error('Unable to connect to the Redis server - Notification Service is going to exit!');
+				process.exit(1);
+			}
+			return (opts.attempt + 1) * 1000;
+		};
 		logger.debug('redis config: ', options);
 		return options;
 	}
