@@ -15,15 +15,6 @@ const logger = createLogger({
 				format.simple(),
 			),
 		}),
-		new (transports.File)({
-			filename: `${appRoot}/logs/app.log`, level: 'debug',
-			handleExceptions: true,
-			maxsize: 5242880, // 5MB
-			maxFiles: 5,
-			format: combine(
-				timestamp(),
-			),
-		}),
 	],
 	exitOnError: false,
 });
