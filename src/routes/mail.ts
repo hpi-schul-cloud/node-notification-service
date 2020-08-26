@@ -20,15 +20,16 @@ router.post('/', (req, res) => {
 	if (req.body.from) {
 		mail.from = req.body.from;
 	}
+
 	mailService.send(req.body.platformId, mail, req.body.to)
 		.then((response: any) => {
+			res.send('Mail queued.');
 			logger.info(response);
 		})
 		.catch((error: Error) => {
 			logger.error({ error, platformId: req.body.platformId, mail, to: req.body.to });
+			res.status(500).send('Request failed.');
 		});
-
-	res.send('Mail queued.');
 });
 
 export default router;
