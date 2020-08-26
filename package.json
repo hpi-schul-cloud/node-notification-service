@@ -27,7 +27,7 @@
     "@types/chai-as-promised": "^7.1.2",
     "@types/defaults-deep": "^0.2.0",
     "@types/morgan": "^1.9.0",
-    "@types/redis": "^2.8.22",
+    "@types/redis": "^2.8.26",
     "app-root-path": "^3.0.0",
     "axios": "^0.19.0",
     "bee-queue": "^1.2.2",
