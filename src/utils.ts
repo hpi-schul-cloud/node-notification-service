@@ -13,13 +13,13 @@ class Utils {
 
 	private static _getPlatformConfig(platformId?: string): any {
 		try {
-			let config: {} = platformId ? require(`../platforms/${platformId}/config.json`) : {};
-			config = defaults(
+			const config: {} = platformId ? require(`../platforms/${platformId}/config.json`) : {};
+			const result = defaults(
 				config,
 				require(`../platforms/config.default.json`),
 			);
-			logger.silly('platform config loaded', { platformId, config });
-			return (config);
+			logger.info('platform config loaded', { platformId, result });
+			return (result);
 		} catch (err) {
 			logger.error(
 				'config.json missing. copy config.default.json to selected platform-folder "platforms/' + platformId + '" and update it.',

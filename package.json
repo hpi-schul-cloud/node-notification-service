@@ -1,6 +1,6 @@
 {
   "name": "notification-service",
-  "version": "1.0.4",
+  "version": "1.1.1",
   "description": "A notification service for mails and push notifications build with Typescript on top of Node and Express.js.",
   "homepage": "https://github.com/schul-cloud/node-notification-service",
   "bugs": {
@@ -17,9 +17,10 @@
   "scripts": {
     "build": "tsc",
     "debug": "concurrently \"tsc -w\" \"nodemon build/app.js\"",
-    "lint": "tslint -p tsconfig.json --fix",
+    "lint": "tslint -p tsconfig.json",
     "start": "node -r ts-node/register -r tsconfig-paths/register build/app.js",
-    "test": "mocha -t 30000 -r tsconfig-paths/register -r ts-node/register test/**/*.spec.ts --exit"
+    "test": "mocha -t 30000 -r tsconfig-paths/register -r ts-node/register test/**/*.spec.ts --exit",
+    "clean": "rm -rf build node_modules"
   },
   "dependencies": {
     "@types/app-root-path": "^1.2.4",
@@ -27,14 +28,13 @@
     "@types/defaults-deep": "^0.2.0",
     "@types/morgan": "^1.9.1",
     "@types/redis": "^2.8.22",
-    "axios": "^0.19.0",
     "app-root-path": "^3.0.0",
+    "axios": "^0.19.0",
     "bee-queue": "^1.2.2",
     "body-parser": "^1.19.0",
     "defaults-deep": "^0.2.4",
     "express": "^4.17.1",
     "firebase-admin": "^8.12.1",
-    "husky": "^4.2.5",
     "js-yaml": "^3.14.0",
     "mongoose": "^5.7.5",
     "morgan": "^1.10.0",
