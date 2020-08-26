@@ -5,7 +5,7 @@ import MailService from '@/services/MailService';
 import mail from '@test/data/mail';
 import message from '@test/data/message';
 import logger from '@/helper/logger';
-import { doesIntersect } from 'tslint';
+import PlatformMailTransporter from "../../src/interfaces/PlatformMailTransporter";
 
 const EMAIL_SERVICE: string = process.env.MAIL_SERVICE || 'mailcatcher';
 
@@ -28,43 +28,50 @@ const getTestEmailAccount = async ({ EMAIL_SERVICE }: any) => {
 		);
 	} else {
 		account = SMTP_MAILCATCHER;
-		logger.info('using mailcatcheer for receiving emails in tests')
+		logger.info('using mailcatcher for receiving emails in tests')
 	}
 	return account;
+}
+
+const configureEmailAccount = async (mailService : MailService) => {
+	const account: any = await getTestEmailAccount({ EMAIL_SERVICE });
+	const { host, port, secure } = account.smtp;
+	const transporter = nodeMailer.createTransport({
+		host,
+		port,
+		secure,
+		auth: {
+			user: account.user,
+			pass: account.pass
+		}
+	});
+
+	// Add the custom transporter
+	const mailTransporter = {
+		platformId: message.platform,
+		transporter,
+	};
+	(mailService as any).transporters.push(mailTransporter);
+	return mailTransporter;
 }
 
 describe('MailService.send', () => {
 
 	// Instantiate the service
 	const mailService: MailService = new MailService();
-	let messageInfo: any;
 
-	before('should send an mail.', async () => {
-		// Create ethereal mail account
-		const account: any = await getTestEmailAccount({ EMAIL_SERVICE });
-		const { host, port, secure } = account.smtp;
-		const { user, pass } = account;
-		const transporter = nodeMailer.createTransport({
-			host,
-			port,
-			secure,
-			auth: {
-				user,
-				pass
-			}
-		});
-
-		// Add the custom transporter
-		(mailService as any).transporters.push({
-			platformId: message.platform,
-			transporter,
-		});
-
-		// Send a mail
-		messageInfo = await mailService.directSend(message.platform, mail, mail.to, 'noId');
+	beforeEach('should send an mail.', async () => {
+		// Clear transporters
+		(mailService as any).transporters = [];
 	});
 
 	it('should send an mail, accepted by the receiver.', async () => {
+		// Create mail account
+		await configureEmailAccount(mailService);
+
+		// Send a mail
+		const messageInfo : any = await mailService.directSend(message.platform, mail, mail.to, 'noId');
+
 		expect(messageInfo.accepted)
 			.to.be.an('array')
 			.to.have.lengthOf(1)
@@ -77,8 +84,78 @@ describe('MailService.send', () => {
 	});
 
 	it('should send an mail, from the given sender.', async () => {
+		// Create mail account
+		await configureEmailAccount(mailService);
+		await configureEmailAccount(mailService);
+
+		// Send a mail
+		const messageInfo : any = await mailService.directSend(message.platform, mail, mail.to, 'noId');
+
 		expect(messageInfo.envelope)
-			.to.have.property('from', mail.from);
+			.to.have.property('from', 'bounce@sample.org');
 	});
+
+	it('should reactivate a random transporter', async () => {
+		// Create mail accounts
+		const transporterOne: PlatformMailTransporter = await configureEmailAccount(mailService);
+		const transporterTwo: PlatformMailTransporter = await configureEmailAccount(mailService);
+
+		// make both account unavailable
+		transporterOne.unavailableSince = new Date();
+		transporterTwo.unavailableSince = new Date();
+
+		// Send a mails
+		await mailService.directSend(message.platform, mail, mail.to, 'noId');
+		await mailService.directSend(message.platform, mail, mail.to, 'noId');
+		await mailService.directSend(message.platform, mail, mail.to, 'noId');
+
+		// all Mails have been send using transporterTwo
+		console.log('transporterOne.lastSuccessAt', transporterOne.lastSuccessAt);
+		console.log('transporterTwo.lastSuccessAt', transporterTwo.lastSuccessAt);
+	});
+
+	// TODO: Enable again when logic to avoid using unavailable transporters for one hour was activated
+	// it('should send all mails using transporterTwo.', async () => {
+	// 	// Create mail accounts
+	// 	const transporterOne: PlatformMailTransporter = await configureEmailAccount(mailService);
+	// 	const transporterTwo: PlatformMailTransporter = await configureEmailAccount(mailService);
+	//
+	// 	// make one account unavailable
+	// 	transporterOne.unavailableSince = new Date();
+	//
+	// 	// Send mails
+	// 	await mailService.directSend(message.platform, mail, mail.to, 'noId');
+	// 	await mailService.directSend(message.platform, mail, mail.to, 'noId');
+	// 	await mailService.directSend(message.platform, mail, mail.to, 'noId');
+	//
+	// 	// all Mails have been send using transporterTwo
+	// 	expect(transporterTwo.lastSuccessAt)
+	// 		.to.be.an('Date');
+	// 	expect(transporterOne.lastSuccessAt)
+	// 		.to.be.undefined;
+	// });
+	//
+	// it('should reactivate transporterOne', async () => {
+	// 	// Create mail accounts
+	// 	const transporterOne: PlatformMailTransporter = await configureEmailAccount(mailService);
+	// 	const transporterTwo: PlatformMailTransporter = await configureEmailAccount(mailService);
+	//
+	// 	// make both account unavailable
+	// 	transporterOne.unavailableSince = new Date(new Date().getTime() - (2 * 60 * 60 * 1000)); // 2 hours ago
+	// 	transporterTwo.unavailableSince = new Date();
+	//
+	// 	// Send a mails
+	// 	await mailService.directSend(message.platform, mail, mail.to, 'noId');
+	// 	await mailService.directSend(message.platform, mail, mail.to, 'noId');
+	// 	await mailService.directSend(message.platform, mail, mail.to, 'noId');
+	//
+	// 	// all Mails have been send using transporterOne
+	// 	expect(transporterOne.lastSuccessAt)
+	// 		.to.be.an('Date');
+	// 	expect(transporterOne.unavailableSince)
+	// 		.to.be.undefined;
+	// 	expect(transporterTwo.lastSuccessAt)
+	// 		.to.be.undefined;
+	// });
 
 });
