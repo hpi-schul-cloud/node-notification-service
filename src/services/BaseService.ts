@@ -1,11 +1,9 @@
-import nodeMailer, { SentMessageInfo } from 'nodemailer';
-import { messaging as firebaseMessaging } from 'firebase-admin';
-import Mail from '@/interfaces/Mail';
-import PlatformMailTransporter from '@/interfaces/PlatformMailTransporter';
-import PlatformPushTransporter from '@/interfaces/PlatformPushTransporter';
+import {SentMessageInfo} from 'nodemailer';
 import Utils from '@/utils';
 import logger from '@/helper/logger';
-import Queue, { Job } from 'bee-queue';
+import Queue, {Job} from 'bee-queue';
+import PlatformTransporter from '@/interfaces/PlatformTransporter';
+import {PlatformMessage} from '@/interfaces/PlatformMessage';
 
 
 function getType(object: object | null) {
@@ -62,75 +60,96 @@ export default abstract class BaseService {
 
 	// region public members
 	private static queues: Queue[] = [];
+
+	private static selectRandomFromArray(array: any[]): any {
+		const randPos: number = Math.floor((Math.random() * array.length));
+		return array[randPos];
+	}
+
+	private static selectTransporter(platformTransporters: PlatformTransporter[]): PlatformTransporter {
+		// TODO: Enable logic to avoid using unavailable transporters for one hour
+		// function inLastHour(moment: Date): boolean {
+		// 	const timeDifference = new Date().getTime() - moment.getTime();
+		// 	return timeDifference < 1000 * 60 * 60; // 1 hour in milliseconds
+		// }
+		// const healthyTransporters = platformTransporters.filter((transporter) => {
+		// 	return !(transporter.unavailableSince && BaseService.inLastHour(transporter.unavailableSince));
+		// });
+		//
+		// if (healthyTransporters.length > 0) {
+		// 	return BaseService.selectRandomFromArray(healthyTransporters);
+		// }
+
+		return BaseService.selectRandomFromArray(platformTransporters);
+	}
 	// endregion
 
 	// region private members
-	private platformConfig: any;
-	private transporters: any[] = [];
-	private platforms: string[];
-
+	private transporters: PlatformTransporter[] = [];
 	// endregion
 
 
 	// region constructor
 	protected constructor() {
-		this.platforms = Utils.getPlatformIds();
-		for (const platform of this.platforms) {
+		const platforms = Utils.getPlatformIds();
+		for (const platform of platforms) {
 			logger.debug('[queue] init for platform ' + platform + ' and service ' + this._serviceType());
 			this.getQueue(platform);
 		}
 	}
+	// endregion
 
-	public async send(platformId: string, message: Mail | firebaseMessaging.Message, receiver: string, messageId?: string): Promise<string> {
+	// region public methods
+	public async send(platformId: string, message: PlatformMessage, receiver: string, messageId?: string): Promise<string> {
 		const config = await Utils.getPlatformConfig(platformId);
 		const queue = this.getQueue(platformId);
 		return queue.createJob({ platformId, message, receiver, messageId })
-			.backoff('exponential', 1000)
+			.backoff('fixed', 2000 * 60) // 2min
 			.retries(config.queue.retries)
 			.timeout(config.queue.timeout)
 			.save()
 			.then((job: Job) => job.id);
 	}
 
-	public directSend(platformId: string, message: Mail | firebaseMessaging.Message, receiver: string, messageId?: string): Promise<string> {
+	public directSend(platformId: string, message: PlatformMessage, receiver: string, messageId?: string): Promise<string> {
 		return this.process(platformId, message, receiver, messageId);
 	}
 	// endregion
 
 	// region private methods
 
-	protected abstract _send(transporter: nodeMailer.Transporter | firebaseMessaging.Messaging, message: Mail | firebaseMessaging.Message): Promise<SentMessageInfo | string>;
+	protected abstract _send(transporter: PlatformTransporter, message: PlatformMessage): Promise<SentMessageInfo | string>;
 
-	protected abstract _createTransporter(config: any): nodeMailer.Transporter | firebaseMessaging.Messaging;
+	protected abstract _createTransporters(platformId: string, config: any): PlatformTransporter[];
 
 	protected _createQueueName(platformId: string): string {
 		return platformId + '_' + this._serviceType();
 	}
 	protected abstract _serviceType(): string;
 
-	private createTransporter(platformId: string): nodeMailer.Transporter | firebaseMessaging.Messaging {
+	private createTransporters(platformId: string): PlatformTransporter[] {
 		const config = Utils.getPlatformConfig(platformId);
-		const transporter = this._createTransporter(config);
-		const platformPushTransporter = {
-			platformId,
-			transporter,
-		};
-		this.transporters.push(platformPushTransporter);
-		return transporter;
+		const newTransporters = this._createTransporters(platformId, config);
+
+		for (const transporter of newTransporters) {
+			this.transporters.push(transporter);
+		}
+
+		return newTransporters;
 	}
 
-	private getTransporter(platformId: string): nodeMailer.Transporter | firebaseMessaging.Messaging {
-		const currentTransporter: PlatformMailTransporter | PlatformPushTransporter | undefined = this.transporters.find(
-			(transporter: PlatformMailTransporter | PlatformPushTransporter) => {
+	private getTransporter(platformId: string): PlatformTransporter {
+		let platformTransporters: PlatformTransporter[] = this.transporters.filter(
+			(transporter: PlatformTransporter) => {
 				return transporter.platformId === platformId;
 			},
 		);
 
-		if (currentTransporter) {
-			return currentTransporter.transporter;
+		if (platformTransporters.length === 0) {
+			platformTransporters = this.createTransporters(platformId);
 		}
 
-		return this.createTransporter(platformId);
+		return BaseService.selectTransporter(platformTransporters);
 	}
 
 	private createQueue(platformId: string): Queue {
@@ -175,20 +194,43 @@ export default abstract class BaseService {
 				logger.info('[message] sent', {
 					queue: queue ? queue.name : null,
 					platformId,
-					transporter: getType(transporter),
+					transporter: getType(transporter.transporter),
 					receiver,
 					messageId,
 				});
+
+				// update transporter
+				transporter.lastSuccessAt = new Date();
+				transporter.unavailableSince = undefined;
+
 				return Promise.resolve(info);
 			}).catch((error) => {
 				logger.error('[message] not sent', {
 					queue: queue ? queue.name : null,
 					error,
 					platformId,
-					transporter: getType(transporter),
+					transporter: getType(transporter.transporter),
 					receiver,
 					messageId,
 				});
+
+				// update transporter
+				transporter.lastErrorAt = new Date();
+				transporter.lastError = error;
+
+				// Known E-Mail Errors:
+				// - 450: Mail send limit exceeded
+				//   {"code":"EENVELOPE","response":"450-Requested mail action not taken: mailbox unavailable\n450 Mail send limit exceeded.",
+				//    "responseCode":450,"command":"RCPT TO","rejected":["XXX"],"rejectedErrors":[{...}]}
+				// - 535 Authentication credentials invalid (account blocked)
+				//   {"code":"EAUTH","response":"535 Authentication credentials invalid","responseCode":535,"command":"AUTH PLAIN"}
+				// - 550: Mailbox unavailable (recipient email)
+				//   {"code":"EENVELOPE","response":"550-Requested action not taken: mailbox unavailable\n550 invalid DNS MX or A/AAAA resource record",
+				//    "responseCode":550,"command":"RCPT TO","rejected":["XXX"],"rejectedErrors":[{...}]}
+				if (error && error.responseCode && (error.responseCode === 450 || error.responseCode === 535)) {
+					transporter.unavailableSince = new Date();
+				}
+
 				return Promise.reject(error);
 			});
 	}
