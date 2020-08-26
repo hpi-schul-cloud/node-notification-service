@@ -14,7 +14,7 @@
 
 1. Change the mounted directory inside the docker-compose.yml matching your path.
 
-1. Deploy the service using docker compose / stack: 
+1. Deploy the service using docker compose / stack:
   ```docker-compose up``` or ```docker stack -c docker-compose.yml```.
 
 ## Getting Started
@@ -51,6 +51,34 @@ At the end, the escalation logic sends the final messages according to some spec
 We also have the device service: this service is only responsible for managing the device tokens. The device tokens are necessary to deliver the push notifications to the different devices.
 
 External services can mark specific messages as seen to disable the escalation logic for a specific user. If the push message was delivered and this message was marked as seen via the respective API call, the mail message will not be sent.
+
+## Config
+To use multiple Mail Configs (for example for load balancing) just use an array of options in the mail config.
+
+```
+{
+  "mail": {
+    "options": [
+      {
+        "host": "mail",
+        "port": 1025,
+        "secure": false,
+        "auth": {
+          "user": "",
+          "pass": ""
+        }
+      },
+      ...
+    ],
+    "defaults": {
+      "from": "Sample Service <sample@sample.org>",
+      "envelope": {
+        "from": "Bounce <bounce@sample.org>"
+      },
+      "delay": 0
+    }
+  }
+```
 
 ## Docs
 
