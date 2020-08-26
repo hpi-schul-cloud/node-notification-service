@@ -45,7 +45,7 @@
     "swagger-ui-express": "^4.0.1",
     "ts-node": "^8.0.3",
     "tsconfig-paths": "^3.4.2",
-    "winston": "^3.2.1"
+    "winston": "^3.3.3"
   },
   "devDependencies": {
     "@types/chai": "^4.2.11",
