@@ -104,7 +104,11 @@ export default abstract class BaseService {
 		const config = await Utils.getPlatformConfig(platformId);
 		const queue = this.getQueue(platformId);
 		return queue.createJob({ platformId, message, receiver, messageId })
-			.backoff('fixed', 2000 * 60) // 2min
+			// https://www.npmjs.com/package/bee-queue#jobbackoffstrategy-delayfactor
+			// but exponential has a unexpected behavore. With time = 1000 it work nearly like expected
+			// (why ever) 3 time with same time and after it double time for each try
+			// but with time = 5000 it is run out in very high time first 42 sec, second 82sec, 162 sec and so on
+			.backoff(config.queue.backoffStrategy, config.queue.backoffTime)
 			.retries(config.queue.retries)
 			.timeout(config.queue.timeout)
 			.save()
@@ -178,6 +182,7 @@ export default abstract class BaseService {
 					done(null, info);
 				})
 				.catch((error) => {
+					// TODO: Remove invalid emails
 					logger.error('[processing queue:' + queue.name + '] failed job ' + job.id, { messageId, receiver });
 					done(error);
 				});

@@ -37,13 +37,17 @@
   },
   "queue": {
     "timeout": 10000,
-    "retries": 1000,
+    "retries": 6,
+    "backoffTime": 120000,
+    "backoffStrategy": "fixed",
     "defaults": {
       "prefix": "notification",
       "stallInterval": 5000,
       "nearTermWindow": 1200000,
       "delayedDebounce": 1000,
       "redis": {
+        "host": "127.0.0.1",
+        "port": 6379,
         "db": 0,
         "options": {}
       },
