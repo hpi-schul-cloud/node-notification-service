@@ -156,36 +156,130 @@ export default abstract class BaseService {
 		return BaseService.selectTransporter(platformTransporters);
 	}
 
+	public jobErrorHandling(ref: any, job: any, queue: Queue, done: Queue.DoneCallback<{}>) {
+		const { receiver, messageId } = job.data;
+		const escalation = (message: string , err: any) => {
+			// send to sentry
+			// add to healt check route
+			logger.error('[Critical Error]' + message, err);
+		}
+
+		const removeAndBackupJob = (job: any, err: any) => {
+			// save job and error in DB
+			// remove job
+		}
+
+		const pausedQuerys = (ref: any, time: number ) => {
+			// is already paused?
+			// 
+		}
+
+		return (error: any) => {
+			// TODO outsource error handling for test it in unit tests
+			// ionos email provider is use for live systems
+			// https://www.ionos.de/hilfe/e-mail/postmaster/smtp-fehlermeldungen-der-11-ionos-mailserver/
+
+			// TODO: make backup jobs over new route avaible
+			
+			// remove jobs with invalid DNS
+			if (error.responseCode >= 550) {
+				// remove from job
+				// save in redis, mongoDB
+				// add to healts check route
+				removeAndBackupJob(job, error);
+			} else if (error.responseCode === 421 && error.message.includes('421 Rate limit reached. Please try again later')) {
+				// TODO: eskalation send email to admin do not work at this position (?)
+				// Send to sentry
+				// add to healts check route
+				// timeout for job query
+				const time = 2 * 60 * 1000;
+				escalation('Rate limit reached, it is paused for ' + time, error);
+				pausedQuerys(ref, time);
+			} else if (error.responseCode === 421 && error.message.includes('421 Reject due to policy violations ')) {
+				// -> eskalation Sentry
+				// add to healts check route
+				escalation('Our email account is blocked, please contact iones.', error);
+			}
+
+			logger.error('[processing queue:' + queue.name + '] failed job ' + job.id, { messageId, receiver });
+			done(error);
+		}
+	}
+			
+
 	private createQueue(platformId: string): Queue {
 		logger.debug('[setup] initialize service queue: ' + this._createQueueName(platformId));
 		const redisOptions = Utils.getRedisOptions(platformId);
 		const queue = new Queue(this._createQueueName(platformId), redisOptions);
+		const queueName = queue.name;
+
 		queue.on('ready', () => {
-			logger.debug('[queue] ' + queue.name + ': ready... execute BaseService.close() for graceful shutdown.');
+			logger.debug('[queue] ' + queueName + ': ready... execute BaseService.close() for graceful shutdown.');
 		});
 		queue.on('retrying', (job, err) => {
-			logger.warn('[queue] ' + queue.name + `: Job ${job.id} failed with error ${err.message} but is being retried!`);
+			logger.warn('[queue] ' + queueName + `: Job ${job.id} failed with error ${err.message} but is being retried!`);
 		});
 		queue.on('failed', (job, err) => {
-			logger.error('[queue] ' + queue.name + `: Job ${job.id} failed with error ${err.message}`);
+			logger.error('[queue] ' + queueName + `: Job ${job.id} failed with error ${err.message}`);
 		});
 		queue.on('stalled', (jobId) => {
-			logger.warn('[queue] ' + queue.name + `: Job ${jobId} stalled and will be reprocessed`);
+			logger.warn('[queue] ' + queueName + `: Job ${jobId} stalled and will be reprocessed`);
 		});
 		queue.process((job: any, done: Queue.DoneCallback<{}>) => {
 			// tslint:disable-next-line: no-shadowed-variable
 			const { platformId, message, receiver, messageId } = job.data;
-			logger.debug('[queue:' + queue.name + '] processing job ' + job.id, { messageId, receiver });
+			logger.debug('[queue:' + queueName + '] processing job ' + job.id, { messageId, receiver });
 			this.process(platformId, message, receiver, messageId, queue)
 				.then((info) => {
-					logger.debug('[processing queue:' + queue.name + '] finished job ' + job.id, { messageId, receiver });
+					logger.debug('[processing queue:' + queueName + '] finished job ' + job.id, { messageId, receiver });
 					done(null, info);
 				})
-				.catch((error) => {
-					// TODO: Remove invalid emails
-					logger.error('[processing queue:' + queue.name + '] failed job ' + job.id, { messageId, receiver });
+				.catch(this.jobErrorHandling(this, job, queue, done))
+				/* .catch((error) => {
+					// TODO outsource error handling for test it in unit tests
+					// ionos email provider is use for live systems
+					// https://www.ionos.de/hilfe/e-mail/postmaster/smtp-fehlermeldungen-der-11-ionos-mailserver/
+
+					// TODO: make backup jobs over new route avaible
+					const escalation = (message: string , err: any) => {
+						// send to sentry
+						// add to healt check route
+						logger.error('[Critical Error]' + message, err);
+					}
+
+					const removeAndBackupJob = (job: any, err: any) => {
+						// save job and error in DB
+						// remove job
+					}
+
+					const pausedQuerys = (ref: any, time: number ) => {
+						// is already paused?
+						// 
+					}
+
+					// remove jobs with invalid DNS
+					if (error.responseCode >= 550) {
+						// remove from job
+						// save in redis, mongoDB
+						// add to healts check route
+						removeAndBackupJob(job, error);
+					} else if (error.responseCode === 421 && error.message.includes('421 Rate limit reached. Please try again later')) {
+						// TODO: eskalation send email to admin do not work at this position (?)
+						// Send to sentry
+						// add to healts check route
+						// timeout for job query
+						const time = 2 * 60 * 1000;
+						escalation('Rate limit reached, it is paused for ' + time, error);
+						pausedQuerys(this, time);
+					} else if (error.responseCode === 421 && error.message.includes('421 Reject due to policy violations ')) {
+						// -> eskalation Sentry
+						// add to healts check route
+						escalation('Our email account is blocked, please contact iones.', error);
+					}
+
+					logger.error('[processing queue:' + queueName + '] failed job ' + job.id, { messageId, receiver });
 					done(error);
-				});
+				}); */
 		});
 		BaseService.queues.push(queue);
 		return queue;
