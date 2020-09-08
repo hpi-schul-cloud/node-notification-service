@@ -4,6 +4,9 @@ import logger from '@/helper/logger';
 import Queue, {Job} from 'bee-queue';
 import PlatformTransporter from '@/interfaces/PlatformTransporter';
 import {PlatformMessage} from '@/interfaces/PlatformMessage';
+import { JsonObject } from 'swagger-ui-express';
+import FailedJobModel from '@/models/failedJobs';
+import { database } from 'firebase-admin';
 
 
 function getType(object: object | null) {
@@ -156,6 +159,43 @@ export default abstract class BaseService {
 		return BaseService.selectTransporter(platformTransporters);
 	}
 
+	// done
+	// 1. setup notification service 
+	// 2. setup with real smtp iones mail
+	// 3. evaluade critical parts
+	// 4. reconnect strategie
+	// 5. remove invalid mail jobs
+	// 6. new failed job handling
+	// 7. evaluade bee-query and redis settings
+	// 8. increase Persistent Volumes Claim (PVC) -> devops
+	// 9. clarify colors from production logs
+	// 10. try to reproduce throwing save persistent bugs
+	// 11. route to access to the stored fail mails, + swagger doku
+	// 12. deleted jobs save to db
+	//
+	// TODO
+	// 2. clearify the many connections to redis
+	// 3. how to set only schul-cloud template
+	// 4. pause query by rate limit
+	// 5. cut redis list with old mails -> devops (remove all jobs that are older then 2 weeks)
+	// 6. by rollout the next version -> reconfiguration -> Ticket
+	// 7. setup documentation
+	// 8. fix deploy script -> devops scripts look different to repo scripts 
+	// --------------------------
+	// clearify which email data should display, log and see over route -> filter
+	// Prometheus integration
+	// alert if something go wrong of Prometheus base
+	// remove cronjob restarts
+	// Sentry integration
+	// collect process.env for better configuration
+	// improve error logging
+	// shd connection to notification service -> failed jobs
+	// status of resending process of jobs
+	// stored time of failed jobs
+	// replace all any data types params with specific Datatypes
+	// extract test handling code outside of the production pipline example see utils
+
+
 	public jobErrorHandling(ref: any, job: any, queue: Queue, done: Queue.DoneCallback<{}>) {
 		const { receiver, messageId } = job.data;
 		const escalation = (message: string , err: any) => {
@@ -164,9 +204,30 @@ export default abstract class BaseService {
 			logger.error('[Critical Error]' + message, err);
 		}
 
-		const removeAndBackupJob = (job: any, err: any) => {
-			// save job and error in DB
-			// remove job
+		const backupJob = (job: any, err: any) => {
+			// do not await to finished
+			const receiver = job.data.receiver;
+			FailedJobModel.create({
+				receiver,
+				jobId: job.id,
+				data: job.data,
+				error: err,
+			}, (err: any, doc: any) => {
+				if (err) {
+					logger.error('Can not store the data for failed job.', job);
+				} else {
+					logger.error('Removed job is saved!', { id: doc.id, receiver });
+				}
+			});
+			/*queue.removeJob(job.id).then(() => {
+				console.log('Job is removed', { 
+					id: job.id,
+					data: job.data,
+					err,
+				});
+			}); 
+			*/
+			// queue.removeJob(job.id) and job.remove() do not work, but fill with done with null works
 		}
 
 		const pausedQuerys = (ref: any, time: number ) => {
@@ -181,12 +242,14 @@ export default abstract class BaseService {
 
 			// TODO: make backup jobs over new route avaible
 			
+			logger.error('[processing queue:' + queue.name + '] failed job ' + job.id, { messageId, receiver });
 			// remove jobs with invalid DNS
 			if (error.responseCode >= 550) {
 				// remove from job
 				// save in redis, mongoDB
 				// add to healts check route
-				removeAndBackupJob(job, error);
+				backupJob(job, error);
+				done(null)
 			} else if (error.responseCode === 421 && error.message.includes('421 Rate limit reached. Please try again later')) {
 				// TODO: eskalation send email to admin do not work at this position (?)
 				// Send to sentry
@@ -195,14 +258,15 @@ export default abstract class BaseService {
 				const time = 2 * 60 * 1000;
 				escalation('Rate limit reached, it is paused for ' + time, error);
 				pausedQuerys(ref, time);
+				done(error);
 			} else if (error.responseCode === 421 && error.message.includes('421 Reject due to policy violations ')) {
 				// -> eskalation Sentry
 				// add to healts check route
 				escalation('Our email account is blocked, please contact iones.', error);
+				done(error);
+			} else {
+				done(error);
 			}
-
-			logger.error('[processing queue:' + queue.name + '] failed job ' + job.id, { messageId, receiver });
-			done(error);
 		}
 	}
 			
@@ -215,6 +279,10 @@ export default abstract class BaseService {
 
 		queue.on('ready', () => {
 			logger.debug('[queue] ' + queueName + ': ready... execute BaseService.close() for graceful shutdown.');
+			// @ts-ignore
+			// queue.client.on('error', (err) => {
+			//	console.log('xxxxx', err);
+			// });
 		});
 		queue.on('retrying', (job, err) => {
 			logger.warn('[queue] ' + queueName + `: Job ${job.id} failed with error ${err.message} but is being retried!`);
@@ -281,6 +349,12 @@ export default abstract class BaseService {
 					done(error);
 				}); */
 		});
+
+		queue.checkStalledJobs(2 * 60 * 1000, (err, numStalled) => {
+			// prints the number of stalled jobs detected every 120 sec
+			console.log('Checked stalled jobs'+platformId, numStalled);
+		});
+
 		BaseService.queues.push(queue);
 		return queue;
 	}
