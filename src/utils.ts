@@ -32,7 +32,6 @@ class Utils {
 		const platformDir = path.join(__dirname, '..', 'platforms');
 		const files = fs.readdirSync(platformDir);
 		const platformIds = files.filter((file) => fs.lstatSync(path.join(platformDir, file)).isDirectory());
-		logger.debug('platformIds loaded: ', { platformIds });
 		return platformIds;
 	}
 
@@ -195,6 +194,10 @@ class Utils {
 				};
 			},
 		};
+	}
+
+	public Sleep(milliseconds: number) {
+		return new Promise(resolve => setTimeout(resolve, milliseconds));
 	}
 }
 

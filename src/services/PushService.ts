@@ -5,23 +5,10 @@ import mongoose from 'mongoose';
 import PlatformPushTransporter from '@/interfaces/PlatformPushTransporter';
 
 export default class PushService extends BaseService {
-	// region public static methods
-	// endregion
+	public constructor(name: string) { 
+		super(name);
+	}
 
-	// region private static methods
-	// endregion
-
-	// region public members
-	// endregion
-
-	// region private members
-	// endregion
-
-	// region constructor
-	public constructor() { super(); }
-	// endregion
-
-	// region public methods
 	public removeToken(platform: string, userId: string, device: string): any {
 		return DeviceService.removeDevice(device, platform, mongoose.Types.ObjectId(userId));
 	}
@@ -51,9 +38,4 @@ export default class PushService extends BaseService {
 	protected _serviceType(): string {
 		return 'push';
 	}
-
-	// endregion
-
-	// region private methods
-	// endregion
 }

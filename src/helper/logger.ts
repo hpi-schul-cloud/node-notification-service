@@ -14,7 +14,7 @@ let logFormat = combine(
 );
 
 if (isProductionMode) {
-	level = 'error';
+	level = 'warn';
 	logFormat = combine(
 		timestamp(),
 		format.simple(),
