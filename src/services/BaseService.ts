@@ -145,42 +145,6 @@ export default abstract class BaseService {
 		return BaseService.selectTransporter(platformTransporters);
 	}
 
-	// done
-	// 1. setup notification service 
-	// 2. setup with real smtp iones mail
-	// 3. evaluade critical parts
-	// 4. reconnect strategie
-	// 5. remove invalid mail jobs
-	// 6. new failed job handling
-	// 7. evaluade bee-query and redis settings
-	// 8. increase Persistent Volumes Claim (PVC) -> devops
-	// 9. clarify colors from production logs
-	// 10. try to reproduce throwing save persistent bugs
-	// 11. route to access to the stored fail mails, + swagger doku
-	// 12. deleted jobs save to db
-	//
-	// TODO
-	// 2. clearify the many connections to redis
-	// 3. how to set only schul-cloud template
-	// 4. pause query by rate limit
-	// 5. cut redis list with old mails -> devops (remove all jobs that are older then 2 weeks)
-	// 6. by rollout the next version -> reconfiguration -> Ticket
-	// 7. setup documentation
-	// 8. fix deploy script -> devops scripts look different to repo scripts 
-	// --------------------------
-	// clearify which email data should display, log and see over route -> filter
-	// Prometheus integration
-	// alert if something go wrong of Prometheus base
-	// remove cronjob restarts
-	// Sentry integration
-	// collect process.env for better configuration
-	// improve error logging
-	// shd connection to notification service -> failed jobs
-	// status of resending process of jobs
-	// stored time of failed jobs
-	// replace all any data types params with specific Datatypes
-	// extract test handling code outside of the production pipline example see utils
-
 	public async pausedQueue(time: number) {
 		this.paused = true;
 		logger.warn(`Query of ${this.name} is in paused mode for ${time} ms`)
