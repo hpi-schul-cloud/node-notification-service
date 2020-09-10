@@ -34,6 +34,24 @@
 
 Simply run `npm test` and all your tests in the `test/` directory will be run.
 
+> This requires a running redis and email service locally. For email some alternatives exist.
+
+### Redis setup
+
+#### Redis setup on OSX
+
+Simply install redis via Brew
+
+```bash
+  brew install redis
+  brew services start redis
+```
+
+### Email setup
+
+1. Setting `process.env.MAIL_SERVICE = 'ethereal'` before test execution will create temporarily an email account on [ethereal](https://ethereal.email/). The credentials will be printed in the console and used to view delivered emails on that service. Therefore [login](https://ethereal.email/login) with user and pass as password and [list messages](https://ethereal.email/messages) received. If doing so, there is no need to setup a mail service locally. 
+2. A local mail service may be defined on localhost:1025 which is used in the [github test action](https://github.com/hpi-schul-cloud/node-notification-service/blob/ed12ab488e29e057410f4a904dccf68a71e107c9/.github/workflows/nodejs.yml#L19) too.
+
 ## Architecture
 
 ![Architecture Diagram](https://user-images.githubusercontent.com/12249969/43454900-9ee6c4e6-94be-11e8-97b1-ed1371d3dece.png)
