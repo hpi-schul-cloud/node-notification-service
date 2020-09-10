@@ -16,7 +16,6 @@ function getType(object: object | null) {
 
 export default abstract class BaseService {
 
-	private paused: boolean = false;
 	private static queues: Queue[] = [];
 	private transporters: PlatformTransporter[] = [];
 	private name: string = 'NoName';
@@ -34,6 +33,7 @@ export default abstract class BaseService {
 		}
 		this.pausedQueue(2*60*1000);
 	}
+	private paused: boolean = false;
 
 	public static getQueues(): Queue[] {
 		return this.queues;
