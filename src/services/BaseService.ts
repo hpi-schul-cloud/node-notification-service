@@ -226,7 +226,7 @@ export default abstract class BaseService {
 				logger.warn('[queue] ' + queueName + `: Job ${job.id} wait for start sending. ${err.message}`);
 			} else {
 				logger.error('[queue] ' + queueName + `: Job ${job.id} failed with error ${err.message}`);
-			}	
+			}
 		});
 		queue.on('stalled', (jobId) => {
 			logger.warn('[queue] ' + queueName + `: Job ${jobId} stalled and will be reprocessed`);
