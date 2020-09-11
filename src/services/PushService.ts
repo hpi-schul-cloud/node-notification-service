@@ -5,7 +5,7 @@ import mongoose from 'mongoose';
 import PlatformPushTransporter from '@/interfaces/PlatformPushTransporter';
 
 export default class PushService extends BaseService {
-	public constructor(name: string) { 
+	public constructor(name: string) {
 		super(name);
 	}
 

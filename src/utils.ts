@@ -9,8 +9,6 @@ import { QueueSettings } from 'bee-queue';
 import { isNullOrUndefined } from 'util';
 
 class Utils {
-
-
 	private static _getPlatformConfig(platformId?: string): any {
 		try {
 			const config: {} = platformId ? require(`../platforms/${platformId}/config.json`) : {};
@@ -34,7 +32,6 @@ class Utils {
 		const platformIds = files.filter((file) => fs.lstatSync(path.join(platformDir, file)).isDirectory());
 		return platformIds;
 	}
-
 
 	private static _loadTemplate(
 		platformId: string,
@@ -74,7 +71,6 @@ class Utils {
 		return Promise.resolve(template);
 	}
 
-
 	private cache: Cache;
 	private platformIds: string[];
 	private platformConfigs: any;
@@ -107,13 +103,13 @@ class Utils {
 		options.redis.port = parseInt(process.env.REDIS_PORT || '6379', undefined);
 		options.redis.retry_strategy = (opts) => {
 			// one hour every 10 sec retry
-			if (opts.attempt >= parseInt(process.env.REDIS_RETRY_ATTEMPTS || '360', 10)) { 
+			if (opts.attempt >= parseInt(process.env.REDIS_RETRY_ATTEMPTS || '360', 10)) {
 				logger.error('[Critical Error] Unable to connect to the Redis server - Notification Service is going to exit!');
 				process.exit(1);
 			}
 			logger.error('Unable to connect to the Redis server ..retry', { ...opts, platformId });
 			return 10000;
-		}; 
+		};
 		logger.debug('redis config: ', options);
 		return options;
 	}
@@ -197,7 +193,7 @@ class Utils {
 	}
 
 	public Sleep(milliseconds: number) {
-		return new Promise(resolve => setTimeout(resolve, milliseconds));
+		return new Promise((resolve) => setTimeout(resolve, milliseconds));
 	}
 }
 
