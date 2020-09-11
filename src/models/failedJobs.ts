@@ -9,7 +9,7 @@ export const failedJobSchema = new Schema({
 	data: { type: Object },
 	error: { type: Object, required: true },
 }, {
-	timestamps: true, 
+	timestamps: true,
 });
 
 const FailedJobModel: Model<IFailedJobModel> = model('failedJob', failedJobSchema);

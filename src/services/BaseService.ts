@@ -25,14 +25,14 @@ export default abstract class BaseService {
 		let platforms = Utils.getPlatformIds();
 		// TODO outsource env in additional file
 		if (process.env.TESTPLATFORM !== '1') {
-			platforms = platforms.filter(p => p !== 'testplatform');
+			platforms = platforms.filter((p) => p !== 'testplatform');
 		}
 		for (const platform of platforms) {
 			logger.debug('[queue] init for platform ' + platform + ' and service ' + this._serviceType());
 			this.getQueue(platform);
 		}
-		this.pausedQueue(2*60*1000);
 	}
+
 	private paused: boolean = false;
 
 	public static getQueues(): Queue[] {
@@ -147,9 +147,9 @@ export default abstract class BaseService {
 
 	public async pausedQueue(time: number) {
 		this.paused = true;
-		logger.warn(`Query of ${this.name} is in paused mode for ${time} ms`)
+		logger.warn(`Query of ${this.name} is in paused mode for ${time} ms`);
 		await Utils.Sleep(time);
-		logger.warn(`Query of ${this.name} is go in progress.`)
+		logger.warn(`Query of ${this.name} is go in progress.`);
 		this.paused = false;
 	}
 
@@ -159,7 +159,7 @@ export default abstract class BaseService {
 			// send to sentry
 			// add to healt check route
 			logger.error('[Critical Error]' + message, err);
-		}
+		};
 
 		const backupJob = (job: any, err: any) => {
 			// do not await to finished
@@ -176,7 +176,7 @@ export default abstract class BaseService {
 					logger.error('Removed job is saved!', { id: doc.id, receiver });
 				}
 			});
-		}
+		};
 
 		return (error: any) => {
 			// TODO outsource error handling for test it in unit tests
@@ -184,14 +184,14 @@ export default abstract class BaseService {
 			// https://www.ionos.de/hilfe/e-mail/postmaster/smtp-fehlermeldungen-der-11-ionos-mailserver/
 
 			// TODO: make backup jobs over new route avaible
-			
+
 			// logger.error('[processing queue:' + queue.name + '] failed job ' + job.id, { messageId, receiver });
 			// remove jobs with invalid DNS
 			if (error.responseCode >= 550) {
 				// add to healts check route
 				backupJob(job, error);
 				// queue.removeJob(job.id) and job.remove() do not work, but with done(null) it is removed the job
-				done(null)
+				done(null);
 			} else if (error.responseCode === 421 && error.message.includes('421 Rate limit reached. Please try again later')) {
 				// TODO: eskalation send email to admin do not work at this position (?)
 				// Send to sentry

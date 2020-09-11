@@ -49,7 +49,7 @@ export class LoggerStream {
 }
 
 if (isProductionMode) {
-	console.log('Logging initialized at production level'); 
+	console.log('Logging initialized at production level');
 } else {
 	logger.debug('Logging initialized at development level, set NODE_ENV === \'production\' for production use.');
 }
