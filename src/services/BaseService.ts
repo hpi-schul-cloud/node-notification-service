@@ -200,7 +200,7 @@ export default abstract class BaseService {
 				done(error);
 			} else if (error.responseCode === 421 && error.message.includes('421 Reject due to policy violations')) {
 				// -> eskalation Sentry
-				escalation('Our email account is blocked, please contact iones.', error);
+				escalation('Our email account is blocked, please contact Ionos.', error);
 				done(error);
 			} else {
 				done(error);
