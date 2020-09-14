@@ -215,8 +215,8 @@ describe('MessageService.send', () => {
 	});
 
 	it('should report health statistics for all queues', async () => {
-		const mailService = new MailService();
-		const pushService = new PushService();
+		const mailService = new MailService('MailTestService');
+		const pushService = new PushService('PushTestService');
 		const health = await BaseService.healthState();
 		expect(health.length).to.be.greaterThan(1);
 	});
