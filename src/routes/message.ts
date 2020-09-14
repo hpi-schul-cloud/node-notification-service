@@ -8,13 +8,7 @@ const router: express.Router = express.Router();
 export const messageService: MessageService = new MessageService();
 
 router.post('/', (req, res) => {
-	if (
-		utils.parametersMissing(
-			['platform', 'template', 'payload', 'languagePayloads', 'receivers'],
-			req.body,
-			res,
-		)
-	) {
+	if (utils.parametersMissing(['platform', 'template', 'payload', 'languagePayloads', 'receivers'], req.body, res)) {
 		return;
 	}
 
@@ -52,16 +46,8 @@ router.post('/:messageId/seen', async (req, res) => {
 	}
 
 	try {
-		const message = await messageService.seen(
-			req.params.messageId,
-			req.body.receiverId,
-		);
-		if (
-			req.body.redirect &&
-			message &&
-			message.payload &&
-			req.body.redirect in message.payload
-		) {
+		const message = await messageService.seen(req.params.messageId, req.body.receiverId);
+		if (req.body.redirect && message && message.payload && req.body.redirect in message.payload) {
 			const payload: any = message.payload;
 			return res.send({
 				redirect: payload[req.body.redirect],
@@ -86,11 +72,7 @@ router.post('/user/:userId', async (req, res) => {
 			default: 10,
 		});
 		const skip = utils.integerInRange(req.body.skip, { min: 0, default: 0 });
-		const messages = await messageService.byUser(
-			req.params.userId,
-			limit,
-			skip,
-		);
+		const messages = await messageService.byUser(req.params.userId, limit, skip);
 		res.send(messages);
 	} catch (e) {
 		res.status(400).send(e.message);
@@ -102,10 +84,7 @@ router.post('/user/:userId/message/:messageId', async (req, res) => {
 		return;
 	}
 	try {
-		const message = await messageService.byUserAndMessageId(
-			req.params.userId,
-			req.params.messageId,
-		);
+		const message = await messageService.byUserAndMessageId(req.params.userId, req.params.messageId);
 		if (message.data === null) {
 			return res.send(404);
 		}
@@ -121,10 +100,7 @@ router.post('/:messageId/remove/:userId', async (req, res) => {
 	}
 
 	try {
-		const message = await messageService.remove(
-			req.params.messageId,
-			req.params.userId,
-		);
+		const message = await messageService.remove(req.params.messageId, req.params.userId);
 		res.send(message);
 	} catch (e) {
 		res.status(400).send(e.message);
@@ -137,9 +113,7 @@ router.post('/user/:userId/removeAll', async (req, res) => {
 	}
 
 	try {
-		const messages = await messageService.removeAll(
-			req.params.userId,
-		);
+		const messages = await messageService.removeAll(req.params.userId);
 		res.send(messages);
 	} catch (e) {
 		res.status(400).send(e.message);
@@ -152,9 +126,7 @@ router.post('/user/:userId/readAll', async (req, res) => {
 	}
 
 	try {
-		const messages = await messageService.readAll(
-			req.params.userId,
-		);
+		const messages = await messageService.readAll(req.params.userId);
 		res.send(messages);
 	} catch (e) {
 		res.status(400).send(e.message);
