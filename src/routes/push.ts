@@ -7,7 +7,7 @@ import Utils from '@/utils';
 
 const router: express.Router = express.Router();
 
-const pushService = new PushService();
+const pushService = new PushService('PushService');
 
 const PromiseAny = (promises: Array<Promise<any>>) => {
 	return new Promise((resolve, reject) => {
