@@ -33,7 +33,6 @@ const times = (x: any) => (f: any) => {
 };
 
 describe('MessageService.send', () => {
-
 	before('should establish a database connection.', (done) => {
 		// connect to database
 		const db = mongoose.connection;
@@ -72,10 +71,7 @@ describe('MessageService.send', () => {
 			return;
 		}
 		let databaseMessage: Message = databaseMessageModel.toObject();
-		expect(
-			databaseMessage.receivers.length,
-			'Could not find any receiver in message',
-		).to.be.equal(2);
+		expect(databaseMessage.receivers.length, 'Could not find any receiver in message').to.be.equal(2);
 		const user: any = databaseMessage.receivers[0];
 		await messageService.seen(messageId, user.userId);
 		databaseMessageModel = await messageModel.findById(messageId);
@@ -88,10 +84,9 @@ describe('MessageService.send', () => {
 			expect(databaseMessage, 'Could not find message in database.').not.to.be.null;
 			return;
 		}
-		expect(
-			databaseMessage.seenCallback[0],
-			'Could not mark message seen by first receiver',
-		).to.containSubset({ userId: user.userId });
+		expect(databaseMessage.seenCallback[0], 'Could not mark message seen by first receiver').to.containSubset({
+			userId: user.userId,
+		});
 	});
 
 	it('only receivers can mark the message as read', async () => {
@@ -102,23 +97,18 @@ describe('MessageService.send', () => {
 			return;
 		}
 		const databaseMessage: Message = databaseMessageModel.toObject();
-		expect(
-			databaseMessage.receivers.length,
-			'Could not find any receiver in message',
-		).to.be.equal(2);
+		expect(databaseMessage.receivers.length, 'Could not find any receiver in message').to.be.equal(2);
 		const user: any = databaseMessage.receivers[0];
-		await expect(messageService
-			.seen(messageId, '307f191e813c19729de860ea'),
-			'unknown receiverid should fail')
-			.to.eventually.be.rejectedWith(Error);
-		expect(await messageService
-			.seen(messageId, user.userId),
-			'first call adds seen callback')
-			.to.containSubset({ seenCallback: { userId: user.Id } });
-		expect(await messageService
-			.seen(messageId, user.userId),
-			'second call should be ignored')
-			.to.containSubset({ seenCallback: { userId: user.Id } });
+		await expect(
+			messageService.seen(messageId, '307f191e813c19729de860ea'),
+			'unknown receiverid should fail'
+		).to.eventually.be.rejectedWith(Error);
+		expect(await messageService.seen(messageId, user.userId), 'first call adds seen callback').to.containSubset({
+			seenCallback: { userId: user.Id },
+		});
+		expect(await messageService.seen(messageId, user.userId), 'second call should be ignored').to.containSubset({
+			seenCallback: { userId: user.Id },
+		});
 	});
 
 	it('should return user messages as seen', async () => {
@@ -132,17 +122,16 @@ describe('MessageService.send', () => {
 		await messageService.seen(messageId, receivers[1].userId);
 		const messages = await messageService.byUser(userId, 100, 0);
 		expect(messages.data.length).to.be.greaterThan(0);
-		const dbMessages: MessageModel[] = messages.data
-			.filter((msg: MessageModel) =>
-				mongoose.Types.ObjectId(messageId).equals(msg._id));
+		const dbMessages: MessageModel[] = messages.data.filter((msg: MessageModel) =>
+			mongoose.Types.ObjectId(messageId).equals(msg._id)
+		);
 		expect(dbMessages.length).to.be.equal(1);
 		const dbMessage = dbMessages[0];
-		expect(dbMessage.receivers.length, // FIXME fails on travis
-			'foreign receivers should be removed for export to user')
-			.to.be.equal(1);
-		expect(dbMessage.seenCallback.length,
-			'foreign callbacks should be removed for export to user')
-			.to.be.equal(1);
+		expect(
+			dbMessage.receivers.length, // FIXME fails on travis
+			'foreign receivers should be removed for export to user'
+		).to.be.equal(1);
+		expect(dbMessage.seenCallback.length, 'foreign callbacks should be removed for export to user').to.be.equal(1);
 	});
 
 	it('should mark all user messages as seen', async () => {
@@ -156,9 +145,11 @@ describe('MessageService.send', () => {
 			const messages: any = await messageService.byUser(userId, 10, 0);
 			const ok = messages.data.map((m: Message) => {
 				expect(m.seenCallback.length).to.be.greaterThan(0);
-				expect(m.seenCallback.filter((e) => {
-					return e.userId.toString() === userId.toString();
-				}).length).to.be.equal(1);
+				expect(
+					m.seenCallback.filter((e) => {
+						return e.userId.toString() === userId.toString();
+					}).length
+				).to.be.equal(1);
 				return Promise.resolve();
 			});
 			return Promise.all(ok);

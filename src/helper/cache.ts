@@ -2,7 +2,6 @@ import NodeCache from 'node-cache';
 import logger from './logger';
 
 class Cache {
-
 	private cache: NodeCache;
 
 	constructor(ttlSeconds: number) {
@@ -40,6 +39,5 @@ class Cache {
 		this.cache.flushAll();
 	}
 }
-
 
 export default Cache;

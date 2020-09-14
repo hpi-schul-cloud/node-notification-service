@@ -34,8 +34,14 @@ export default class EscalationLogic {
 				const receiverDevices = await DeviceService.getDevices(message.platform, receiver.userId, service);
 				for (const device of receiverDevices) {
 					// todo avoid recreation of templatingService for each receiver device/user
-					templatingService = await TemplatingService.create(message.platform, message.template,
-						message.payload, message.languagePayloads, messageId, receiver.language);
+					templatingService = await TemplatingService.create(
+						message.platform,
+						message.template,
+						message.payload,
+						message.languagePayloads,
+						messageId,
+						receiver.language
+					);
 					if (service === 'firebase') {
 						const pushMessage = await templatingService.createPushMessage(receiver, device);
 						// FIXME add queuing, add rest route for queue length
@@ -53,7 +59,9 @@ export default class EscalationLogic {
 
 		// Send mail messages after 4 hours delay
 		const config = await Utils.getPlatformConfig(message.platform);
-		setTimeout(() => { this.sendMailMessages(messageId); }, config.mail.defaults.delay);
+		setTimeout(() => {
+			this.sendMailMessages(messageId);
+		}, config.mail.defaults.delay);
 		// todo send mail message without delay if there was no push device registered
 	}
 
@@ -72,8 +80,14 @@ export default class EscalationLogic {
 				continue;
 			}
 
-			const templatingService = await TemplatingService.create(message.platform, message.template,
-				message.payload, message.languagePayloads, messageId, receiver.language);
+			const templatingService = await TemplatingService.create(
+				message.platform,
+				message.template,
+				message.payload,
+				message.languagePayloads,
+				messageId,
+				receiver.language
+			);
 
 			const mailMessage = await templatingService.createMailMessage(receiver);
 			// FIXME add queuing, add rest route for queue length

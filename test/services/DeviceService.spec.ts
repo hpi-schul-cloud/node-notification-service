@@ -16,7 +16,6 @@ const expect = chai.expect;
 const SERVICE = 'firebase';
 
 describe('DeviceService', () => {
-
 	before('should establish a database connection.', (done) => {
 		// connect to database
 		const db = mongoose.connection;
@@ -35,8 +34,7 @@ describe('DeviceService', () => {
 		}
 		const databaseDevice: Device = databaseDeviceModel.toObject();
 
-		expect(databaseDevice)
-			.to.containSubset(device);
+		expect(databaseDevice).to.containSubset(device);
 	});
 
 	it('should add new token to existing device in the database.', async () => {
@@ -52,15 +50,13 @@ describe('DeviceService', () => {
 		const modifiedDevice = Object.assign({}, device);
 		modifiedDevice.tokens.push(newToken);
 
-		expect(databaseDevice.tokens)
-			.to.deep.equal(modifiedDevice.tokens);
+		expect(databaseDevice.tokens).to.deep.equal(modifiedDevice.tokens);
 	});
 
 	it('should get tokens for existing device in the database.', async () => {
 		const tokens = await DeviceService.getDevices(device.platform, device.userId, SERVICE);
 
-		expect(tokens)
-			.to.containSubset(device.tokens);
+		expect(tokens).to.containSubset(device.tokens);
 	});
 
 	it('should remove a device from database', async () => {
@@ -84,30 +80,27 @@ describe('DeviceService', () => {
 		expect(emptyList.length, 'device already removed').to.be.equal(0);
 	});
 
-
 	it('should remove all related devices from database with only a token defined', async () => {
 		const newToken = 'f4jfi039fj089fj903ij49';
 		const userIds = [
 			mongoose.Types.ObjectId('cdcd40c86362e0fb12000001'),
 			mongoose.Types.ObjectId('cdcd40c86362e0fb12000002'),
 		];
-		return Promise.all(userIds.map((userId) => DeviceService.addDevice(device.platform, userId, newToken, SERVICE)))
-			.then(async (deviceIds) => {
-				const removedId = await DeviceService.removeDevice(newToken);
-				expect(removedId.length, 'only one device has been removed').to.be.equal(2);
-				expect(removedId[0], 'removed device').to.be.equal(newToken);
-				expect(removedId[1], 'removed device').to.be.equal(newToken);
-				const emptyList = await DeviceService.removeDevice(newToken);
-				expect(emptyList.length, 'devices already removed').to.be.equal(0);
-			});
+		return Promise.all(
+			userIds.map((userId) => DeviceService.addDevice(device.platform, userId, newToken, SERVICE))
+		).then(async (deviceIds) => {
+			const removedId = await DeviceService.removeDevice(newToken);
+			expect(removedId.length, 'only one device has been removed').to.be.equal(2);
+			expect(removedId[0], 'removed device').to.be.equal(newToken);
+			expect(removedId[1], 'removed device').to.be.equal(newToken);
+			const emptyList = await DeviceService.removeDevice(newToken);
+			expect(emptyList.length, 'devices already removed').to.be.equal(0);
+		});
 	});
-
-
 
 	after('should drop database and close connection', (done) => {
 		mongoose.connection.db.dropDatabase(() => {
 			mongoose.connection.close(done);
 		});
 	});
-
 });
