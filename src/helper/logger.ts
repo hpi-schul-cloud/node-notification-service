@@ -2,27 +2,19 @@ import appRoot from 'app-root-path';
 import { createLogger, transports, format } from 'winston';
 const { combine, timestamp, colorize } = format;
 
-
 // instantiate a new Winston Logger with the settings defined above
 const isProductionMode = process.env.NODE_ENV === 'production';
 
 let level = 'debug';
-let logFormat = combine(
-	timestamp(),
-	colorize(),
-	format.simple(),
-);
+let logFormat = combine(timestamp(), colorize(), format.simple());
 
 if (isProductionMode) {
 	level = 'warn';
-	logFormat = combine(
-		timestamp(),
-		format.simple(),
-	);
+	logFormat = combine(timestamp(), format.simple());
 }
 const logger = createLogger({
 	transports: [
-		new (transports.Console)({
+		new transports.Console({
 			level,
 			handleExceptions: true,
 			format: logFormat,
@@ -51,7 +43,7 @@ export class LoggerStream {
 if (isProductionMode) {
 	console.log('Logging initialized at production level');
 } else {
-	logger.debug('Logging initialized at development level, set NODE_ENV === \'production\' for production use.');
+	logger.debug("Logging initialized at development level, set NODE_ENV === 'production' for production use.");
 }
 
 export default logger;

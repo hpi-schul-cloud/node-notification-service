@@ -10,13 +10,11 @@ chai.use(spies);
 const expect = chai.expect;
 
 describe('PushService.send', () => {
-
 	// Instantiate the service
 	const pushService = new PushService('PushTestService');
 	const spyFunction = chai.spy();
 
 	before('should create a mock push transporter.', async () => {
-
 		const transporter = {
 			send() {
 				spyFunction();
@@ -35,8 +33,6 @@ describe('PushService.send', () => {
 	});
 
 	it('should send a push.', () => {
-		expect(spyFunction)
-			.to.have.been.called();
+		expect(spyFunction).to.have.been.called();
 	});
-
 });

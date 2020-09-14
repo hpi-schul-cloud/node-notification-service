@@ -23,16 +23,20 @@ export default class PushService extends BaseService {
 	}
 
 	protected _createTransporters(platformId: string, config: any): PlatformPushTransporter[] {
-		const transporter = firebaseAdmin.initializeApp({
-			// https://stackoverflow.com/questions/40799258/where-can-i-get-serviceaccountcredentials-json-for-firebase-admin
-			credential: firebaseAdmin.credential.cert(config.push.service_account_object),
-			databaseURL: config.push.databaseURL,
-		}).messaging();
+		const transporter = firebaseAdmin
+			.initializeApp({
+				// https://stackoverflow.com/questions/40799258/where-can-i-get-serviceaccountcredentials-json-for-firebase-admin
+				credential: firebaseAdmin.credential.cert(config.push.service_account_object),
+				databaseURL: config.push.databaseURL,
+			})
+			.messaging();
 
-		return [{
-			platformId,
-			transporter,
-		}];
+		return [
+			{
+				platformId,
+				transporter,
+			},
+		];
 	}
 
 	protected _serviceType(): string {

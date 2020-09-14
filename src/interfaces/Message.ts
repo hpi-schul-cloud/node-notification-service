@@ -9,6 +9,7 @@ export default interface Message {
 		name: string;
 		mail: string;
 	};
+	// eslint-disable-next-line @typescript-eslint/ban-types
 	payload: {};
 	languagePayloads: LanguagePayload[];
 	receivers: UserResource[];

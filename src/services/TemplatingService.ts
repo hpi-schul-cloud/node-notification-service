@@ -12,13 +12,21 @@ const MAIL_MESSAGE = 'MAIL';
 const PUSH_MESSAGE = 'PUSH';
 
 export default class TemplatingService {
-
-
-
-
-	public static async create(platformId: string, templateId: string, payload: {}, languagePayloads: LanguagePayload[], messageId: string, language?: string) {
+	public static async create(
+		platformId: string,
+		templateId: string,
+		// eslint-disable-next-line @typescript-eslint/ban-types
+		payload: {},
+		languagePayloads: LanguagePayload[],
+		messageId: string,
+		language?: string
+	): Promise<TemplatingService> {
 		const templatingService = new TemplatingService(platformId, messageId);
-		templatingService.parsedMessageTemplates = await TemplatingService.initializeMessageTemplates(platformId, templateId, language);
+		templatingService.parsedMessageTemplates = await TemplatingService.initializeMessageTemplates(
+			platformId,
+			templateId,
+			language
+		);
 		templatingService.messagePayloads = TemplatingService.initializeMessagePayloads(payload, languagePayloads);
 		return templatingService;
 	}
@@ -26,7 +34,11 @@ export default class TemplatingService {
 	// endregion
 
 	// region private static methods
-	private static async initializeMessageTemplates(platformId: string, templateId: string, language?: string): Promise<Template[]> {
+	private static async initializeMessageTemplates(
+		platformId: string,
+		templateId: string,
+		language?: string
+	): Promise<Template[]> {
 		// FIXME fetch all languages and initialize only once
 		const templates = [MAIL_MESSAGE, PUSH_MESSAGE].map(async (type) => {
 			const messageTemplate = await Utils.loadTemplate(platformId, templateId, type, language);
@@ -51,15 +63,17 @@ export default class TemplatingService {
 	}
 
 	private static initializeMessagePayloads(payload: any, languagePayloads: LanguagePayload[]): Payload[] {
-		return languagePayloads.map((languagePayload: LanguagePayload): Payload => {
-			return {
-				_id: Utils.guid(),
-				message: payload,
-				languageId: languagePayload.language,
-				language: languagePayload.payload,
-				user: {},
-			};
-		});
+		return languagePayloads.map(
+			(languagePayload: LanguagePayload): Payload => {
+				return {
+					_id: Utils.guid(),
+					message: payload,
+					languageId: languagePayload.language,
+					language: languagePayload.payload,
+					user: {},
+				};
+			}
+		);
 	}
 	// endregion
 
@@ -103,7 +117,6 @@ export default class TemplatingService {
 	}
 
 	public async createPushMessage(user: UserResource, device: string): Promise<firebaseMessaging.Message> {
-
 		const template = this.getTemplate(PUSH_MESSAGE);
 		const payload = this.getUserPayload(user);
 		const functions = await this.getMustacheFunctions(user);
