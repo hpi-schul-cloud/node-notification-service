@@ -6,16 +6,17 @@ const router: express.Router = express.Router();
 const failedJobService = new FailedJobService();
 
 router.get('/:receiver', async (req, res) => {
-
 	// TODO add shd key verification
 	// validate regex
-	if (Utils.parametersMissing(['receiver'], req.params, res)) { return; }
+	if (Utils.parametersMissing(['receiver'], req.params, res)) {
+		return;
+	}
 
 	try {
 		const jobs = await failedJobService.getJobByReceiver(req.params.receiver);
 		res.json({
 			jobs,
-		})
+		});
 	} catch (err) {
 		res.status(400).send(err.message);
 	}
@@ -26,4 +27,3 @@ router.get('/:receiver', async (req, res) => {
 });
 
 export default router;
-

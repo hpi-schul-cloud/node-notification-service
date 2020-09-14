@@ -6,8 +6,9 @@ import mongoose from 'mongoose';
 const router: express.Router = express.Router();
 
 router.post('/', async (req, res) => {
-
-	if (Utils.parametersMissing(['platform', 'userId', 'token', 'service'], req.body, res)) { return; }
+	if (Utils.parametersMissing(['platform', 'userId', 'token', 'service'], req.body, res)) {
+		return;
+	}
 
 	try {
 		await DeviceService.addDevice(req.body.platform, req.body.userId, req.body.token, req.body.service);
@@ -18,8 +19,9 @@ router.post('/', async (req, res) => {
 });
 
 router.get('/:platform/:userId', async (req, res) => {
-
-	if (Utils.parametersMissing(['platform', 'userId'], req.params, res)) { return; }
+	if (Utils.parametersMissing(['platform', 'userId'], req.params, res)) {
+		return;
+	}
 
 	try {
 		const devices: string[] = [];
@@ -27,7 +29,9 @@ router.get('/:platform/:userId', async (req, res) => {
 			return DeviceService.getDevices(req.params.platform, mongoose.Types.ObjectId(req.params.userId), service);
 		});
 		Promise.all(chain).then((tokens) => {
-			tokens.forEach((serviceTokens) => { devices.push(...serviceTokens); });
+			tokens.forEach((serviceTokens) => {
+				devices.push(...serviceTokens);
+			});
 			res.send(devices);
 		});
 	} catch (e) {
@@ -36,11 +40,16 @@ router.get('/:platform/:userId', async (req, res) => {
 });
 
 router.delete('/:platform/:userId/:token', async (req, res) => {
-
-	if (Utils.parametersMissing(['platform', 'userId', 'token'], req.params, res)) { return; }
+	if (Utils.parametersMissing(['platform', 'userId', 'token'], req.params, res)) {
+		return;
+	}
 
 	try {
-		const devices = await DeviceService.removeDevice(req.params.token, req.params.platform, mongoose.Types.ObjectId(req.params.userId));
+		const devices = await DeviceService.removeDevice(
+			req.params.token,
+			req.params.platform,
+			mongoose.Types.ObjectId(req.params.userId)
+		);
 		res.send(devices);
 	} catch (e) {
 		res.status(500).send(e.message);

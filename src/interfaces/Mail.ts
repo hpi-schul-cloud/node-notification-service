@@ -5,7 +5,7 @@ export default interface Mail {
 	subject: string;
 	text: string;
 	html: string;
-	attachments?: Array<{ content: Buffer | string, filename: string }>;
+	attachments?: Array<{ content: Buffer | string; filename: string }>;
 	envelope?: {
 		from?: string;
 		to?: string;
