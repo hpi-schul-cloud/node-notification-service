@@ -4,7 +4,12 @@ import mongoose from 'mongoose';
 
 export default class DeviceService {
 	// region public static methods
-	public static async addDevice(platform: string, userId: mongoose.Types.ObjectId, token: string, service: string): Promise<string> {
+	public static async addDevice(
+		platform: string,
+		userId: mongoose.Types.ObjectId,
+		token: string,
+		service: string
+	): Promise<string> {
 		let device = await DeviceModel.findOne({ platform, userId, service });
 		if (!device) {
 			device = new DeviceModel({
@@ -23,7 +28,11 @@ export default class DeviceService {
 		return savedDevice.id;
 	}
 
-	public static async getDevices(platform: string, userId: mongoose.Types.ObjectId, service: string): Promise<string[]> {
+	public static async getDevices(
+		platform: string,
+		userId: mongoose.Types.ObjectId,
+		service: string
+	): Promise<string[]> {
 		const devices = await DeviceModel.findOne({ platform, userId, service });
 		if (!devices) {
 			return [];
@@ -32,7 +41,11 @@ export default class DeviceService {
 	}
 
 	/** removed a device, if only token defined it can remove multiple devices from different users if they have shared one device */
-	public static async removeDevice(token: string, platform?: string, userId?: mongoose.Types.ObjectId): Promise<string[]> {
+	public static async removeDevice(
+		token: string,
+		platform?: string,
+		userId?: mongoose.Types.ObjectId
+	): Promise<string[]> {
 		if (userId && platform) {
 			const device = await DeviceModel.findOne({ platform, userId, tokens: token });
 			if (device) {
@@ -62,7 +75,6 @@ export default class DeviceService {
 			logger.warn('no devices removed using token', { token });
 			return [];
 		}
-
 	}
 	// endregion
 

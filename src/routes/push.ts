@@ -28,15 +28,16 @@ const PromiseAny = (promises: Array<Promise<any>>) => {
 					if (count === 0 && !resolved) {
 						reject(new Error('No promises resolved successfully.'));
 					}
-				},
+				}
 			);
 		});
 	});
 };
 
 router.post('/', async (req, res) => {
-
-	if (Utils.parametersMissing(['platform', 'template', 'payload', 'languagePayloads', 'receivers'], req.body, res)) { return; }
+	if (Utils.parametersMissing(['platform', 'template', 'payload', 'languagePayloads', 'receivers'], req.body, res)) {
+		return;
+	}
 
 	// Construct Templating Service
 	let templatingService: TemplatingService;
@@ -54,8 +55,14 @@ router.post('/', async (req, res) => {
 				const receiverDevices = await DeviceService.getDevices(req.body.platform, receiver.userId, service);
 				for (const device of receiverDevices) {
 					// todo avoid recreation of templatingService for each receiver device/user
-					templatingService = await TemplatingService.create(req.body.platform, req.body.template,
-						req.body.payload, req.body.languagePayloads, messageId, receiver.language);
+					templatingService = await TemplatingService.create(
+						req.body.platform,
+						req.body.template,
+						req.body.payload,
+						req.body.languagePayloads,
+						messageId,
+						receiver.language
+					);
 					if (service === 'firebase') {
 						const pushMessage = await templatingService.createPushMessage(receiver, device);
 						// FIXME add queuing, add rest route for queue length
@@ -70,8 +77,7 @@ router.post('/', async (req, res) => {
 				}
 			});
 		}
-		PromiseAny(queuedMessages)
-			.then(() => res.send('Push queued.'));
+		PromiseAny(queuedMessages).then(() => res.send('Push queued.'));
 	} catch (err) {
 		res.status(500).send(err);
 	}

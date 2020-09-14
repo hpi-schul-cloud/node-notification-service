@@ -11,7 +11,7 @@ class Shutdown {
 				return resolve();
 			});
 		});
-	}
+	};
 	public static httpShutdown = (instance: Server) => {
 		return new Promise((resolve, reject) => {
 			logger.info('[shutdown:http] close http connections...');
@@ -20,7 +20,7 @@ class Shutdown {
 				resolve();
 			});
 		});
-	}
+	};
 }
 
 export default Shutdown;

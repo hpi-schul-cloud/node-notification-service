@@ -1,24 +1,25 @@
-import {SentMessageInfo} from 'nodemailer';
+import { SentMessageInfo } from 'nodemailer';
 import Utils from '@/utils';
 import logger from '@/helper/logger';
-import Queue, {Job} from 'bee-queue';
+import Queue, { Job } from 'bee-queue';
 import PlatformTransporter from '@/interfaces/PlatformTransporter';
-import {PlatformMessage} from '@/interfaces/PlatformMessage';
+import { PlatformMessage } from '@/interfaces/PlatformMessage';
 import { JsonObject } from 'swagger-ui-express';
 import FailedJobModel from '@/models/failedJobs';
 import { database } from 'firebase-admin';
 
-
+// eslint-disable-next-line @typescript-eslint/ban-types
 function getType(object: object | null) {
-	if (object === null) { return 'null'; }
+	if (object === null) {
+		return 'null';
+	}
 	return object.constructor.name;
 }
 
 export default abstract class BaseService {
-
 	private static queues: Queue[] = [];
 	private transporters: PlatformTransporter[] = [];
-	private name: string = 'NoName';
+	private name = 'NoName';
 
 	protected constructor(name: string) {
 		this.name = name;
@@ -33,22 +34,21 @@ export default abstract class BaseService {
 		}
 	}
 
-	private paused: boolean = false;
+	private paused = false;
 
 	public static getQueues(): Queue[] {
 		return this.queues;
 	}
 	public static healthState() {
-		return Promise.all(BaseService.queues
-			.map((queue: Queue) => {
-				return queue.checkHealth()
-					.then((health: any) => {
-						return {
-							queue: queue.name,
-							health,
-						};
-					});
-			}),
+		return Promise.all(
+			BaseService.queues.map((queue: Queue) => {
+				return queue.checkHealth().then((health: any) => {
+					return {
+						queue: queue.name,
+						health,
+					};
+				});
+			})
 		);
 	}
 
@@ -57,21 +57,23 @@ export default abstract class BaseService {
 			logger.debug('[queue] no queues to be closed...');
 			return Promise.resolve();
 		}
-		return Promise.all(BaseService.queues.map(async (queue) => {
-			logger.debug('[queue] ' + queue.name + ' will be closed...');
-			try {
-				await queue.close();
-				logger.debug('[queue] ' + queue.name + ' has been closed.');
-				return Promise.resolve();
-			} catch (error) {
-				logger.error('[queue] failed to gracefully shut down queue ' + queue.name, error);
-				return Promise.reject();
-			}
-		})).then(() => Promise.resolve());
+		return Promise.all(
+			BaseService.queues.map(async (queue) => {
+				logger.debug('[queue] ' + queue.name + ' will be closed...');
+				try {
+					await queue.close();
+					logger.debug('[queue] ' + queue.name + ' has been closed.');
+					return Promise.resolve();
+				} catch (error) {
+					logger.error('[queue] failed to gracefully shut down queue ' + queue.name, error);
+					return Promise.reject();
+				}
+			})
+		).then(() => Promise.resolve());
 	}
 
 	private static selectRandomFromArray(array: any[]): any {
-		const randPos: number = Math.floor((Math.random() * array.length));
+		const randPos: number = Math.floor(Math.random() * array.length);
 		return array[randPos];
 	}
 
@@ -92,26 +94,42 @@ export default abstract class BaseService {
 		return BaseService.selectRandomFromArray(platformTransporters);
 	}
 
-	public async send(platformId: string, message: PlatformMessage, receiver: string, messageId?: string): Promise<string> {
+	public async send(
+		platformId: string,
+		message: PlatformMessage,
+		receiver: string,
+		messageId?: string
+	): Promise<string> {
 		const config = await Utils.getPlatformConfig(platformId);
 		const queue = this.getQueue(platformId);
-		return queue.createJob({ platformId, message, receiver, messageId })
-			// https://www.npmjs.com/package/bee-queue#jobbackoffstrategy-delayfactor
-			// but exponential has a unexpected behavore. With time = 1000 it work nearly like expected
-			// (why ever) 3 time with same time and after it double time for each try
-			// but with time = 5000 it is run out in very high time first 42 sec, second 82sec, 162 sec and so on
-			.backoff(config.queue.backoffStrategy, config.queue.backoffTime)
-			.retries(config.queue.retries)
-			.timeout(config.queue.timeout)
-			.save()
-			.then((job: Job) => job.id);
+		return (
+			queue
+				.createJob({ platformId, message, receiver, messageId })
+				// https://www.npmjs.com/package/bee-queue#jobbackoffstrategy-delayfactor
+				// but exponential has a unexpected behavore. With time = 1000 it work nearly like expected
+				// (why ever) 3 time with same time and after it double time for each try
+				// but with time = 5000 it is run out in very high time first 42 sec, second 82sec, 162 sec and so on
+				.backoff(config.queue.backoffStrategy, config.queue.backoffTime)
+				.retries(config.queue.retries)
+				.timeout(config.queue.timeout)
+				.save()
+				.then((job: Job) => job.id)
+		);
 	}
 
-	public directSend(platformId: string, message: PlatformMessage, receiver: string, messageId?: string): Promise<string> {
+	public directSend(
+		platformId: string,
+		message: PlatformMessage,
+		receiver: string,
+		messageId?: string
+	): Promise<string> {
 		return this.process(platformId, message, receiver, messageId);
 	}
 
-	protected abstract _send(transporter: PlatformTransporter, message: PlatformMessage): Promise<SentMessageInfo | string>;
+	protected abstract _send(
+		transporter: PlatformTransporter,
+		message: PlatformMessage
+	): Promise<SentMessageInfo | string>;
 
 	protected abstract _createTransporters(platformId: string, config: any): PlatformTransporter[];
 
@@ -132,11 +150,9 @@ export default abstract class BaseService {
 	}
 
 	private getTransporter(platformId: string): PlatformTransporter {
-		let platformTransporters: PlatformTransporter[] = this.transporters.filter(
-			(transporter: PlatformTransporter) => {
-				return transporter.platformId === platformId;
-			},
-		);
+		let platformTransporters: PlatformTransporter[] = this.transporters.filter((transporter: PlatformTransporter) => {
+			return transporter.platformId === platformId;
+		});
 
 		if (platformTransporters.length === 0) {
 			platformTransporters = this.createTransporters(platformId);
@@ -153,9 +169,10 @@ export default abstract class BaseService {
 		this.paused = false;
 	}
 
+	// eslint-disable-next-line @typescript-eslint/ban-types
 	public jobErrorHandling(job: any, queue: Queue, done: Queue.DoneCallback<{}>, intervallTime: number) {
 		// const { receiver, messageId } = job.data;
-		const escalation = (message: string , err: any) => {
+		const escalation = (message: string, err: any) => {
 			// send to sentry
 			// add to healt check route
 			logger.error('[Critical Error]' + message, err);
@@ -164,18 +181,21 @@ export default abstract class BaseService {
 		const backupJob = (job: any, err: any) => {
 			// do not await to finished
 			const receiver = job.data.receiver;
-			FailedJobModel.create({
-				receiver,
-				jobId: job.id,
-				data: job.data,
-				error: err,
-			}, (err: any, doc: any) => {
-				if (err) {
-					logger.error('Can not store the data for failed job.', job);
-				} else {
-					logger.error('Removed job is saved!', { id: doc.id, receiver });
+			FailedJobModel.create(
+				{
+					receiver,
+					jobId: job.id,
+					data: job.data,
+					error: err,
+				},
+				(err: any, doc: any) => {
+					if (err) {
+						logger.error('Can not store the data for failed job.', job);
+					} else {
+						logger.error('Removed job is saved!', { id: doc.id, receiver });
+					}
 				}
-			});
+			);
 		};
 
 		return (error: any) => {
@@ -192,7 +212,10 @@ export default abstract class BaseService {
 				backupJob(job, error);
 				// queue.removeJob(job.id) and job.remove() do not work, but with done(null) it is removed the job
 				done(null);
-			} else if (error.responseCode === 421 && error.message.includes('421 Rate limit reached. Please try again later')) {
+			} else if (
+				error.responseCode === 421 &&
+				error.message.includes('421 Rate limit reached. Please try again later')
+			) {
 				// TODO: eskalation send email to admin do not work at this position (?)
 				// Send to sentry
 				escalation('Rate limit reached, it is paused for ' + intervallTime, error);
@@ -205,7 +228,7 @@ export default abstract class BaseService {
 			} else {
 				done(error);
 			}
-		}
+		};
 	}
 
 	private createQueue(platformId: string): Queue {
@@ -231,10 +254,11 @@ export default abstract class BaseService {
 		queue.on('stalled', (jobId) => {
 			logger.warn('[queue] ' + queueName + `: Job ${jobId} stalled and will be reprocessed`);
 		});
+		// eslint-disable-next-line @typescript-eslint/ban-types
 		queue.process((job: any, done: Queue.DoneCallback<{}>) => {
 			if (this.paused === true) {
 				return;
-			}	
+			}
 			// tslint:disable-next-line: no-shadowed-variable
 			const { platformId, message, receiver, messageId } = job.data;
 			logger.debug('[queue:' + queueName + '] processing job ' + job.id, { messageId, receiver });
@@ -243,12 +267,12 @@ export default abstract class BaseService {
 					logger.debug('[processing queue:' + queueName + '] finished job ' + job.id, { messageId, receiver });
 					done(null, info);
 				})
-				.catch(this.jobErrorHandling(job, queue, done, intervallTime))
+				.catch(this.jobErrorHandling(job, queue, done, intervallTime));
 		});
 
 		queue.checkStalledJobs(intervallTime, (err, numStalled) => {
 			// prints the number of stalled jobs detected every 180 sec
-			console.log('Checked stalled query jobs in '+platformId+' of '+this.name, numStalled);
+			console.log('Checked stalled query jobs in ' + platformId + ' of ' + this.name, numStalled);
 		});
 
 		BaseService.queues.push(queue);
@@ -273,7 +297,8 @@ export default abstract class BaseService {
 				transporter.unavailableSince = undefined;
 
 				return Promise.resolve(info);
-			}).catch((error) => {
+			})
+			.catch((error) => {
 				logger.error('[message] not sent', {
 					queue: queue ? queue.name : null,
 					error,
@@ -305,11 +330,9 @@ export default abstract class BaseService {
 	}
 
 	private getQueue(platformId: string): Queue {
-		const currentQueue: any | undefined = BaseService.queues.find(
-			(queue: Queue) => {
-				return queue.name === this._createQueueName(platformId);
-			},
-		);
+		const currentQueue: any | undefined = BaseService.queues.find((queue: Queue) => {
+			return queue.name === this._createQueueName(platformId);
+		});
 
 		if (currentQueue) {
 			return currentQueue;
