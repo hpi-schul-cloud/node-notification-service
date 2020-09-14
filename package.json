@@ -31,7 +31,7 @@
 		"@types/node": "^14.10.1",
 		"@types/redis": "^2.8.27",
 		"app-root-path": "^3.0.0",
-		"axios": "^0.19.0",
+		"axios": "^0.20.0",
 		"bee-queue": "^1.2.3",
 		"body-parser": "^1.19.0",
 		"defaults-deep": "^0.2.4",
