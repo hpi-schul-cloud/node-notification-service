@@ -76,10 +76,7 @@ const instance = app.listen(NOTIFICATION_PORT);
 process.on('SIGINT', () => {
 	logger.info('[shutdown] SIGINT received: gracefully shutting down...)');
 
-	Promise.all([
-		Shutdown.httpShutdown(instance),
-		Shutdown.queueShutdown(),
-	]).then(() => {
+	Promise.all([Shutdown.httpShutdown(instance), Shutdown.queueShutdown()]).then(() => {
 		logger.info('[shutdown] gracefully closed all connections...');
 		process.exit();
 	});

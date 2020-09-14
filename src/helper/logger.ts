@@ -6,22 +6,15 @@ const { combine, timestamp, colorize } = format;
 const isProductionMode = process.env.NODE_ENV === 'production';
 
 let level = 'debug';
-let logFormat = combine(
-	timestamp(),
-	colorize(),
-	format.simple(),
-);
+let logFormat = combine(timestamp(), colorize(), format.simple());
 
 if (isProductionMode) {
 	level = 'warn';
-	logFormat = combine(
-		timestamp(),
-		format.simple(),
-	);
+	logFormat = combine(timestamp(), format.simple());
 }
 const logger = createLogger({
 	transports: [
-		new (transports.Console)({
+		new transports.Console({
 			level,
 			handleExceptions: true,
 			format: logFormat,
