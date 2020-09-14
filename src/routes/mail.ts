@@ -4,7 +4,7 @@ import Mail from '@/interfaces/Mail';
 import logger from '@/helper/logger';
 
 const router = express.Router();
-const mailService = new MailService();
+const mailService = new MailService('MailService');
 
 
 router.post('/', (req, res) => {

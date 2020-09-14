@@ -4,6 +4,9 @@ import logger from '@/helper/logger';
 import Queue, {Job} from 'bee-queue';
 import PlatformTransporter from '@/interfaces/PlatformTransporter';
 import {PlatformMessage} from '@/interfaces/PlatformMessage';
+import { JsonObject } from 'swagger-ui-express';
+import FailedJobModel from '@/models/failedJobs';
+import { database } from 'firebase-admin';
 
 
 function getType(object: object | null) {
@@ -12,7 +15,26 @@ function getType(object: object | null) {
 }
 
 export default abstract class BaseService {
-	// region public static methods
+
+	private static queues: Queue[] = [];
+	private transporters: PlatformTransporter[] = [];
+	private name: string = 'NoName';
+
+	protected constructor(name: string) {
+		this.name = name;
+		let platforms = Utils.getPlatformIds();
+		// TODO outsource env in additional file
+		if (process.env.TESTPLATFORM !== '1') {
+			platforms = platforms.filter((p) => p !== 'testplatform');
+		}
+		for (const platform of platforms) {
+			logger.debug('[queue] init for platform ' + platform + ' and service ' + this._serviceType());
+			this.getQueue(platform);
+		}
+	}
+
+	private paused: boolean = false;
+
 	public static getQueues(): Queue[] {
 		return this.queues;
 	}
@@ -48,19 +70,6 @@ export default abstract class BaseService {
 		})).then(() => Promise.resolve());
 	}
 
-	// endregion
-
-	// region public methods
-
-
-	// endregion
-
-	// region private static methods
-	// endregion
-
-	// region public members
-	private static queues: Queue[] = [];
-
 	private static selectRandomFromArray(array: any[]): any {
 		const randPos: number = Math.floor((Math.random() * array.length));
 		return array[randPos];
@@ -82,29 +91,16 @@ export default abstract class BaseService {
 
 		return BaseService.selectRandomFromArray(platformTransporters);
 	}
-	// endregion
 
-	// region private members
-	private transporters: PlatformTransporter[] = [];
-	// endregion
-
-
-	// region constructor
-	protected constructor() {
-		const platforms = Utils.getPlatformIds();
-		for (const platform of platforms) {
-			logger.debug('[queue] init for platform ' + platform + ' and service ' + this._serviceType());
-			this.getQueue(platform);
-		}
-	}
-	// endregion
-
-	// region public methods
 	public async send(platformId: string, message: PlatformMessage, receiver: string, messageId?: string): Promise<string> {
 		const config = await Utils.getPlatformConfig(platformId);
 		const queue = this.getQueue(platformId);
 		return queue.createJob({ platformId, message, receiver, messageId })
-			.backoff('fixed', 2000 * 60) // 2min
+			// https://www.npmjs.com/package/bee-queue#jobbackoffstrategy-delayfactor
+			// but exponential has a unexpected behavore. With time = 1000 it work nearly like expected
+			// (why ever) 3 time with same time and after it double time for each try
+			// but with time = 5000 it is run out in very high time first 42 sec, second 82sec, 162 sec and so on
+			.backoff(config.queue.backoffStrategy, config.queue.backoffTime)
 			.retries(config.queue.retries)
 			.timeout(config.queue.timeout)
 			.save()
@@ -114,9 +110,6 @@ export default abstract class BaseService {
 	public directSend(platformId: string, message: PlatformMessage, receiver: string, messageId?: string): Promise<string> {
 		return this.process(platformId, message, receiver, messageId);
 	}
-	// endregion
-
-	// region private methods
 
 	protected abstract _send(transporter: PlatformTransporter, message: PlatformMessage): Promise<SentMessageInfo | string>;
 
@@ -152,36 +145,112 @@ export default abstract class BaseService {
 		return BaseService.selectTransporter(platformTransporters);
 	}
 
+	public async pausedQueue(time: number) {
+		this.paused = true;
+		logger.warn(`Query of ${this.name} is in paused mode for ${time} ms`);
+		await Utils.Sleep(time);
+		logger.warn(`Query of ${this.name} is go in progress.`);
+		this.paused = false;
+	}
+
+	public jobErrorHandling(job: any, queue: Queue, done: Queue.DoneCallback<{}>, intervallTime: number) {
+		// const { receiver, messageId } = job.data;
+		const escalation = (message: string , err: any) => {
+			// send to sentry
+			// add to healt check route
+			logger.error('[Critical Error]' + message, err);
+		};
+
+		const backupJob = (job: any, err: any) => {
+			// do not await to finished
+			const receiver = job.data.receiver;
+			FailedJobModel.create({
+				receiver,
+				jobId: job.id,
+				data: job.data,
+				error: err,
+			}, (err: any, doc: any) => {
+				if (err) {
+					logger.error('Can not store the data for failed job.', job);
+				} else {
+					logger.error('Removed job is saved!', { id: doc.id, receiver });
+				}
+			});
+		};
+
+		return (error: any) => {
+			// TODO outsource error handling for test it in unit tests
+			// ionos email provider is use for live systems
+			// https://www.ionos.de/hilfe/e-mail/postmaster/smtp-fehlermeldungen-der-11-ionos-mailserver/
+
+			// TODO: make backup jobs over new route avaible
+
+			// logger.error('[processing queue:' + queue.name + '] failed job ' + job.id, { messageId, receiver });
+			// remove jobs with invalid DNS
+			if (error.responseCode >= 550) {
+				// add to healts check route
+				backupJob(job, error);
+				// queue.removeJob(job.id) and job.remove() do not work, but with done(null) it is removed the job
+				done(null);
+			} else if (error.responseCode === 421 && error.message.includes('421 Rate limit reached. Please try again later')) {
+				// TODO: eskalation send email to admin do not work at this position (?)
+				// Send to sentry
+				escalation('Rate limit reached, it is paused for ' + intervallTime, error);
+				this.pausedQueue(intervallTime);
+				done(error);
+			} else if (error.responseCode === 421 && error.message.includes('421 Reject due to policy violations')) {
+				// -> eskalation Sentry
+				escalation('Our email account is blocked, please contact Ionos.', error);
+				done(error);
+			} else {
+				done(error);
+			}
+		}
+	}
+
 	private createQueue(platformId: string): Queue {
 		logger.debug('[setup] initialize service queue: ' + this._createQueueName(platformId));
 		const redisOptions = Utils.getRedisOptions(platformId);
 		const queue = new Queue(this._createQueueName(platformId), redisOptions);
+		const queueName = queue.name;
+		const intervallTime = 3 * 60 * 1000;
+
 		queue.on('ready', () => {
-			logger.debug('[queue] ' + queue.name + ': ready... execute BaseService.close() for graceful shutdown.');
+			logger.debug('[queue] ' + queueName + ': ready... execute BaseService.close() for graceful shutdown.');
 		});
 		queue.on('retrying', (job, err) => {
-			logger.warn('[queue] ' + queue.name + `: Job ${job.id} failed with error ${err.message} but is being retried!`);
+			logger.warn('[queue] ' + queueName + `: Job ${job.id} failed with error ${err.message} but is being retried!`);
 		});
 		queue.on('failed', (job, err) => {
-			logger.error('[queue] ' + queue.name + `: Job ${job.id} failed with error ${err.message}`);
+			if (this.paused === true) {
+				logger.warn('[queue] ' + queueName + `: Job ${job.id} wait for start sending. ${err.message}`);
+			} else {
+				logger.error('[queue] ' + queueName + `: Job ${job.id} failed with error ${err.message}`);
+			}
 		});
 		queue.on('stalled', (jobId) => {
-			logger.warn('[queue] ' + queue.name + `: Job ${jobId} stalled and will be reprocessed`);
+			logger.warn('[queue] ' + queueName + `: Job ${jobId} stalled and will be reprocessed`);
 		});
 		queue.process((job: any, done: Queue.DoneCallback<{}>) => {
+			if (this.paused === true) {
+				return;
+			}	
 			// tslint:disable-next-line: no-shadowed-variable
 			const { platformId, message, receiver, messageId } = job.data;
-			logger.debug('[queue:' + queue.name + '] processing job ' + job.id, { messageId, receiver });
+			logger.debug('[queue:' + queueName + '] processing job ' + job.id, { messageId, receiver });
 			this.process(platformId, message, receiver, messageId, queue)
 				.then((info) => {
-					logger.debug('[processing queue:' + queue.name + '] finished job ' + job.id, { messageId, receiver });
+					logger.debug('[processing queue:' + queueName + '] finished job ' + job.id, { messageId, receiver });
 					done(null, info);
 				})
-				.catch((error) => {
-					logger.error('[processing queue:' + queue.name + '] failed job ' + job.id, { messageId, receiver });
-					done(error);
-				});
+				.catch(this.jobErrorHandling(job, queue, done, intervallTime))
 		});
+
+		queue.checkStalledJobs(intervallTime, (err, numStalled) => {
+			// prints the number of stalled jobs detected every 180 sec
+			console.log('Checked stalled query jobs in '+platformId+' of '+this.name, numStalled);
+		});
+
 		BaseService.queues.push(queue);
 		return queue;
 	}
@@ -248,8 +317,4 @@ export default abstract class BaseService {
 
 		return this.createQueue(platformId);
 	}
-
-
-
-	// endregion
 }
