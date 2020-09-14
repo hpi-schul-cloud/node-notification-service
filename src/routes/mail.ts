@@ -4,8 +4,7 @@ import Mail from '@/interfaces/Mail';
 import logger from '@/helper/logger';
 
 const router = express.Router();
-const mailService = new MailService();
-
+const mailService = new MailService('MailService');
 
 router.post('/', (req, res) => {
 	const mail: Mail = {
@@ -21,7 +20,8 @@ router.post('/', (req, res) => {
 		mail.from = req.body.from;
 	}
 
-	mailService.send(req.body.platformId, mail, req.body.to)
+	mailService
+		.send(req.body.platformId, mail, req.body.to)
 		.then((response: any) => {
 			res.send('Mail queued.');
 			logger.info(response);

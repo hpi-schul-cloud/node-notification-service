@@ -17,7 +17,6 @@ const expect = chai.expect;
 const SERVICE = 'firebase';
 
 describe('EscalationLogic.escalate', () => {
-
 	// Instantiate the service
 	const messageService = new MessageService();
 
@@ -29,7 +28,6 @@ describe('EscalationLogic.escalate', () => {
 		db.once('open', done);
 		mongoose.connect(config.MONGO_DB_PATH);
 	});
-
 
 	it('should call the escalation logic.', async () => {
 		// add test device
@@ -45,13 +43,11 @@ describe('EscalationLogic.escalate', () => {
 
 		// wait for async calls have been called
 		await TestUtils.timeout(2000);
-		expect(spyFunctionPush, 'push spy not executed')
-			.to.have.been.called();
+		expect(spyFunctionPush, 'push spy not executed').to.have.been.called();
 
 		const config = await Utils.getPlatformConfig(message.platform);
 		await TestUtils.timeout(config.mail.defaults.delay + 1000);
-		expect(spyFunctionMail, 'mail spy not executed')
-			.to.have.been.called();
+		expect(spyFunctionMail, 'mail spy not executed').to.have.been.called();
 	});
 
 	after('should drop database and close connection', (done) => {
@@ -59,5 +55,4 @@ describe('EscalationLogic.escalate', () => {
 			mongoose.connection.close(done);
 		});
 	});
-
 });

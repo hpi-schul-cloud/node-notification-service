@@ -1,39 +1,21 @@
-import nodeMailer, {SentMessageInfo} from 'nodemailer';
+import nodeMailer, { SentMessageInfo } from 'nodemailer';
 import BaseService from '@/services/BaseService';
 import Mail from '@/interfaces/Mail';
 import PlatformMailTransporter from '@/interfaces/PlatformMailTransporter';
 import Utils from '@/utils';
 
 export default class MailService extends BaseService {
-	// endregion
-
-	// region public methods
-
-	// region public static methods
-	// endregion
-
-	// region private static methods
-	// endregion
-
-	// region public members
-	// endregion
-
-	// region private members
-	// endregion
-
-	// region constructor
-	public constructor() {
-		super();
+	public constructor(name: string) {
+		super(name);
 	}
-	// endregion
 
-	// region public methods
 	protected async _send(transporter: PlatformMailTransporter, mail: Mail): Promise<SentMessageInfo> {
 		if (mail.attachments) {
-			const decodeFiles = (files: Array<{content: any, filename: string}>) => files.map(({ content, filename }) => ({
-				filename,
-				content: Buffer.from(content, 'base64'),
-			}));
+			const decodeFiles = (files: Array<{ content: any; filename: string }>) =>
+				files.map(({ content, filename }) => ({
+					filename,
+					content: Buffer.from(content, 'base64'),
+				}));
 			mail.attachments = decodeFiles(mail.attachments);
 		}
 
@@ -68,9 +50,4 @@ export default class MailService extends BaseService {
 	protected _serviceType(): string {
 		return 'mail';
 	}
-
-	// endregion
-
-	// region private methods
-	// endregion
 }

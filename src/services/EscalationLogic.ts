@@ -8,27 +8,8 @@ import DeviceService from '@/services/DeviceService';
 import Message from '@/interfaces/Message';
 
 export default class EscalationLogic {
-	// region public static methods
-	// endregion
-
-	// region private static methods
-	// endregion
-
-	// region public members
-	// endregion
-
-	// region private members
-
-	private mailService = new MailService();
-	private pushService = new PushService();
-
-	// endregion
-
-	// region constructor
-
-	// endregion
-
-	// region public methods
+	private mailService = new MailService('EscalationLogicMailService');
+	private pushService = new PushService('EscalationLogicPushService');
 
 	public async escalate(messageId: string) {
 		const databaseMessage = await MessageModel.findById(messageId);
@@ -53,8 +34,14 @@ export default class EscalationLogic {
 				const receiverDevices = await DeviceService.getDevices(message.platform, receiver.userId, service);
 				for (const device of receiverDevices) {
 					// todo avoid recreation of templatingService for each receiver device/user
-					templatingService = await TemplatingService.create(message.platform, message.template,
-						message.payload, message.languagePayloads, messageId, receiver.language);
+					templatingService = await TemplatingService.create(
+						message.platform,
+						message.template,
+						message.payload,
+						message.languagePayloads,
+						messageId,
+						receiver.language
+					);
 					if (service === 'firebase') {
 						const pushMessage = await templatingService.createPushMessage(receiver, device);
 						// FIXME add queuing, add rest route for queue length
@@ -72,12 +59,12 @@ export default class EscalationLogic {
 
 		// Send mail messages after 4 hours delay
 		const config = await Utils.getPlatformConfig(message.platform);
-		setTimeout(() => { this.sendMailMessages(messageId); }, config.mail.defaults.delay);
+		setTimeout(() => {
+			this.sendMailMessages(messageId);
+		}, config.mail.defaults.delay);
 		// todo send mail message without delay if there was no push device registered
 	}
-	// endregion
 
-	// region private methods
 	private async sendMailMessages(messageId: string) {
 		// Fetch message again to get updated list of receivers
 		const message = await MessageModel.findById(messageId);
@@ -93,13 +80,18 @@ export default class EscalationLogic {
 				continue;
 			}
 
-			const templatingService = await TemplatingService.create(message.platform, message.template,
-				message.payload, message.languagePayloads, messageId, receiver.language);
+			const templatingService = await TemplatingService.create(
+				message.platform,
+				message.template,
+				message.payload,
+				message.languagePayloads,
+				messageId,
+				receiver.language
+			);
 
 			const mailMessage = await templatingService.createMailMessage(receiver);
 			// FIXME add queuing, add rest route for queue length
 			(await this.mailService).send(message.platform, mailMessage, receiver.userId.toString(), messageId);
 		}
 	}
-	// endregion
 }
