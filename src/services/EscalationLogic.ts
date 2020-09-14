@@ -8,27 +8,8 @@ import DeviceService from '@/services/DeviceService';
 import Message from '@/interfaces/Message';
 
 export default class EscalationLogic {
-	// region public static methods
-	// endregion
-
-	// region private static methods
-	// endregion
-
-	// region public members
-	// endregion
-
-	// region private members
-
-	private mailService = new MailService();
-	private pushService = new PushService();
-
-	// endregion
-
-	// region constructor
-
-	// endregion
-
-	// region public methods
+	private mailService = new MailService('EscalationLogicMailService');
+	private pushService = new PushService('EscalationLogicPushService');
 
 	public async escalate(messageId: string) {
 		const databaseMessage = await MessageModel.findById(messageId);
@@ -75,9 +56,7 @@ export default class EscalationLogic {
 		setTimeout(() => { this.sendMailMessages(messageId); }, config.mail.defaults.delay);
 		// todo send mail message without delay if there was no push device registered
 	}
-	// endregion
 
-	// region private methods
 	private async sendMailMessages(messageId: string) {
 		// Fetch message again to get updated list of receivers
 		const message = await MessageModel.findById(messageId);
@@ -101,5 +80,4 @@ export default class EscalationLogic {
 			(await this.mailService).send(message.platform, mailMessage, receiver.userId.toString(), messageId);
 		}
 	}
-	// endregion
 }

@@ -12,7 +12,7 @@ const expect = chai.expect;
 describe('PushService.send', () => {
 
 	// Instantiate the service
-	const pushService = new PushService();
+	const pushService = new PushService('PushTestService');
 	const spyFunction = chai.spy();
 
 	before('should create a mock push transporter.', async () => {
