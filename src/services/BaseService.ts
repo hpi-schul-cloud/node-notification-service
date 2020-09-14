@@ -1,16 +1,18 @@
-import {SentMessageInfo} from 'nodemailer';
+import { SentMessageInfo } from 'nodemailer';
 import Utils from '@/utils';
 import logger from '@/helper/logger';
-import Queue, {Job} from 'bee-queue';
+import Queue, { Job } from 'bee-queue';
 import PlatformTransporter from '@/interfaces/PlatformTransporter';
 import {PlatformMessage} from '@/interfaces/PlatformMessage';
 import { JsonObject } from 'swagger-ui-express';
 import FailedJobModel from '@/models/failedJobs';
 import { database } from 'firebase-admin';
 
-
+// eslint-disable-next-line @typescript-eslint/ban-types
 function getType(object: object | null) {
-	if (object === null) { return 'null'; }
+	if (object === null) {
+		return 'null';
+	}
 	return object.constructor.name;
 }
 
@@ -39,16 +41,15 @@ export default abstract class BaseService {
 		return this.queues;
 	}
 	public static healthState() {
-		return Promise.all(BaseService.queues
-			.map((queue: Queue) => {
-				return queue.checkHealth()
-					.then((health: any) => {
-						return {
-							queue: queue.name,
-							health,
-						};
-					});
-			}),
+		return Promise.all(
+			BaseService.queues.map((queue: Queue) => {
+				return queue.checkHealth().then((health: any) => {
+					return {
+						queue: queue.name,
+						health,
+					};
+				});
+			})
 		);
 	}
 
@@ -57,21 +58,23 @@ export default abstract class BaseService {
 			logger.debug('[queue] no queues to be closed...');
 			return Promise.resolve();
 		}
-		return Promise.all(BaseService.queues.map(async (queue) => {
-			logger.debug('[queue] ' + queue.name + ' will be closed...');
-			try {
-				await queue.close();
-				logger.debug('[queue] ' + queue.name + ' has been closed.');
-				return Promise.resolve();
-			} catch (error) {
-				logger.error('[queue] failed to gracefully shut down queue ' + queue.name, error);
-				return Promise.reject();
-			}
-		})).then(() => Promise.resolve());
+		return Promise.all(
+			BaseService.queues.map(async (queue) => {
+				logger.debug('[queue] ' + queue.name + ' will be closed...');
+				try {
+					await queue.close();
+					logger.debug('[queue] ' + queue.name + ' has been closed.');
+					return Promise.resolve();
+				} catch (error) {
+					logger.error('[queue] failed to gracefully shut down queue ' + queue.name, error);
+					return Promise.reject();
+				}
+			})
+		).then(() => Promise.resolve());
 	}
 
 	private static selectRandomFromArray(array: any[]): any {
-		const randPos: number = Math.floor((Math.random() * array.length));
+		const randPos: number = Math.floor(Math.random() * array.length);
 		return array[randPos];
 	}
 
@@ -107,7 +110,12 @@ export default abstract class BaseService {
 			.then((job: Job) => job.id);
 	}
 
-	public directSend(platformId: string, message: PlatformMessage, receiver: string, messageId?: string): Promise<string> {
+	public directSend(
+		platformId: string,
+		message: PlatformMessage,
+		receiver: string,
+		messageId?: string
+	): Promise<string> {
 		return this.process(platformId, message, receiver, messageId);
 	}
 
@@ -132,11 +140,9 @@ export default abstract class BaseService {
 	}
 
 	private getTransporter(platformId: string): PlatformTransporter {
-		let platformTransporters: PlatformTransporter[] = this.transporters.filter(
-			(transporter: PlatformTransporter) => {
-				return transporter.platformId === platformId;
-			},
-		);
+		let platformTransporters: PlatformTransporter[] = this.transporters.filter((transporter: PlatformTransporter) => {
+			return transporter.platformId === platformId;
+		});
 
 		if (platformTransporters.length === 0) {
 			platformTransporters = this.createTransporters(platformId);
@@ -231,6 +237,7 @@ export default abstract class BaseService {
 		queue.on('stalled', (jobId) => {
 			logger.warn('[queue] ' + queueName + `: Job ${jobId} stalled and will be reprocessed`);
 		});
+		// eslint-disable-next-line @typescript-eslint/ban-types
 		queue.process((job: any, done: Queue.DoneCallback<{}>) => {
 			if (this.paused === true) {
 				return;
@@ -273,7 +280,8 @@ export default abstract class BaseService {
 				transporter.unavailableSince = undefined;
 
 				return Promise.resolve(info);
-			}).catch((error) => {
+			})
+			.catch((error) => {
 				logger.error('[message] not sent', {
 					queue: queue ? queue.name : null,
 					error,
@@ -305,11 +313,9 @@ export default abstract class BaseService {
 	}
 
 	private getQueue(platformId: string): Queue {
-		const currentQueue: any | undefined = BaseService.queues.find(
-			(queue: Queue) => {
-				return queue.name === this._createQueueName(platformId);
-			},
-		);
+		const currentQueue: any | undefined = BaseService.queues.find((queue: Queue) => {
+			return queue.name === this._createQueueName(platformId);
+		});
 
 		if (currentQueue) {
 			return currentQueue;

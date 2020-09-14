@@ -1,4 +1,4 @@
-import nodeMailer, {SentMessageInfo} from 'nodemailer';
+import nodeMailer, { SentMessageInfo } from 'nodemailer';
 import BaseService from '@/services/BaseService';
 import Mail from '@/interfaces/Mail';
 import PlatformMailTransporter from '@/interfaces/PlatformMailTransporter';
@@ -11,10 +11,11 @@ export default class MailService extends BaseService {
 
 	protected async _send(transporter: PlatformMailTransporter, mail: Mail): Promise<SentMessageInfo> {
 		if (mail.attachments) {
-			const decodeFiles = (files: Array<{content: any, filename: string}>) => files.map(({ content, filename }) => ({
-				filename,
-				content: Buffer.from(content, 'base64'),
-			}));
+			const decodeFiles = (files: Array<{ content: any; filename: string }>) =>
+				files.map(({ content, filename }) => ({
+					filename,
+					content: Buffer.from(content, 'base64'),
+				}));
 			mail.attachments = decodeFiles(mail.attachments);
 		}
 

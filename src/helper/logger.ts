@@ -2,7 +2,6 @@ import appRoot from 'app-root-path';
 import { createLogger, transports, format } from 'winston';
 const { combine, timestamp, colorize } = format;
 
-
 // instantiate a new Winston Logger with the settings defined above
 const isProductionMode = process.env.NODE_ENV === 'production';
 
@@ -51,7 +50,7 @@ export class LoggerStream {
 if (isProductionMode) {
 	console.log('Logging initialized at production level');
 } else {
-	logger.debug('Logging initialized at development level, set NODE_ENV === \'production\' for production use.');
+	logger.debug("Logging initialized at development level, set NODE_ENV === 'production' for production use.");
 }
 
 export default logger;
