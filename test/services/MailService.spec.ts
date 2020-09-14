@@ -58,7 +58,7 @@ const configureEmailAccount = async (mailService : MailService) => {
 describe('MailService.send', () => {
 
 	// Instantiate the service
-	const mailService: MailService = new MailService();
+	const mailService: MailService = new MailService('MailTestService');
 
 	beforeEach('should send an mail.', async () => {
 		// Clear transporters
