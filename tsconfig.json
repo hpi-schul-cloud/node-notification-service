@@ -10,11 +10,11 @@
     "baseUrl": ".",
     "paths": {
       "@/*": [
-        "src/*",
-        "build/*"
+        "./src/*",
+        "./build/*"
       ],
       "@test/*": [
-        "test/*"
+        "./test/*"
       ]
     },
     "lib": [
