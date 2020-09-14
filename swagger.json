@@ -113,6 +113,31 @@
         }
       }
     },
+    "/failedJob/{:receiver}": {
+      "get": {
+        "tags": [
+          "FailedJob"
+        ],
+        "description": "All saved jobs with emails that can not processed.",
+        "parameters": [{
+          "name": "receiver",
+          "in": "path",
+          "description": "The search String for the receiver",
+          "required": true,
+          "schema": {
+            "$ref": "#/definitions/FailedJob"
+          }
+        }],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "The job that is match the requested receiver string."
+          }
+        }
+      }
+    },
     "/messages": {
       "post": {
         "tags": [
@@ -295,6 +320,19 @@
         "platform": "testplatform",
         "mail": "sample@sample.org",
         "token": "nms76vghyXGFa652chgagvhy56c1zc7vxghSWq"
+      }
+    },
+    "FailedJob": {
+      "required": [
+        "receiver"
+      ],
+      "properties": {
+        "receiver": {
+          "type": "string"
+        }
+      },
+      "example": {
+        "receiver": "paul@fail"
       }
     },
     "Message": {

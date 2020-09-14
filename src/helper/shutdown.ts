@@ -3,7 +3,6 @@ import BaseService from '@/services/BaseService';
 import { Server } from 'http';
 
 class Shutdown {
-
 	public static queueShutdown = () => {
 		return new Promise((resolve, reject) => {
 			logger.info('[shutdown] close message queue instances...');
