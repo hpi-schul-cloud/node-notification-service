@@ -10,7 +10,7 @@
 		"resolveJsonModule": true,
 		"baseUrl": ".",
 		"paths": {
-			"@/*": ["./src/*", "./build/*"],
+			"@/*": ["./src/*", "./build/src/*"],
 			"@test/*": ["./test/*"]
 		},
 		"lib": ["es2015", "esnext.asynciterable"]
