@@ -28,7 +28,7 @@
 		"@types/defaults-deep": "^0.2.0",
 		"@types/express-serve-static-core": "^4.17.12",
 		"@types/morgan": "^1.9.1",
-		"@types/node": "^14.10.1",
+		"@types/node": "^14.10.2",
 		"@types/redis": "^2.8.27",
 		"app-root-path": "^3.0.0",
 		"axios": "^0.19.0",
