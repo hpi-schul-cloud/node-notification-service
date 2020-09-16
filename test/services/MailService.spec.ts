@@ -5,7 +5,7 @@ import MailService from '@/services/MailService';
 import mail from '@test/data/mail';
 import message from '@test/data/message';
 import logger from '@/helper/logger';
-import PlatformMailTransporter from "../../src/interfaces/PlatformMailTransporter";
+import PlatformMailTransporter from '../../src/interfaces/PlatformMailTransporter';
 
 const EMAIL_SERVICE: string = process.env.MAIL_SERVICE || 'mailcatcher';
 
@@ -13,7 +13,7 @@ const SMTP_MAILCATCHER: any = {
 	smtp: {
 		host: process.env.MAILCATCHER_HOST || 'localhost',
 		port: 1025,
-		secure: false
+		secure: false,
 	},
 	user: '',
 	pass: '',
@@ -23,17 +23,19 @@ const getTestEmailAccount = async ({ EMAIL_SERVICE }: any) => {
 	let account: any = null;
 	if (EMAIL_SERVICE === 'ethereal') {
 		account = await nodeMailer.createTestAccount();
-		logger.info('Use Ethereal Email: https://ethereal.email/',
-			{ smpt: account.smtp, user: account.user, pass: account.pass }
-		);
+		logger.info('Use Ethereal Email: https://ethereal.email/', {
+			smpt: account.smtp,
+			user: account.user,
+			pass: account.pass,
+		});
 	} else {
 		account = SMTP_MAILCATCHER;
-		logger.info('using mailcatcher for receiving emails in tests')
+		logger.info('using mailcatcher for receiving emails in tests');
 	}
 	return account;
-}
+};
 
-const configureEmailAccount = async (mailService : MailService) => {
+const configureEmailAccount = async (mailService: MailService) => {
 	const account: any = await getTestEmailAccount({ EMAIL_SERVICE });
 	const { host, port, secure } = account.smtp;
 	const transporter = nodeMailer.createTransport({
@@ -42,8 +44,8 @@ const configureEmailAccount = async (mailService : MailService) => {
 		secure,
 		auth: {
 			user: account.user,
-			pass: account.pass
-		}
+			pass: account.pass,
+		},
 	});
 
 	// Add the custom transporter
@@ -53,10 +55,9 @@ const configureEmailAccount = async (mailService : MailService) => {
 	};
 	(mailService as any).transporters.push(mailTransporter);
 	return mailTransporter;
-}
+};
 
 describe('MailService.send', () => {
-
 	// Instantiate the service
 	const mailService: MailService = new MailService('MailTestService');
 
@@ -70,17 +71,11 @@ describe('MailService.send', () => {
 		await configureEmailAccount(mailService);
 
 		// Send a mail
-		const messageInfo : any = await mailService.directSend(message.platform, mail, mail.to, 'noId');
+		const messageInfo: any = await mailService.directSend(message.platform, mail, mail.to, 'noId');
 
-		expect(messageInfo.accepted)
-			.to.be.an('array')
-			.to.have.lengthOf(1)
-			.to.include(mail.to);
+		expect(messageInfo.accepted).to.be.an('array').to.have.lengthOf(1).to.include(mail.to);
 
-		expect(messageInfo.rejected)
-			.to.be.an('array')
-			.that.is.empty
-			.to.not.include(mail.to);
+		expect(messageInfo.rejected).to.be.an('array').that.is.empty.to.not.include(mail.to);
 	});
 
 	it('should send an mail, from the given sender.', async () => {
@@ -89,10 +84,9 @@ describe('MailService.send', () => {
 		await configureEmailAccount(mailService);
 
 		// Send a mail
-		const messageInfo : any = await mailService.directSend(message.platform, mail, mail.to, 'noId');
+		const messageInfo: any = await mailService.directSend(message.platform, mail, mail.to, 'noId');
 
-		expect(messageInfo.envelope)
-			.to.have.property('from', 'bounce@sample.org');
+		expect(messageInfo.envelope).to.have.property('from', 'bounce@sample.org');
 	});
 
 	it('should reactivate a random transporter', async () => {
@@ -157,5 +151,4 @@ describe('MailService.send', () => {
 	// 	expect(transporterTwo.lastSuccessAt)
 	// 		.to.be.undefined;
 	// });
-
 });

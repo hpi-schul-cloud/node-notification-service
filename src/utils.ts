@@ -11,18 +11,19 @@ import { isNullOrUndefined } from 'util';
 class Utils {
 	private static _getPlatformConfig(platformId?: string): any {
 		try {
-			const config: {} = platformId ? require(`../platforms/${platformId}/config.json`) : {};
-			const result = defaults(
-				config,
-				require(`../platforms/config.default.json`),
-			);
+			// eslint-disable-next-line @typescript-eslint/no-var-requires
+			const config: any = platformId ? require(`../platforms/${platformId}/config.json`) : {};
+			// eslint-disable-next-line @typescript-eslint/no-var-requires
+			const result = defaults(config, require(`../platforms/config.default.json`));
 			logger.info('platform config loaded', { platformId, result });
-			return (result);
+			return result;
 		} catch (err) {
 			logger.error(
-				'config.json missing. copy config.default.json to selected platform-folder "platforms/' + platformId + '" and update it.',
+				'config.json missing. copy config.default.json to selected platform-folder "platforms/' +
+					platformId +
+					'" and update it.'
 			);
-			return (require(`../platforms/config.default.json`));
+			return require(`../platforms/config.default.json`);
 		}
 	}
 
@@ -37,7 +38,7 @@ class Utils {
 		platformId: string,
 		templateId: string,
 		type: string,
-		language?: string,
+		language?: string
 	): Promise<Template> {
 		let template: Template;
 		let templatePath = path.join(
@@ -47,22 +48,14 @@ class Utils {
 			platformId,
 			'templates',
 			templateId,
-			`${type}${language ? '.' + language : ''}.mustache`,
+			`${type}${language ? '.' + language : ''}.mustache`
 		);
 		try {
-			template = yaml.safeLoad(fs.readFileSync(templatePath, 'utf8'));
+			template = yaml.safeLoad(fs.readFileSync(templatePath, 'utf8')) as any;
 		} catch (err) {
 			// use language independent template as default/fallback
-			templatePath = path.join(
-				__dirname,
-				'..',
-				'platforms',
-				platformId,
-				'templates',
-				templateId,
-				`${type}.mustache`,
-			);
-			template = yaml.safeLoad(fs.readFileSync(templatePath, 'utf8'));
+			templatePath = path.join(__dirname, '..', 'platforms', platformId, 'templates', templateId, `${type}.mustache`);
+			template = yaml.safeLoad(fs.readFileSync(templatePath, 'utf8')) as any;
 		}
 		template.type = type;
 		if (language) {
@@ -98,7 +91,9 @@ class Utils {
 	public getRedisOptions(platformId?: string) {
 		const platformConfig = this.getPlatformConfig(platformId);
 		const options: QueueSettings = platformConfig.queue.defaults;
-		if (!options.redis) { options.redis = {}; }
+		if (!options.redis) {
+			options.redis = {};
+		}
 		options.redis.host = process.env.REDIS_HOST || '127.0.0.1';
 		options.redis.port = parseInt(process.env.REDIS_PORT || '6379', undefined);
 		options.redis.retry_strategy = (opts) => {
@@ -114,12 +109,7 @@ class Utils {
 		return options;
 	}
 
-	public loadTemplate(
-		platformId: string,
-		templateId: string,
-		type: string,
-		language?: string,
-	): Promise<Template> {
+	public loadTemplate(platformId: string, templateId: string, type: string, language?: string): Promise<Template> {
 		const cacheKey = `${platformId}_${templateId}_${type}_${language ? language : 'nolanguage'}`;
 		return this.cache.get(cacheKey, () => {
 			return Utils._loadTemplate(platformId, templateId, type, language);
@@ -132,20 +122,7 @@ class Utils {
 				.toString(16)
 				.substring(1);
 		}
-		return (
-			s4() +
-			s4() +
-			'-' +
-			s4() +
-			'-' +
-			s4() +
-			'-' +
-			s4() +
-			'-' +
-			s4() +
-			s4() +
-			s4()
-		);
+		return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
 	}
 
 	public parametersMissing(parametersList: string[], base: any, res: any) {
@@ -163,7 +140,9 @@ class Utils {
 
 	public integerInRange(value: string, options: any) {
 		const retValue = parseInt(value, 10);
-		if (isNullOrUndefined(retValue)) { return options.default; }
+		if (isNullOrUndefined(retValue)) {
+			return options.default;
+		}
 		if (options.min && retValue < options.min) {
 			throw new Error('Value min is ' + options.min);
 		}
@@ -173,11 +152,7 @@ class Utils {
 		return retValue;
 	}
 
-	public async mustacheFunctions(
-		platformId: string,
-		messageId: string,
-		receiverId: string,
-	): Promise<any> {
+	public async mustacheFunctions(platformId: string, messageId: string, receiverId: string): Promise<any> {
 		const config = await this.getPlatformConfig(platformId);
 		return {
 			callbackLink() {
