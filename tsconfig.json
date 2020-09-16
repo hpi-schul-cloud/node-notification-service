@@ -14,7 +14,5 @@
 			"@test/*": ["./test/*"]
 		},
 		"lib": ["es2015", "esnext.asynciterable"]
-	},
-	"include": ["src/**/*"],
-	"exclude": ["node_modules", "**/*.spec.ts"]
+	}
 }
