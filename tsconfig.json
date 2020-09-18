@@ -1,7 +1,7 @@
 {
 	"compileOnSave": true,
 	"compilerOptions": {
-		"outDir": "./build",
+		"outDir": "build",
 		"esModuleInterop": true,
 		"strict": true,
 		"module": "commonjs",
@@ -10,8 +10,8 @@
 		"resolveJsonModule": true,
 		"baseUrl": ".",
 		"paths": {
-			"@/*": ["./src/*", "./build/src/*"],
-			"@test/*": ["./test/*"]
+			"@/*": ["src/*", "build/src/*"],
+			"@test/*": ["test/*"]
 		},
 		"lib": ["es2015", "esnext.asynciterable"]
 	}
