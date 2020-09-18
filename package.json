@@ -15,7 +15,8 @@
 	"main": "src/app",
 	"types": "src/app",
 	"scripts": {
-		"build": "tsc",
+		"build": "tsc --project tsconfig.production.json",
+		"build:all": "tsc",
 		"debug": "concurrently \"tsc -w\" \"nodemon\"",
 		"lint": "eslint --fix --ignore-path .gitignore .",
 		"start": "node -r ts-node/register -r tsconfig-paths/register build/src/app.js",
