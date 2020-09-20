@@ -16,7 +16,7 @@
 	"types": "src/app",
 	"scripts": {
 		"build": "tsc",
-		"debug": "concurrently \"tsc -w\" \"nodemon build/app.js\"",
+		"debug": "concurrently \"tsc -w\" \"nodemon\"",
 		"lint": "eslint --fix --ignore-path .gitignore .",
 		"start": "node -r ts-node/register -r tsconfig-paths/register build/src/app.js",
 		"test": "mocha -t 30000 -r tsconfig-paths/register -r ts-node/register test/**/*.spec.ts --exit",
