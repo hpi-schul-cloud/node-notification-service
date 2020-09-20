@@ -161,16 +161,17 @@ export default abstract class BaseService {
 		return BaseService.selectTransporter(platformTransporters);
 	}
 
-	public async pausedQueue(time: number) {
+	public async pausedQueue(time: number): Promise<string> {
 		this.paused = true;
 		logger.warn(`Query of ${this.name} is in paused mode for ${time} ms`);
 		await Utils.Sleep(time);
 		logger.warn(`Query of ${this.name} is go in progress.`);
 		this.paused = false;
+		return Promise.resolve(this.name);
 	}
 
 	// eslint-disable-next-line @typescript-eslint/ban-types
-	public jobErrorHandling(job: any, queue: Queue, done: Queue.DoneCallback<{}>, intervallTime: number) {
+	public jobErrorHandling(job: Job, queue: Queue, done: Queue.DoneCallback<{}>, intervallTime: number): any {
 		// const { receiver, messageId } = job.data;
 		const escalation = (message: string, err: any) => {
 			// send to sentry

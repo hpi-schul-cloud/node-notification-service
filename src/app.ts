@@ -14,7 +14,7 @@ import pushRouter from '@/routes/push';
 import messageRouter from '@/routes/message';
 import deviceRouter from '@/routes/device';
 import statisticRouter from '@/routes/statistic';
-import failedJobsRouter from '@/routes/failedJobs';
+import admin from '@/routes/admin';
 import HttpException from './exceptions/httpException';
 import Shutdown from '@/helper/shutdown';
 
@@ -41,7 +41,7 @@ app.use('/push', pushRouter);
 app.use('/messages', messageRouter);
 app.use('/devices', deviceRouter);
 app.use('/statistic', statisticRouter);
-app.use('/failedJobs', failedJobsRouter);
+app.use('/admin', admin);
 
 app.head('/', (req, res) => {
 	res.send(200);
