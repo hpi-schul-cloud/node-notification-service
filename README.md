@@ -13,22 +13,36 @@
 1. Change the mounted directory inside the docker-compose.yml matching your path.
 
 1. Deploy the service using docker compose / stack:
-  ```docker-compose up``` or ```docker stack -c docker-compose.yml```.
+   `docker-compose up` or `docker stack -c docker-compose.yml`.
 
 ## Getting Started
 
 1. Make sure you have [NodeJS](https://nodejs.org/) and [npm](https://www.npmjs.com/) installed.
 2. Install the dependencies
 
-    ```
-    npm install
-    ```
+   ```bash
+   npm install
+   ```
 
-3. Start the app
+3. Compile
 
-    ```
-    npm start
-    ```
+   1. Production: Compile app excluding tests
+
+      ```bash
+      npm run build
+      ```
+
+   2. Development: Compile app including tests
+
+      ```bash
+      npm run build:all
+      ```
+
+4. Start the app
+
+   ```bash
+   npm start
+   ```
 
 ## Testing
 
@@ -49,7 +63,7 @@ Simply install redis via Brew
 
 ### Email setup
 
-1. Setting `process.env.MAIL_SERVICE = 'ethereal'` before test execution will create temporarily an email account on [ethereal](https://ethereal.email/). The credentials will be printed in the console and used to view delivered emails on that service. Therefore [login](https://ethereal.email/login) with user and pass as password and [list messages](https://ethereal.email/messages) received. If doing so, there is no need to setup a mail service locally. 
+1. Setting `process.env.MAIL_SERVICE = 'ethereal'` before test execution will create temporarily an email account on [ethereal](https://ethereal.email/). The credentials will be printed in the console and used to view delivered emails on that service. Therefore [login](https://ethereal.email/login) with user and pass as password and [list messages](https://ethereal.email/messages) received. If doing so, there is no need to setup a mail service locally.
 2. A local mail service may be defined on localhost:1025 which is used in the [github test action](https://github.com/hpi-schul-cloud/node-notification-service/blob/ed12ab488e29e057410f4a904dccf68a71e107c9/.github/workflows/nodejs.yml#L19) too.
 
 ## Architecture
@@ -69,6 +83,7 @@ We also have the device service: this service is only responsible for managing t
 External services can mark specific messages as seen to disable the escalation logic for a specific user. If the push message was delivered and this message was marked as seen via the respective API call, the mail message will not be sent.
 
 ## Config
+
 To use multiple Mail Configs (for example for load balancing) just use an array of options in the mail config.
 
 ```
@@ -98,7 +113,7 @@ To use multiple Mail Configs (for example for load balancing) just use an array 
 
 ## Docs
 
-A Swagger Docs is available at ```/docs```
+A Swagger Docs is available at `/docs`
 
 ## License
 
