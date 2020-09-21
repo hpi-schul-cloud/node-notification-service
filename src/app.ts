@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import express, { NextFunction, Request, Response } from 'express';
 import bodyParser from 'body-parser';
 import swaggerUi from 'swagger-ui-express';
-import swagger from '../swagger.json';
+import swagger from './swagger.json';
 import morgan from 'morgan';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const mjson = require('morgan-json');

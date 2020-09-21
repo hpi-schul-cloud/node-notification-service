@@ -1,15 +1,7 @@
 {
-    "ignore": [
-        "**/*.test.ts",
-        "**/*.spec.ts",
-        ".git",
-        "node_modules"
-    ],
-    "watch": [
-        "build",
-        "platforms"
-    ],
-    "exec": "node --inspect=5859 -r tsconfig-paths/register -r ts-node/register build/app.js",
-    "ext": "js",
-    "delay": "2500"
+	"ignore": ["**/*.test.ts", "**/*.spec.ts", ".git", "node_modules"],
+	"watch": ["build", "platforms"],
+	"exec": "node --inspect=5859 -r tsconfig-paths/register -r ts-node/register build/src/app.js",
+	"ext": "js",
+	"delay": "2500"
 }
