@@ -3,8 +3,6 @@ import express from 'express';
 import swaggerUi from 'swagger-ui-express';
 import swagger from './swagger.json';
 import morgan from 'morgan';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const mjson = require('morgan-json');
 import logger, { LoggerStream } from '@/helper/logger';
 import mailRouter from '@/routes/mail';
 import pushRouter from '@/routes/push';
@@ -27,7 +25,7 @@ const NOTIFICATION_PORT = parseInt(process.env.REDIS_PORT || '') || 3031;
 app.use(express.json({ limit: 10 * 1024 * 1024 })); // 10MB limit
 app.use(express.urlencoded({ extended: true }));
 
-const logFormat = mjson(':status :method :url :res[content-length] bytes :response-time ms');
+const logFormat = ':status :method :url :res[content-length] bytes - :response-time ms';
 app.use(morgan(logFormat, { stream: new LoggerStream('request', 'debug') }));
 
 // services
