@@ -1,4 +1,4 @@
-import ApplicationError from './exceptions/HttpException';
+import ApplicationError from './exceptions/ApplicationError';
 import { Request, Response, NextFunction } from 'express';
 import logger from './helper/logger';
 import util from 'util';
