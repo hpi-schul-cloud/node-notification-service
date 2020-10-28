@@ -52,8 +52,9 @@ app.use(errorHandler);
 
 // the mongodb connection
 const db = mongoose.connection;
-// tslint:disable-next-line: no-console
-db.on('error', console.error.bind(logger, '[critical] MongoDB connection error:'));
+db.on('error', (error) => {
+	logger.error('[critical] MongoDB connection error:', error);
+});
 
 // the server instance
 let server: Server;
@@ -64,7 +65,7 @@ const run = async () => {
 
 	const mongoURI = `mongodb://${process.env.MONGO_HOST || 'localhost'}/notification-service`;
 	logger.info(`MongoDB uri: ${mongoURI}`);
-	await mongoose.connect(mongoURI);
+	await mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });
 
 	// TODO make producer configurable optional
 	server = app.listen(NOTIFICATION_PORT, NOTIFICATION_HOST, () => {
