@@ -43,6 +43,23 @@ function loadCfgEnv(): ConfigData {
 	};
 }
 
+function applyMailEnv(cfg: ConfigData): ConfigData {
+	const cfgEnv = {
+		host: process.env.MAIL_HOST,
+		port: parseInt(process.env.MAIL_PORT || '') || undefined,
+	};
+
+	const mailOptions = Array.isArray(cfg.mail.options)
+		? (cfg.mail.options as ConfigData[])
+		: ([cfg.mail.options] as ConfigData[]);
+
+	cfg.mail.options = mailOptions.map((cfgOpt) => {
+		return defaults(cfgEnv, cfgOpt);
+	});
+
+	return cfg;
+}
+
 function loadConfig(cfgPath: string): ConfigData[] {
 	const platformIds = loadPlatformIds(cfgPath);
 	const cfgDefault = loadCfgDefault(cfgPath);
@@ -56,14 +73,19 @@ function loadConfig(cfgPath: string): ConfigData[] {
 		// platform config overrides
 		cfgCombined = defaults(cfgPlatform, cfgDefault);
 
-		// env config overrides
+		// general env config overrides
 		cfgCombined = defaults(cfgEnv, cfgCombined);
+
+		// mail env config overrides
+		cfgCombined = applyMailEnv(cfgCombined);
 
 		// store platformId
 		cfgCombined.platformId = pId;
 
 		return cfgCombined;
 	});
+
+	logger.debug('Application config loaded:', configuration);
 
 	return configuration;
 }
@@ -72,5 +94,3 @@ function loadConfig(cfgPath: string): ConfigData[] {
 export type ConfigData = Record<string, any>;
 
 export default loadConfig(path.join(__dirname, '..', 'platforms'));
-
-// console.dir(configuration, { depth: null });

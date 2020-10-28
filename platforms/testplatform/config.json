@@ -1,7 +1,7 @@
 {
   "mail": {
     "options": [{
-      "host": "localhost",
+      "host": "mail",
       "port": 1025,
       "secure": false,
       "auth": {
