@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import defaults from 'defaults-deep';
+import { defaultsDeep } from 'lodash';
 import logger from '@/helper/logger';
 
 function loadPlatformIds(cfgPath: string): string[] {
@@ -54,7 +54,7 @@ function applyMailEnv(cfg: ConfigData): ConfigData {
 		: ([cfg.mail.options] as ConfigData[]);
 
 	cfg.mail.options = mailOptions.map((cfgOpt) => {
-		return defaults(cfgEnv, cfgOpt);
+		return defaultsDeep(cfgEnv, cfgOpt);
 	});
 
 	return cfg;
@@ -71,10 +71,10 @@ function loadConfig(cfgPath: string): ConfigData[] {
 		let cfgCombined: ConfigData;
 
 		// platform config overrides
-		cfgCombined = defaults(cfgPlatform, cfgDefault);
+		cfgCombined = defaultsDeep(cfgPlatform, cfgDefault);
 
 		// general env config overrides
-		cfgCombined = defaults(cfgEnv, cfgCombined);
+		cfgCombined = defaultsDeep(cfgEnv, cfgCombined);
 
 		// mail env config overrides
 		cfgCombined = applyMailEnv(cfgCombined);
