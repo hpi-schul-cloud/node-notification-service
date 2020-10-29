@@ -66,18 +66,41 @@ export class MailTransport implements MessageTransport<Mail> {
 	 * @param message
 	 */
 	async deliver(message: Mail): Promise<void> {
-		message.attachments = this.decodeAttachments(message.attachments);
+		try {
+			message.attachments = this.decodeAttachments(message.attachments);
 
-		if (this.msgDefaults.envelope) {
-			message.envelope = {
-				from: this.msgDefaults.envelope.from || message.from,
-				to: this.msgDefaults.envelope.to || message.to,
-			};
+			if (this.msgDefaults.envelope) {
+				message.envelope = {
+					from: this.msgDefaults.envelope.from || message.from,
+					to: this.msgDefaults.envelope.to || message.to,
+				};
+			}
+
+			const sentInfo = await this.transporter.sendMail(message);
+
+			this._status.lastSuccessAt = new Date();
+
+			logger.debug(
+				`[transport] Message delivered on ${this.serviceType}/${this.platformId}: ${util.inspect(sentInfo)}`
+			);
+		} catch (error) {
+			this._status.lastErrorAt = new Date();
+			this._status.lastError = error;
+
+			// Known E-Mail Errors:
+			// - 450: Mail send limit exceeded
+			//   {"code":"EENVELOPE","response":"450-Requested mail action not taken: mailbox unavailable\n450 Mail send limit exceeded.",
+			//    "responseCode":450,"command":"RCPT TO","rejected":["XXX"],"rejectedErrors":[{...}]}
+			// - 535 Authentication credentials invalid (account blocked)
+			//   {"code":"EAUTH","response":"535 Authentication credentials invalid","responseCode":535,"command":"AUTH PLAIN"}
+			// - 550: Mailbox unavailable (recipient email)
+			//   {"code":"EENVELOPE","response":"550-Requested action not taken: mailbox unavailable\n550 invalid DNS MX or A/AAAA resource record",
+			//    "responseCode":550,"command":"RCPT TO","rejected":["XXX"],"rejectedErrors":[{...}]}
+			if (error && error.responseCode && (error.responseCode === 450 || error.responseCode === 535)) {
+				this._status.unavailableSince = new Date();
+			}
+			throw error;
 		}
-
-		const sentInfo = await this.transporter.sendMail(message);
-
-		logger.debug(`[transport] Message delivered on ${this.serviceType}/${this.platformId}: ${util.inspect(sentInfo)}`);
 	}
 
 	// --------------------------------------------------------------------------
