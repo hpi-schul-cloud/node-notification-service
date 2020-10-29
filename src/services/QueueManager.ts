@@ -65,11 +65,11 @@ export default class QueueManager {
 	async startWorker(serviceType: string, platformId: string, callback: ProcessPromiseFunction<JobData>): Promise<void> {
 		const queue = this.findQueue(serviceType, platformId);
 
-		logger.debug(`[queue] Checking if ${queue.name} is ready`);
+		logger.info(`[queue] Checking if ${queue.name} is ready`);
 		await queue.isReady();
-		logger.debug(`[queue] Ok ${queue.name} is ready`);
+		logger.info(`[queue] Ok ${queue.name} is ready`);
 
-		logger.debug(`[queue] Starting service worker for ${queue.name}`);
+		logger.info(`[queue] Starting service worker for ${queue.name}`);
 		queue.process(callback);
 	}
 
