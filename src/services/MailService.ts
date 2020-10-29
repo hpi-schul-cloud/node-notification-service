@@ -52,10 +52,8 @@ export default class MailService {
 	 * @param receiver
 	 * @param messageId
 	 */
-	async send(platformId: string, message: PlatformMessage, receiver: string, messageId?: string): Promise<void> {
-		await this.queueManager.addJob({ serviceType: SERVICE_TYPE, platformId, message, receiver, messageId });
-		// TODO logging?
-		logger.debug('[queue] job added');
+	send(platformId: string, message: PlatformMessage, receiver: string, messageId?: string): Promise<void> {
+		return this.queueManager.addJob({ serviceType: SERVICE_TYPE, platformId, message, receiver, messageId });
 	}
 
 	/**
@@ -65,17 +63,17 @@ export default class MailService {
 	 * @param receiver
 	 * @param messageId
 	 */
-	async directSend(platformId: string, message: PlatformMessage, receiver: string, messageId?: string): Promise<void> {
+	directSend(platformId: string, message: PlatformMessage, receiver: string, messageId?: string): Promise<void> {
 		logger.debug('direct send', { platformId, message, receiver, messageId });
-		await this.getTransport(SERVICE_TYPE, platformId).deliver(message as Mail);
+		return this.getTransport(SERVICE_TYPE, platformId).deliver(message as Mail);
 	}
 
-	private async process(job: Job<JobData>): Promise<void> {
+	private process(job: Job<JobData>): Promise<void> {
 		const { platformId, message, receiver, messageId } = job.data;
 		logger.debug(
 			`[queue] ${job.queue.name} processing job id: ${job.id}, messageId: ${messageId}, receiver: ${receiver}`
 		);
-		await this.getTransport(SERVICE_TYPE, platformId).deliver(message as Mail);
+		return this.getTransport(SERVICE_TYPE, platformId).deliver(message as Mail);
 	}
 
 	// TODO refactor to a TransportManager?
