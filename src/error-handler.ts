@@ -9,9 +9,7 @@ export default (err: ApplicationError, req: Request, res: Response, next: NextFu
 	res.locals.message = err.message;
 	res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-	if (req.app.get('env') === 'development') {
-		logger.error(util.inspect(err));
-	}
+	logger.error(util.inspect(err));
 
 	// not found
 	if (err.status === 404) {

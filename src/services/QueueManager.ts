@@ -115,6 +115,7 @@ export default class QueueManager {
 	private findQueue(serviceType: string, platformId: string): Queue {
 		const queue = this.queues.find((q) => q.name === this.getQueueName(serviceType, platformId));
 		if (!queue) {
+			// TODO throw a more specific error that can be evaluated to a status code (422)
 			throw new Error(`Could not find queue with platformId='${platformId}' and serviceType='${serviceType}'`);
 		}
 		return queue;
