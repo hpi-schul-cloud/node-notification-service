@@ -67,7 +67,7 @@ export class MailTransport implements MessageTransport<Mail> {
 	 */
 	async deliver(message: Mail): Promise<void> {
 		try {
-			message.attachments = this.decodeAttachments(message.attachments);
+			message.attachments = this.prepareAttachments(message.attachments);
 
 			if (this.msgDefaults.envelope) {
 				message.envelope = {
@@ -106,11 +106,12 @@ export class MailTransport implements MessageTransport<Mail> {
 
 	// --------------------------------------------------------------------------
 
-	private decodeAttachments(attachments: Attachment[] = []): Attachment[] {
+	private prepareAttachments(attachments: Attachment[] = []): Attachment[] {
 		return attachments.map((att) => {
 			return {
 				filename: att.filename,
-				content: Buffer.from(att.content.toString(), 'base64'),
+				content: att.content,
+				encoding: 'base64',
 			};
 		});
 	}
