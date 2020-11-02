@@ -1,5 +1,5 @@
 import logger from '@/helper/logger';
-import MailService from '@/services/MailService';
+// import MailService from '@/services/MailService';
 import PushService from '@/services/PushService';
 import TemplatingService from '@/services/TemplatingService';
 import MessageModel from '@/models/message';
@@ -8,7 +8,7 @@ import DeviceService from '@/services/DeviceService';
 import Message from '@/interfaces/Message';
 
 export default class EscalationLogic {
-	private mailService = new MailService('EscalationLogicMailService');
+	// private mailService = new MailService('EscalationLogicMailService');
 	private pushService = new PushService('EscalationLogicPushService');
 
 	public async escalate(messageId: string) {
@@ -89,9 +89,9 @@ export default class EscalationLogic {
 				receiver.language
 			);
 
-			const mailMessage = await templatingService.createMailMessage(receiver);
+			// const mailMessage = await templatingService.createMailMessage(receiver);
 			// FIXME add queuing, add rest route for queue length
-			(await this.mailService).send(message.platform, mailMessage, receiver.userId.toString(), messageId);
+			// (await this.mailService).send(message.platform, mailMessage, receiver.userId.toString(), messageId);
 		}
 	}
 }

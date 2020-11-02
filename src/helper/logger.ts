@@ -1,4 +1,3 @@
-import appRoot from 'app-root-path';
 import { createLogger, transports, format } from 'winston';
 const { combine, timestamp, colorize } = format;
 
@@ -31,7 +30,7 @@ export class LoggerStream {
 		this.name = name;
 		this.level = level || 'info';
 	}
-	public write(message: string) {
+	public write(message: string): void {
 		if (this.name) {
 			logger.log(this.level, this.name + ' ' + message);
 		} else {

@@ -28,10 +28,14 @@ services:
   mongo:
     image: mongo:3
     restart: always
+    ports:
+      - 27017:27017
 
   redis:
     image: redis:5.0.3
     restart: always
+    ports:
+      - 6379:6379
 
   redis-commander:
     container_name: redis-commander

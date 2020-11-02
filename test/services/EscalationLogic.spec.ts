@@ -35,9 +35,9 @@ describe('EscalationLogic.escalate', () => {
 
 		// use spies for push and mail service
 		const spyFunctionPush = chai.spy();
-		const spyFunctionMail = chai.spy();
+		// const spyFunctionMail = chai.spy();
 		(await (messageService as any).escalationLogic.pushService).send = spyFunctionPush;
-		(await (messageService as any).escalationLogic.mailService).send = spyFunctionMail;
+		// (await (messageService as any).escalationLogic.mailService).send = spyFunctionMail;
 
 		await messageService.send(message);
 
@@ -45,9 +45,9 @@ describe('EscalationLogic.escalate', () => {
 		await TestUtils.timeout(2000);
 		expect(spyFunctionPush, 'push spy not executed').to.have.been.called();
 
-		const config = await Utils.getPlatformConfig(message.platform);
-		await TestUtils.timeout(config.mail.defaults.delay + 1000);
-		expect(spyFunctionMail, 'mail spy not executed').to.have.been.called();
+		// const config = await Utils.getPlatformConfig(message.platform);
+		// await TestUtils.timeout(config.mail.defaults.delay + 1000);
+		// expect(spyFunctionMail, 'mail spy not executed').to.have.been.called();
 	});
 
 	after('should drop database and close connection', (done) => {

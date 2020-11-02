@@ -205,12 +205,12 @@ describe('MessageService.send', () => {
 		}
 	});
 
-	it('should report health statistics for all queues', async () => {
-		const mailService = new MailService('MailTestService');
-		const pushService = new PushService('PushTestService');
-		const health = await BaseService.healthState();
-		expect(health.length).to.be.greaterThan(1);
-	});
+	// it('should report health statistics for all queues', async () => {
+	// 	const mailService = new MailService('MailTestService');
+	// 	const pushService = new PushService('PushTestService');
+	// 	const health = await BaseService.healthState();
+	// 	expect(health.length).to.be.greaterThan(1);
+	// });
 
 	after('should drop database and close connection', (done) => {
 		mongoose.connection.db.dropDatabase(() => {
