@@ -50,6 +50,6 @@ ENV NODE_ENV "production"
 
 COPY --from=build /app /usr/src/app
 
-EXPOSE 3100
+EXPOSE 3031
 
 CMD [ "npm", "start" ]
