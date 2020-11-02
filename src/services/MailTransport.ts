@@ -1,5 +1,5 @@
 import { ConfigData } from '@/configuration';
-import nodemailer from 'nodemailer';
+import nodemailer, { SentMessageInfo } from 'nodemailer';
 import util from 'util';
 import Mail, { Attachment } from '@/interfaces/Mail';
 import logger from '@/helper/logger';
@@ -65,7 +65,7 @@ export class MailTransport implements MessageTransport<Mail> {
 	 *
 	 * @param message
 	 */
-	async deliver(message: Mail): Promise<void> {
+	async deliver(message: Mail): Promise<SentMessageInfo> {
 		try {
 			message.attachments = this.prepareAttachments(message.attachments);
 
@@ -84,6 +84,7 @@ export class MailTransport implements MessageTransport<Mail> {
 			logger.debug(
 				`[transport] Message delivered on ${this.serviceType}/${this.platformId}: ${util.inspect(sentInfo)}`
 			);
+			return sentInfo;
 		} catch (error) {
 			this._status.lastErrorAt = new Date();
 			this._status.lastError = error;

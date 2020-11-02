@@ -5,6 +5,7 @@ import QueueManager, { JobData } from './QueueManager';
 import { Job } from 'bull';
 import Mail from '@/interfaces/Mail';
 import { MailTransport } from './MailTransport';
+import { SentMessageInfo } from 'nodemailer';
 
 const SERVICE_TYPE = 'mail';
 
@@ -63,7 +64,12 @@ export default class MailService {
 	 * @param receiver
 	 * @param messageId
 	 */
-	directSend(platformId: string, message: PlatformMessage, receiver: string, messageId?: string): Promise<void> {
+	directSend(
+		platformId: string,
+		message: PlatformMessage,
+		receiver: string,
+		messageId?: string
+	): Promise<SentMessageInfo> {
 		logger.debug('direct send', { platformId, message, receiver, messageId });
 		return this.getTransport(SERVICE_TYPE, platformId).deliver(message as Mail);
 	}
