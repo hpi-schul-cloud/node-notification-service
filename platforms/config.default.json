@@ -59,7 +59,8 @@
       "activateDelayedJobs": true,
       "removeOnSuccess": true,
       "removeOnFailure": false,
-      "redisScanCount": 200
+      "redisScanCount": 200,
+      "redisRetryAttempts": 360
     }
   }
 }
