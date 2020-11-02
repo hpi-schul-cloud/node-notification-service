@@ -19,7 +19,7 @@ import { Server } from 'http';
 const app: express.Application = express();
 
 const NOTIFICATION_HOST = process.env.NOTIFICATION_HOST || '127.0.0.1';
-const NOTIFICATION_PORT = parseInt(process.env.REDIS_PORT || '') || 3031;
+const NOTIFICATION_PORT = parseInt(process.env.NOTIFICATION_PORT || '3031');
 
 // middlewares
 app.use(express.json({ limit: 10 * 1024 * 1024 })); // 10MB limit
@@ -64,7 +64,6 @@ const run = async () => {
 	await mailService.startWorkers();
 
 	const mongoURI = `mongodb://${process.env.MONGO_HOST || 'localhost'}/notification-service`;
-	logger.info(`MongoDB uri: ${mongoURI}`);
 	await mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });
 
 	// TODO make producer configurable optional
