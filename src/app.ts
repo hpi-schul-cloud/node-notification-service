@@ -18,7 +18,7 @@ import { Server } from 'http';
 
 const app: express.Application = express();
 
-const NOTIFICATION_HOST = process.env.NOTIFICATION_HOST || '127.0.0.1';
+const NOTIFICATION_HOST = process.env.NOTIFICATION_HOST || '0.0.0.0';
 const NOTIFICATION_PORT = parseInt(process.env.NOTIFICATION_PORT || '3031');
 
 // middlewares
