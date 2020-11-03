@@ -1,6 +1,5 @@
 import { ConfigData } from '@/configuration';
 import nodemailer, { SentMessageInfo } from 'nodemailer';
-import util from 'util';
 import Mail, { Attachment } from '@/interfaces/Mail';
 import logger from '@/helper/logger';
 
@@ -81,9 +80,7 @@ export class MailTransport implements MessageTransport<Mail> {
 			this._status.lastSuccessAt = new Date();
 			this._status.unavailableSince = undefined;
 
-			logger.debug(
-				`[transport] Message delivered on ${this.serviceType}/${this.platformId}: ${util.inspect(sentInfo)}`
-			);
+			logger.debug(`[transport] Message delivered on ${this.serviceType}/${this.platformId}`, sentInfo);
 			return sentInfo;
 		} catch (error) {
 			this._status.lastErrorAt = new Date();

@@ -24,7 +24,7 @@ export default class QueueManager {
 	createQueue(serviceType: string, platformId: string, config: ConfigData): Queue {
 		const name = this.getQueueName(serviceType, platformId);
 
-		logger.debug(`[queue] initialize service queue ${name} with config:\n`, config);
+		logger.debug(`[queue] Initializing service queue ${name}`);
 
 		const queue = new Bull<JobData>(name, {
 			prefix: config.defaults.prefix,
@@ -38,16 +38,16 @@ export default class QueueManager {
 		// TODO Do we need a ready event? In Bull this is only provided via Queue.isReady()
 
 		queue.on('error', (err) => {
-			logger.error(`[queue] ${queue.name} failed with error ${err.message}`);
+			logger.error(`[queue] ${queue.name} Error: ${err}`);
 		});
 
 		queue.on('failed', (job, err) => {
-			logger.error(`[queue] ${queue.name} Job ${job.id} failed with error ${err.message}`);
+			logger.error(`[queue] ${queue.name} Job ${job.id} failed: ${err}`);
 			// TODO log 'retrying'
 		});
 
 		queue.on('stalled', (job) => {
-			logger.warn(`[queue] ${queue.name}: Job ${job.id} stalled and will be reprocessed`);
+			logger.warn(`[queue] ${queue.name}: Job ${job.id} marked as stalled`);
 		});
 
 		// TODO check if there's already a queue with the same name
@@ -141,7 +141,7 @@ export default class QueueManager {
 			logger.error('Unable to connect to the Redis server ..retry', { times });
 			return 10000;
 		};
-		logger.debug('redis config: ', options);
+		logger.debug('[queue] Redis config: ', options);
 		return options;
 	}
 

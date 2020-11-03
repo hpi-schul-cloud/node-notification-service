@@ -91,5 +91,5 @@ process.on('SIGINT', async () => {
 
 // start server
 run().catch((error) => {
-	logger.error(`[fatal] ${error.message}`);
+	logger.error(`[fatal] Aborting.`, error);
 });
