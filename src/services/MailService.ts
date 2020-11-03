@@ -70,14 +70,14 @@ export default class MailService {
 		receiver: string,
 		messageId?: string
 	): Promise<SentMessageInfo> {
-		logger.debug('direct send', { platformId, message, receiver, messageId });
+		logger.debug('Direct send', { platformId, message, receiver, messageId });
 		return this.getTransport(SERVICE_TYPE, platformId).deliver(message as Mail);
 	}
 
 	private process(job: Job<JobData>): Promise<void> {
 		const { platformId, message, receiver, messageId } = job.data;
 		logger.debug(
-			`[queue] ${job.queue.name} processing job id: ${job.id}, messageId: ${messageId}, receiver: ${receiver}`
+			`[queue] ${job.queue.name} Processing job id: ${job.id}, messageId: ${messageId}, receiver: ${receiver}`
 		);
 		return this.getTransport(SERVICE_TYPE, platformId).deliver(message as Mail);
 	}

@@ -85,7 +85,7 @@ function loadConfig(cfgPath: string): ConfigData[] {
 		return cfgCombined;
 	});
 
-	logger.debug('Application config loaded:', configuration);
+	logger.debug('Application config loaded.');
 
 	return configuration;
 }
