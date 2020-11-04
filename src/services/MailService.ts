@@ -2,7 +2,7 @@ import { ConfigData } from '@/configuration';
 import logger from '@/helper/logger';
 import { PlatformMessage } from '@/interfaces/PlatformMessage';
 import QueueManager, { JobData } from './QueueManager';
-import { Job } from 'bull';
+import { Job, JobId } from 'bull';
 import Mail from '@/interfaces/Mail';
 import { MailTransport } from './MailTransport';
 import { SentMessageInfo } from 'nodemailer';
@@ -53,7 +53,7 @@ export default class MailService {
 	 * @param receiver
 	 * @param messageId
 	 */
-	send(platformId: string, message: PlatformMessage, receiver: string, messageId?: string): Promise<void> {
+	send(platformId: string, message: PlatformMessage, receiver: string, messageId?: string): Promise<JobId> {
 		return this.queueManager.addJob({ serviceType: SERVICE_TYPE, platformId, message, receiver, messageId });
 	}
 

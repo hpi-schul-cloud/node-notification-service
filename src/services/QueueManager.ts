@@ -1,5 +1,5 @@
 import { ConfigData } from '@/configuration';
-import Bull, { Queue, ProcessPromiseFunction, JobOptions, JobCounts } from 'bull';
+import Bull, { Queue, ProcessPromiseFunction, JobOptions, JobCounts, JobId } from 'bull';
 import logger from '@/helper/logger';
 import { PlatformMessage } from '@/interfaces/PlatformMessage';
 import { RedisOptions } from 'ioredis';
@@ -77,10 +77,13 @@ export default class QueueManager {
 	 *
 	 * @param data
 	 */
-	async addJob(data: JobData): Promise<void> {
+	async addJob(data: JobData): Promise<JobId> {
 		const queue = this.findQueue(data.serviceType, data.platformId);
-		await queue.add(data);
-		logger.debug(`[queue] ${queue.name} job added:`, { data });
+		const job = await queue.add(data);
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		const { message, ...logData } = data;
+		logger.debug(`[queue] ${queue.name} Job id=${job.id} added:`, logData);
+		return job.id;
 	}
 
 	/**
