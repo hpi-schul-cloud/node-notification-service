@@ -5,11 +5,6 @@ import swagger from './swagger.json';
 import morgan from 'morgan';
 import logger, { LoggerStream } from '@/helper/logger';
 import mailRouter from '@/routes/mail';
-import pushRouter from '@/routes/push';
-import messageRouter from '@/routes/message';
-import deviceRouter from '@/routes/device';
-import statisticRouter from '@/routes/statistic';
-import failedJobsRouter from '@/routes/failedJobs';
 import errorHandler from '@/error-handler';
 import configuration from '@/configuration';
 import QueueManager from '@/services/QueueManager';
@@ -34,11 +29,6 @@ const mailService = new MailService(queueManager, configuration);
 
 // routes
 app.use('/mails', mailRouter(mailService));
-app.use('/push', pushRouter);
-app.use('/messages', messageRouter);
-app.use('/devices', deviceRouter);
-app.use('/statistic', statisticRouter);
-app.use('/failedJobs', failedJobsRouter);
 
 app.head('/', (req, res) => {
 	res.send(200);
