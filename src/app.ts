@@ -42,8 +42,27 @@ app.use(errorHandler);
 
 // the mongodb connection
 const db = mongoose.connection;
+// https://mongoosejs.com/docs/connections.html#connection-events
 db.on('error', (error) => {
-	logger.error('[critical] MongoDB connection error:', error);
+	logger.error('[mongodb] error:', error);
+});
+db.on('reconnectFailed', (error) => {
+	logger.error('[mongodb] reconnectFailed:', error);
+});
+const mongoEvents = [
+	'connecting',
+	'connected',
+	'disconnecting',
+	'disconnected',
+	'close',
+	'reconnected',
+	'fullsetup',
+	'all',
+];
+mongoEvents.forEach((event) => {
+	db.on(event, () => {
+		logger.debug(`[mongodb] ${event}`);
+	});
 });
 
 // the server instance
