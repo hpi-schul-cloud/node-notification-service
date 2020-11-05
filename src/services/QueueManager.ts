@@ -52,6 +52,13 @@ export default class QueueManager {
 	 */
 	async startWorker(serviceType: string, platformId: string, callback: ProcessPromiseFunction<JobData>): Promise<void> {
 		const queue = this.findQueue(serviceType, platformId);
+
+		// this is important to ensure during startup that we are initially connected to redis
+		// otherwise the reconnect doesn't work
+		logger.info(`[queue] Checking if ${queue.name} is ready`);
+		await queue.isReady();
+		logger.info(`[queue] Ok ${queue.name} is ready`);
+
 		logger.info(`[queue] Starting service worker for ${queue.name}`);
 		queue.process(callback);
 	}
@@ -113,16 +120,13 @@ export default class QueueManager {
 
 	private getRedisOptions(config: ConfigData): RedisOptions {
 		const options = config.defaults.redis;
-
-		// https://www.npmjs.com/package/ioredis#auto-reconnect
+		// https://github.com/luin/ioredis#auto-reconnect
+		// never retry failed requests
+		// NOTE: This is per request!
+		options.maxRetriesPerRequest = 0;
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		options.retryStrategy = (times: number) => {
-			// one hour every 10 sec retry
-			if (times >= config.defaults.redisRetryAttempts) {
-				logger.error('[critical] Unable to connect to the Redis server - Notification Service is going to exit!');
-				process.exit(1);
-			}
-			logger.error('Unable to connect to Redis server, retrying...', { times });
-			return 10000;
+			return 5000; // reconnect after 5 seconds
 		};
 		logger.debug('[queue] Redis config: ', options);
 		return options;

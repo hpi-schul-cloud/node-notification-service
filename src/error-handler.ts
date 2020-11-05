@@ -28,6 +28,15 @@ export default (err: ApplicationError, req: Request, res: Response, next: NextFu
 			data: err.details,
 		});
 	}
+	// redis connection error
+	// TODO implement a class for RedisConnectionError
+	else if (err.message && err.message.includes('maxRetriesPerRequest')) {
+		res.status(503).send({
+			message: 'Lost connection to Redis server',
+			type: 'RedisConnectionError',
+			data: {},
+		});
+	}
 	// internal server error
 	else {
 		res.status(500).send({
