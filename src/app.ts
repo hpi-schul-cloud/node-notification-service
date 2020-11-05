@@ -69,6 +69,9 @@ mongoEvents.forEach((event) => {
 let server: Server;
 
 const run = async () => {
+	// IMPORTANT: We require successful connection to Redis and MongoDB
+	// before starting the HTTP listener
+
 	// TODO make workers configurable optional
 	await mailService.startWorkers();
 
@@ -101,4 +104,5 @@ process.on('SIGINT', async () => {
 // start server
 run().catch((error) => {
 	logger.error(`[fatal] Aborting.`, error);
+	shutDown();
 });

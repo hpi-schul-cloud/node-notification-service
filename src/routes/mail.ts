@@ -33,14 +33,14 @@ export default (mailService: MailService): Router => {
 
 			const { wellFormed, validDomain, validMailbox } = await emailValidator.verify(mail.to);
 			if (!wellFormed) {
-				res.send({ msg: 'Error: Invalid format' });
+				res.send({ message: 'Error: Invalid format' });
 			} else if (!validDomain && emailValidatorOptions.verifyDomain) {
-				res.send({ msg: 'Error: Invalid domain' });
+				res.send({ message: 'Error: Invalid domain' });
 			} else if (!validMailbox && emailValidatorOptions.verifyMailbox) {
-				res.send({ msg: 'Error: Invalid mailbox' });
+				res.send({ message: 'Error: Invalid mailbox' });
 			} else {
 				const jobId = await mailService.send(req.body.platformId, mail, req.body.to);
-				res.send({ msg: 'Mail queued.', jobId: jobId });
+				res.send({ message: 'Mail queued.', jobId: jobId });
 			}
 		} catch (error) {
 			next(error);
