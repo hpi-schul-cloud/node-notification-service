@@ -1,18 +1,22 @@
 {
 	"compileOnSave": true,
 	"compilerOptions": {
-		"outDir": "build",
+		"lib": ["ES2019"],
+		"module": "commonjs",
+		"target": "ES2019",
 		"esModuleInterop": true,
 		"strict": true,
-		"module": "commonjs",
-		"target": "es5",
+		"moduleResolution": "node",
 		"sourceMap": true,
 		"resolveJsonModule": true,
+		"outDir": "build",
 		"baseUrl": ".",
 		"paths": {
+			"*": ["node_modules/*", "src/types/*"],
 			"@/*": ["src/*", "build/src/*"],
 			"@test/*": ["test/*"]
-		},
-		"lib": ["es2015", "esnext.asynciterable"]
-	}
+		}
+	},
+	"include": ["src/**/*", "test/**/*"],
+	"exclude": ["node_modules"]
 }
