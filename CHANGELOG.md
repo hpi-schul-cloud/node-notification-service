@@ -1,3 +1,9 @@
+# Release 1.1.2
+
+## Features
+
+- Added E-Mail address validation (OPS-1575)
+
 # Release 1.1.1
 
 ## Features

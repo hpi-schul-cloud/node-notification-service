@@ -2,11 +2,20 @@ import express from 'express';
 import MailService from '@/services/MailService';
 import Mail from '@/interfaces/Mail';
 import logger from '@/helper/logger';
+import EmailValidator from 'email-deep-validator';
 
 const router = express.Router();
 const mailService = new MailService('MailService');
 
-router.post('/', (req, res) => {
+const emailValidatorOptions = {
+	timeout: 10000,
+	verifyDomain: true,
+	verifyMailbox: false,
+	logger: logger,
+};
+const emailValidator = new EmailValidator(emailValidatorOptions);
+
+router.post('/', async (req, res) => {
 	const mail: Mail = {
 		to: req.body.to,
 		replyTo: req.body.replyTo,
@@ -20,16 +29,25 @@ router.post('/', (req, res) => {
 		mail.from = req.body.from;
 	}
 
-	mailService
-		.send(req.body.platformId, mail, req.body.to)
-		.then((response: any) => {
-			res.send('Mail queued.');
-			logger.info(response);
-		})
-		.catch((error: Error) => {
-			logger.error({ error, platformId: req.body.platformId, mail, to: req.body.to });
-			res.status(500).send('Request failed.');
-		});
+	const { wellFormed, validDomain, validMailbox } = await emailValidator.verify(mail.to);
+	if (!wellFormed) {
+		res.send('Error: Invalid format');
+	} else if (!validDomain && emailValidatorOptions.verifyDomain) {
+		res.send('Error: Invalid domain');
+	} else if (!validMailbox && emailValidatorOptions.verifyMailbox) {
+		res.send('Error: Invalid mailbox');
+	} else {
+		mailService
+			.send(req.body.platformId, mail, mail.to)
+			.then((response) => {
+				res.send('Mail queued.');
+				logger.info(response);
+			})
+			.catch((error: Error) => {
+				logger.error({ error, platformId: req.body.platformId, mail, to: mail.to });
+				res.status(500).send('Request failed.');
+			});
+	}
 });
 
 export default router;
