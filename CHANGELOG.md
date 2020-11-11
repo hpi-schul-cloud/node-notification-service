@@ -13,6 +13,11 @@ Allowed Types of change: `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `
 
 - OPS-1297 - Added Changelog github action
 
+# Release 1.2.2
+
+## Features
+
+- OPS-1575 - Added E-Mail address validation
 
 # Release 1.1.1
 
