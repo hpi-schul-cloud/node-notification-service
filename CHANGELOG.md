@@ -17,6 +17,11 @@ Allowed Types of change: `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `
 
 - ARC-138 fix changelog action
 - added missing package lock file
+- fixed debug start scripts
+
+### Changed
+
+- SC-6832, SC-7568 - New implementation of mail service
 
 # Release 1.2.2
 
