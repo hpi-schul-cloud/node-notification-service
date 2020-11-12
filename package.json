@@ -17,7 +17,8 @@
 	"scripts": {
 		"build": "tsc --project tsconfig.production.json",
 		"build:all": "tsc",
-		"debug": "concurrently \"tsc -w\" \"nodemon\"",
+		"debug": "nodemon --exec \"tsc && node --inspect=5859 -r tsconfig-paths/register -r ts-node/register build/src/app.js\"",
+		"debug-ts": "nodemon --exec \"node --inspect=5859 -r tsconfig-paths/register -r ts-node/register src/app.ts\"",
 		"lint": "eslint --fix --ignore-path .gitignore .",
 		"start": "node -r ts-node/register -r tsconfig-paths/register build/src/app.js",
 		"test": "mocha -t 30000 -r tsconfig-paths/register -r ts-node/register test/**/*.spec.ts --exit",
