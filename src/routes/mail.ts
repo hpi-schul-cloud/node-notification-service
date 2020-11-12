@@ -2,7 +2,8 @@ import express, { Router } from 'express';
 import MailService from '@/services/MailService';
 import Mail from '@/interfaces/Mail';
 import logger from '@/helper/logger';
-import EmailValidator from 'email-deep-validator';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const EmailValidator = require('email-deep-validator');
 
 const router = express.Router();
 
