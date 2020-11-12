@@ -13,6 +13,10 @@ Allowed Types of change: `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `
 
 - OPS-1297 - Added Changelog github action
 
+### Fixed
+
+- added missing package lock file
+
 # Release 1.2.2
 
 ## Features
