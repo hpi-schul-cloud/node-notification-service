@@ -46,19 +46,13 @@ const db = mongoose.connection;
 db.on('error', (error) => {
 	logger.error('[mongodb] error:', error);
 });
+db.on('disconnected', (error) => {
+	logger.error('[mongodb] disconnected:', error);
+});
 db.on('reconnectFailed', (error) => {
 	logger.error('[mongodb] reconnectFailed:', error);
 });
-const mongoEvents = [
-	'connecting',
-	'connected',
-	'disconnecting',
-	'disconnected',
-	'close',
-	'reconnected',
-	'fullsetup',
-	'all',
-];
+const mongoEvents = ['connecting', 'connected', 'disconnecting', 'close', 'reconnected', 'fullsetup', 'all'];
 mongoEvents.forEach((event) => {
 	db.on(event, () => {
 		logger.debug(`[mongodb] ${event}`);
