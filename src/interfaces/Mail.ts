@@ -1,3 +1,5 @@
+export type Attachment = { content: Buffer | string; filename: string };
+
 export default interface Mail {
 	from?: string;
 	replyTo?: string;
@@ -5,7 +7,7 @@ export default interface Mail {
 	subject: string;
 	text: string;
 	html: string;
-	attachments?: Array<{ content: Buffer | string; filename: string }>;
+	attachments?: Attachment[];
 	envelope?: {
 		from?: string;
 		to?: string;
