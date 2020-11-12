@@ -1,8 +1,19 @@
 import express, { Router } from 'express';
 import MailService from '@/services/MailService';
 import Mail from '@/interfaces/Mail';
+import logger from '@/helper/logger';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const EmailValidator = require('email-deep-validator');
 
 const router = express.Router();
+
+const emailValidatorOptions = {
+	timeout: 10000,
+	verifyDomain: true,
+	verifyMailbox: false,
+	logger: logger,
+};
+const emailValidator = new EmailValidator(emailValidatorOptions);
 
 export default (mailService: MailService): Router => {
 	router.post('/', async (req, res, next) => {
@@ -20,12 +31,20 @@ export default (mailService: MailService): Router => {
 				mail.from = req.body.from;
 			}
 
-			await mailService.send(req.body.platformId, mail, req.body.to);
-			res.send({ msg: 'Mail queued.' });
+			const { wellFormed, validDomain, validMailbox } = await emailValidator.verify(mail.to);
+			if (!wellFormed) {
+				res.send('Error: Invalid format');
+			} else if (!validDomain && emailValidatorOptions.verifyDomain) {
+				res.send('Error: Invalid domain');
+			} else if (!validMailbox && emailValidatorOptions.verifyMailbox) {
+				res.send('Error: Invalid mailbox');
+			} else {
+				await mailService.send(req.body.platformId, mail, req.body.to);
+				res.send({ msg: 'Mail queued.' });
+			}
 		} catch (error) {
 			next(error);
 		}
 	});
-
 	return router;
 };
