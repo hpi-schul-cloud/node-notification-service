@@ -10,6 +10,8 @@ import configuration from '@/configuration';
 import QueueManager from '@/services/QueueManager';
 import MailService from '@/services/MailService';
 import { Server } from 'http';
+import promBundle from 'express-prom-bundle';
+import * as bullProm from 'bull-prom';
 
 const app: express.Application = express();
 
@@ -23,9 +25,19 @@ app.use(express.urlencoded({ extended: true }));
 const logFormat = ':status :method :url :res[content-length] bytes - :response-time ms';
 app.use(morgan(logFormat, { stream: new LoggerStream('request', 'debug') }));
 
+// http metrics
+const promMetrics = promBundle({ includePath: true });
+app.use(promMetrics);
+
 // services
 const queueManager = new QueueManager();
 const mailService = new MailService(queueManager, configuration);
+
+// queue metrics
+const bullMetric = bullProm.init({
+	interval: 1000, // optional, in ms, default to 60000
+});
+queueManager.queues.forEach((queue) => bullMetric.start(queue));
 
 // routes
 app.use('/mails', mailRouter(mailService));
