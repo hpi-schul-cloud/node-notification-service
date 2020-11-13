@@ -13,7 +13,11 @@ export type JobData = {
 };
 
 export default class QueueManager {
-	private queues: Queue[] = [];
+	private _queues: Queue[] = [];
+
+	get queues(): Queue[] {
+		return this._queues;
+	}
 
 	/**
 	 *
