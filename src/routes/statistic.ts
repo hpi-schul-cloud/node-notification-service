@@ -1,14 +1,16 @@
-import express from 'express';
-import BaseService from '@/services/BaseService';
-const router: express.Router = express.Router();
+import express, { Router } from 'express';
+import QueueManager from '@/services/QueueManager';
 
-router.get('/health', async (req, res) => {
-	try {
-		const health = await BaseService.healthState();
-		res.send(health);
-	} catch (e) {
-		res.status(400).send(e.message);
-	}
-});
+const router = express.Router();
 
-export default router;
+export default (queueManager: QueueManager): Router => {
+	router.get('/health', async (req, res, next) => {
+		try {
+			const jobCounts = await queueManager.getJobCounts();
+			res.send(jobCounts);
+		} catch (error) {
+			next(error);
+		}
+	});
+	return router;
+};
