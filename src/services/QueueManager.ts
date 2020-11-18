@@ -40,6 +40,9 @@ export default class QueueManager {
 			},
 		});
 
+		// resume on restart
+		queue.resume();
+
 		this.attachQueueEventHandlers(queue);
 		this.attachRedisEventHandlers(queue);
 
@@ -189,7 +192,7 @@ export default class QueueManager {
 		});
 		queue.on('resumed', (job: Job<JobData>) => {
 			// The queue has been resumed.
-			logger.debug(`[queue] ${queue.name} Job id=${job.id} resumed`);
+			logger.debug(`[queue] ${queue.name} ${job ? 'Job id=' + job.id + ' ' : ''}resumed`);
 		});
 		queue.on('cleaned', (jobs, type) => {
 			// Old jobs have been cleaned from the queue. `jobs` is an  of cleaned
