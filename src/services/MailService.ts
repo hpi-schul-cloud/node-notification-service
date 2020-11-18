@@ -12,7 +12,11 @@ const SERVICE_TYPE = 'mail';
 export default class MailService {
 	private queueManager: QueueManager;
 	private platformIds: string[];
-	private transports: MailTransport[] = [];
+	private _transports: MailTransport[] = [];
+
+	get transports(): MailTransport[] {
+		return this._transports;
+	}
 
 	/**
 	 *

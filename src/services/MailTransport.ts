@@ -11,10 +11,10 @@ export interface MessageTransport<T> {
 }
 
 export type MessageTransportStatus = {
-	lastSuccessAt: Date | undefined;
-	lastErrorAt: Date | undefined;
-	lastError: Error | undefined;
-	unavailableSince: Date | undefined;
+	lastSuccessAt: Date | null;
+	lastErrorAt: Date | null;
+	lastError: Error | null;
+	unavailableSince: Date | null;
 };
 
 export class MailTransport implements MessageTransport<Mail> {
@@ -22,10 +22,10 @@ export class MailTransport implements MessageTransport<Mail> {
 	private msgDefaults: ConfigData;
 
 	_status: MessageTransportStatus = {
-		lastSuccessAt: undefined,
-		lastErrorAt: undefined,
-		lastError: undefined,
-		unavailableSince: undefined,
+		lastSuccessAt: null,
+		lastErrorAt: null,
+		lastError: null,
+		unavailableSince: null,
 	};
 
 	/**
@@ -78,7 +78,7 @@ export class MailTransport implements MessageTransport<Mail> {
 			const sentInfo = await this.transporter.sendMail(message);
 
 			this._status.lastSuccessAt = new Date();
-			this._status.unavailableSince = undefined;
+			this._status.unavailableSince = null;
 
 			logger.debug(`[transport] Message delivered on ${this.serviceType}/${this.platformId}`, sentInfo);
 			return sentInfo;
