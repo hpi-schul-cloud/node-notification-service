@@ -89,10 +89,6 @@ export default class MailService {
 		const randPos = Math.floor(Math.random() * transports.length);
 		const transport = transports[randPos];
 
-		if (!transport) {
-			throw new Error(`Could not find transport with platformId='${platformId}' and serviceType='${serviceType}'`);
-		}
-
 		return transport;
 	}
 }
