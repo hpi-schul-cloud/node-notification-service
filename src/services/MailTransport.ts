@@ -17,6 +17,13 @@ export type MessageTransportStatus = {
 	unavailableSince: Date | null;
 };
 
+export type MailError = {
+	name: string;
+	message: string;
+	stack?: string;
+	responseCode: number;
+};
+
 export class MailTransport implements MessageTransport<Mail> {
 	private transporter: nodemailer.Transporter;
 	private msgDefaults: ConfigData;

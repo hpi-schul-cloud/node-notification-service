@@ -11,6 +11,8 @@ Allowed Types of change: `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `
 
 ### Added
 
+- Added E-mail error handling
+- Added status routes for queues and transports
 - OPS-1297 - Added Changelog github action
 
 ### Fixed
