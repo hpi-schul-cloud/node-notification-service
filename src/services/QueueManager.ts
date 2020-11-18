@@ -3,6 +3,7 @@ import Bull, { Queue, ProcessPromiseFunction, JobOptions, JobCounts, JobId, Job 
 import logger from '@/helper/logger';
 import { PlatformMessage } from '@/interfaces/PlatformMessage';
 import { RedisOptions } from 'ioredis';
+import { ValidationError } from '@/errors';
 
 export type JobData = {
 	serviceType: string;
@@ -112,8 +113,10 @@ export default class QueueManager {
 	private findQueue(serviceType: string, platformId: string): Queue {
 		const queue = this.queues.find((q) => q.name === this.getQueueName(serviceType, platformId));
 		if (!queue) {
-			// TODO throw a more specific error that can be evaluated to a status code (422)
-			throw new Error(`Could not find queue with platformId='${platformId}' and serviceType='${serviceType}'`);
+			throw new ValidationError(
+				`Could not find queue with platformId='${platformId}' and serviceType='${serviceType}'`,
+				[]
+			);
 		}
 		return queue;
 	}
@@ -152,7 +155,7 @@ export default class QueueManager {
 	private attachQueueEventHandlers(queue: Queue) {
 		// https://github.com/OptimalBits/bull/blob/develop/REFERENCE.md#events
 		queue.on('error', (error) => {
-			logger.error(`[queue] ${queue.name} Error: ${error}`);
+			logger.error(`[queue] ${queue.name} ${error}`);
 		});
 		queue.on('waiting', (jobId) => {
 			// A Job is waiting to be processed as soon as a worker is idling.

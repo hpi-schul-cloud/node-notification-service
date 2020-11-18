@@ -12,6 +12,7 @@ import MailService from '@/services/MailService';
 import { Server } from 'http';
 import promBundle from 'express-prom-bundle';
 import * as bullProm from 'bull-prom';
+import { NotFoundError } from './errors';
 
 const app: express.Application = express();
 
@@ -48,6 +49,11 @@ app.head('/', (req, res) => {
 
 // swagger
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swagger));
+
+// 404
+app.use((req, res, next) => {
+	next(new NotFoundError('The requested resource was not found.'));
+});
 
 // error handler (has to be the last middleware)
 app.use(errorHandler);
@@ -101,6 +107,15 @@ const shutDown = async () => {
 	logger.info('[shutdown] All connections closed');
 	process.exit();
 };
+
+process.on('unhandledRejection', (error: Error) => {
+	// this is not catched by ioredis
+	if (error.name === 'MaxRetriesPerRequestError') {
+		logger.debug(error.message);
+	} else {
+		logger.error('Unhandled rejection:', error);
+	}
+});
 
 process.on('SIGINT', async () => {
 	logger.info('[shutdown] SIGINT received)');

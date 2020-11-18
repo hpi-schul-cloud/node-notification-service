@@ -1,4 +1,4 @@
-import ApplicationError from './exceptions/ApplicationError';
+import { ApplicationError, ValidationError, NotFoundError } from './errors';
 import { Request, Response, NextFunction } from 'express';
 import logger from './helper/logger';
 import util from 'util';
@@ -13,36 +13,41 @@ export default (err: ApplicationError, req: Request, res: Response, next: NextFu
 	logger.error(util.inspect(err));
 
 	// not found
-	if (err.status === 404) {
+	if (err instanceof NotFoundError) {
 		res.status(404).send({
-			message: err.message,
+			status: 404,
 			type: 'NotFound',
-			data: {},
+			title: 'Resource not Found',
+			detail: err.message,
 		});
 	}
 	// validation error
-	else if (err.status === 400 || err.status === 422) {
-		res.status(err.status).send({
-			message: err.message,
-			type: 'ValidationError',
-			data: err.details,
+	else if (err instanceof ValidationError) {
+		res.status(400).send({
+			status: 400,
+			type: 'ValidationFailed',
+			title: 'Input data validation failed',
+			detail: err.message,
+			validation_errors: err.params,
 		});
 	}
 	// redis connection error
 	// TODO implement a class for RedisConnectionError
 	else if (err.message && err.message.includes('maxRetriesPerRequest')) {
 		res.status(503).send({
-			message: 'Lost connection to Redis server',
+			status: 503,
 			type: 'RedisConnectionError',
-			data: {},
+			title: 'Redis Connection failed',
+			detail: 'Lost connection to Redis server',
 		});
 	}
 	// internal server error
 	else {
 		res.status(500).send({
-			message: err.message,
-			type: 'UnknownError',
-			data: {},
+			status: 500,
+			type: 'InternalError',
+			title: 'Internal Server Error',
+			detail: err.message,
 		});
 	}
 };
