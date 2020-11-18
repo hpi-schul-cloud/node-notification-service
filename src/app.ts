@@ -5,6 +5,7 @@ import swagger from './swagger.json';
 import morgan from 'morgan';
 import logger, { LoggerStream } from '@/helper/logger';
 import mailRouter from '@/routes/mail';
+import statisticRouter from '@/routes/statistic';
 import errorHandler from '@/error-handler';
 import configuration from '@/configuration';
 import QueueManager from '@/services/QueueManager';
@@ -42,6 +43,7 @@ queueManager.queues.forEach((queue) => bullMetric.start(queue));
 
 // routes
 app.use('/mails', mailRouter(mailService));
+app.use('/statistic', statisticRouter(queueManager));
 
 app.head('/', (req, res) => {
 	res.send(200);
