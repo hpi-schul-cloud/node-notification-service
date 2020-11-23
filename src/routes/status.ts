@@ -5,7 +5,7 @@ import MailService from '@/services/MailService';
 const router = express.Router();
 
 export default (queueManager: QueueManager, mailService: MailService): Router => {
-	router.get('/queues', async (req, res, next) => {
+	router.get('/health', async (req, res, next) => {
 		try {
 			const jobCounts = await queueManager.getJobCounts();
 			res.json(jobCounts);
