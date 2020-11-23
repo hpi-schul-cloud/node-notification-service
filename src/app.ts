@@ -34,7 +34,16 @@ app.use(promMetrics);
 
 // services
 const queueManager = new QueueManager();
-const mailService = new MailService(queueManager, configuration);
+const mailService = new MailService(
+	queueManager,
+	// use test platform only if needed
+	configuration.filter((config) => {
+		if (process.env.TESTPLATFORM !== '1' && config.platformId === 'testplatform') {
+			return false;
+		}
+		return true;
+	})
+);
 
 // queue metrics
 const bullMetric = bullProm.init({
