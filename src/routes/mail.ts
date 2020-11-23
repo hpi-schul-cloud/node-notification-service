@@ -41,7 +41,7 @@ export default (mailService: MailService): Router => {
 				throw new ValidationError('Invalid e-mail mailbox', []);
 			} else {
 				const jobId = await mailService.send(req.body.platformId, mail, req.body.to);
-				res.send({ message: 'Mail queued.', jobId: jobId });
+				res.json({ message: 'Mail queued.', jobId: jobId });
 			}
 		} catch (error) {
 			next(error);
