@@ -45,8 +45,8 @@ queueManager.queues.forEach((queue) => bullMetric.start(queue));
 app.use('/mails', mailRouter(mailService));
 app.use('/status', statusRouter(queueManager, mailService));
 
-app.head('/', (req, res) => {
-	res.send(200);
+app.use('/', (req, res) => {
+	res.json({});
 });
 
 // swagger
