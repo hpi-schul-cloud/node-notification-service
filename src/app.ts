@@ -14,7 +14,7 @@ import MailService from '@/services/MailService';
 import { Server } from 'http';
 import promBundle from 'express-prom-bundle';
 import * as bullProm from 'bull-prom';
-import { NotFoundError } from './errors';
+import { PageNotFoundError } from './errors';
 
 const app: express.Application = express();
 
@@ -65,7 +65,7 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(swagger));
 
 // 404
 app.use((req, res, next) => {
-	next(new NotFoundError('The requested resource was not found.'));
+	next(new PageNotFoundError());
 });
 
 // error handler (has to be the last middleware)

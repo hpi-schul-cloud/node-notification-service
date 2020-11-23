@@ -20,10 +20,16 @@ class NotFoundError extends ApplicationError {
 	}
 }
 
+class PageNotFoundError extends NotFoundError {
+	constructor() {
+		super('Page not found');
+	}
+}
+
 class ValidationError extends ApplicationError {
 	constructor(message: string, validationErrors: ErrorParams) {
 		super(message, undefined, validationErrors);
 	}
 }
 
-export { ApplicationError, NotFoundError, ValidationError };
+export { ApplicationError, NotFoundError, PageNotFoundError, ValidationError };
