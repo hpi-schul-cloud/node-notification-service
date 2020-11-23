@@ -16,8 +16,8 @@ export default (err: ApplicationError, req: Request, res: Response, next: NextFu
 	if (err instanceof NotFoundError) {
 		res.status(404).send({
 			status: 404,
-			type: 'NotFound',
-			title: 'Resource not Found',
+			type: err.constructor.name.replace(/Error$/, ''),
+			title: 'Not found',
 			detail: err.message,
 		});
 	}
