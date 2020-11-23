@@ -43,7 +43,7 @@ queueManager.queues.forEach((queue) => bullMetric.start(queue));
 
 // routes
 app.use('/mails', mailRouter(mailService));
-app.use('/status', statusRouter(queueManager, mailService));
+app.use('/statistic', statusRouter(queueManager, mailService));
 
 app.use('/', (req, res) => {
 	res.json({});
