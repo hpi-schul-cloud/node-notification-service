@@ -115,8 +115,7 @@ export default class MailService {
 				error.responseCode === 421 &&
 				error.message.includes('421 Rate limit reached. Please try again later')
 			) {
-				// const pauseDelay = 3 * 60 * 1000;
-				const pauseDelay = 2000;
+				const pauseDelay = 3 * 60 * 1000;
 				// TODO: eskalation. send email to admin + send to sentry
 				logger.error(
 					`[Critical Error] Rate limit reached, pausing queue ${job.queue.name} for ${pauseDelay} ms`,
