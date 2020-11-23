@@ -24,7 +24,7 @@ function loadCfgPlatform(cfgPath: string, platformId: string): ConfigData {
 		cfg = JSON.parse(fs.readFileSync(file).toString());
 	} else {
 		cfg = {};
-		logger.debug(`Config file for platform ${platformId} not found. Assuming defaults.`);
+		logger.warn(`Config file for platform ${platformId} not found. Assuming defaults.`);
 	}
 	return cfg;
 }
