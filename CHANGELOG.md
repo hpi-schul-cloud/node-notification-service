@@ -15,6 +15,7 @@ Allowed Types of change: `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `
 
 ### Fixed
 
+- ARC-138 fix changelog action
 - added missing package lock file
 
 # Release 1.2.2
