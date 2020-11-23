@@ -6,6 +6,7 @@ import morgan from 'morgan';
 import logger, { LoggerStream } from '@/helper/logger';
 import mailRouter from '@/routes/mail';
 import statusRouter from '@/routes/status';
+import failedJobsRouter from '@/routes/failedJobs';
 import errorHandler from '@/error-handler';
 import configuration from '@/configuration';
 import QueueManager from '@/services/QueueManager';
@@ -44,6 +45,7 @@ queueManager.queues.forEach((queue) => bullMetric.start(queue));
 // routes
 app.use('/mails', mailRouter(mailService));
 app.use('/statistic', statusRouter(queueManager, mailService));
+app.use('/failedJobs', failedJobsRouter);
 
 app.use('/', (req, res) => {
 	res.json({});
