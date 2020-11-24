@@ -121,15 +121,6 @@ const shutDown = async () => {
 	process.exit();
 };
 
-process.on('unhandledRejection', (error: Error) => {
-	// this is not catched by ioredis
-	if (error.name === 'MaxRetriesPerRequestError') {
-		logger.debug(error.message);
-	} else {
-		logger.error('Unhandled rejection:', error);
-	}
-});
-
 process.on('SIGINT', async () => {
 	logger.info('[shutdown] SIGINT received)');
 	await shutDown();
