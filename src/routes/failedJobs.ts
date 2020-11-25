@@ -1,24 +1,16 @@
 import express from 'express';
-import FailedJobService from '@/services/FailedJobService';
-import Utils from '@/utils';
+import FailedJobModel from '@/models/failedJobs';
 
 const router: express.Router = express.Router();
-const failedJobService = new FailedJobService();
 
-router.get('/:receiver', async (req, res) => {
-	// TODO add shd key verification
-	// validate regex
-	if (Utils.parametersMissing(['receiver'], req.params, res)) {
-		return;
-	}
-
+router.get('/:receiver', async (req, res, next) => {
 	try {
-		const jobs = await failedJobService.getJobByReceiver(req.params.receiver);
+		const jobs = await FailedJobModel.find({ receiver: req.params.receiver }).lean().exec();
 		res.json({
 			jobs,
 		});
 	} catch (err) {
-		res.status(400).send(err.message);
+		next(err);
 	}
 
 	// TODO get last x entries, or entries from x to y with total size of 100

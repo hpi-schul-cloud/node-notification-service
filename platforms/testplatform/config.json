@@ -1,38 +1,46 @@
 {
-  "mail": {
-    "options": [{
-      "host": "mail",
-      "port": 1025,
-      "secure": false,
-      "auth": {
-        "user": "",
-        "pass": ""
-      }
-    }],
-    "defaults": {
-      "from": "Sample Service <sample@sample.org>",
-      "envelope": {
-        "from": "Bounce <bounce@sample.org>"
-      },
-      "delay": 0
-    }
-  },
-  "push": {
-    "service_account_object": {
-      "type": "",
-      "project_id": "",
-      "private_key_id": "",
-      "private_key": "",
-      "client_email": "",
-      "client_id": "",
-      "auth_uri": "",
-      "token_uri": "",
-      "auth_provider_x509_cert_url": "",
-      "client_x509_cert_url": ""
-    },
-    "database_url": ""
-  },
-  "callback": {
-    "url": "http://localhost:3100/notification/callback/{MESSAGE_ID}/seenBy/{RECEIVER_ID}/?redirect={REDIRECT_URL}"
-  }
+	"mail": {
+		"options": [
+			{
+				"host": "mail",
+				"port": 1025,
+				"secure": false,
+				"auth": {
+					"user": "",
+					"pass": ""
+				}
+			}
+		],
+		"defaults": {
+			"from": "Sample Service <sample@sample.org>",
+			"envelope": {
+				"from": "Bounce <bounce@sample.org>"
+			},
+			"delay": 0
+		}
+	},
+	"push": {
+		"service_account_object": {
+			"type": "",
+			"project_id": "",
+			"private_key_id": "",
+			"private_key": "",
+			"client_email": "",
+			"client_id": "",
+			"auth_uri": "",
+			"token_uri": "",
+			"auth_provider_x509_cert_url": "",
+			"client_x509_cert_url": ""
+		},
+		"database_url": ""
+	},
+	"callback": {
+		"url": "http://localhost:3100/notification/callback/{MESSAGE_ID}/seenBy/{RECEIVER_ID}/?redirect={REDIRECT_URL}"
+	},
+	"queue": {
+		"defaults": {
+			"removeOnSuccess": false,
+			"removeOnFailure": false
+		}
+	}
 }
