@@ -1,5 +1,6 @@
 import { createLogger, transports, format } from 'winston';
 const { combine, timestamp, colorize } = format;
+import * as Transport from 'winston-transport';
 
 // instantiate a new Winston Logger with the settings defined above
 const isProductionMode = process.env.NODE_ENV === 'production';
@@ -11,14 +12,24 @@ if (isProductionMode) {
 	level = 'warn';
 	logFormat = combine(timestamp(), format.simple());
 }
+
+// This is a rather hacky way of extending winston-transport type definition,
+// because it was not compiled to the latest updates inside the library.
+// TODO: remove when .d.ts file was fixed in winston-transport
+interface WinstonTransport extends Transport {
+	handleRejections?: boolean;
+}
+
+const consoleTransport: WinstonTransport = new transports.Console({
+	level,
+	handleExceptions: true,
+	format: logFormat,
+});
+
+consoleTransport.handleRejections = true;
+
 const logger = createLogger({
-	transports: [
-		new transports.Console({
-			level,
-			handleExceptions: true,
-			format: logFormat,
-		}),
-	],
+	transports: [consoleTransport],
 	exitOnError: false,
 });
 

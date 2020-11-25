@@ -4,6 +4,7 @@ import Mail from '@/interfaces/Mail';
 import logger from '@/helper/logger';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const EmailValidator = require('email-deep-validator');
+import { ValidationError } from '@/errors';
 
 const router = express.Router();
 
@@ -33,14 +34,14 @@ export default (mailService: MailService): Router => {
 
 			const { wellFormed, validDomain, validMailbox } = await emailValidator.verify(mail.to);
 			if (!wellFormed) {
-				res.send('Error: Invalid format');
+				throw new ValidationError('Invalid e-mail address format', []);
 			} else if (!validDomain && emailValidatorOptions.verifyDomain) {
-				res.send('Error: Invalid domain');
+				throw new ValidationError('Invalid e-mail domain', []);
 			} else if (!validMailbox && emailValidatorOptions.verifyMailbox) {
-				res.send('Error: Invalid mailbox');
+				throw new ValidationError('Invalid e-mail mailbox', []);
 			} else {
-				await mailService.send(req.body.platformId, mail, req.body.to);
-				res.send({ msg: 'Mail queued.' });
+				const jobId = await mailService.send(req.body.platformId, mail, req.body.to);
+				res.json({ message: 'Mail queued.', jobId: jobId });
 			}
 		} catch (error) {
 			next(error);
