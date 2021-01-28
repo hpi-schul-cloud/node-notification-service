@@ -9,7 +9,7 @@ data:
   NODE_ENV: production
   NOTIFICATION_HOST: "0.0.0.0"
   NOTIFICATION_PORT: "3031"
-  REDIS_HOST: notification-redis
+  REDIS_HOST: $SERVICE_NAME-redis-master
   REDIS_PORT: "6379"
   NODE_VERSION: "10.21.0"
 
