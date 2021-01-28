@@ -36,6 +36,10 @@ jobs:
         export NAMESPACE=$(echo ${GITHUB_REF##*/} | sed -e "s/\//-/g" | tr '[:upper:]' '[:lower:]')
         export SERVICE_NAME=${GITHUB_REPOSITORY##*/}
         export HOSTNAME=$HOSTNAME_PREFIX-$NAMESPACE.$STAGING_DOMAIN
+        export MAIL_HOST=${{ secrets.MAIL_HOST}}
+        export MAIL_PORT=25
+        export MAIL_USER=${{ secret.MAIL_USER }}
+        export MAIL_PASSWORD=${{ secret.MAIL_PASSWORD}}
 
         export BUILD_IMAGE=$REGISTRY_HOSTNAME/${{ secrets.GCP_PROJECT_ID }}/$SERVICE_NAME:$SHORT_SHA
         
@@ -45,6 +49,10 @@ jobs:
         echo "HOSTNAME=$HOSTNAME"
         echo "STAGING_DOMAIN=$STAGING_DOMAIN"
         echo "BUILD_IMAGE=$BUILD_IMAGE"
+        echo "MAIL_HOST=$MAIL_HOST"
+        echo "MAIL_PORT=$MAIL_PORT"
+        echo "MAIL_USER=$MAIL_USER"
+        echo "MAIL_PASSWORD=$MAIL_PASSWORD"
         
         echo "SHORT_SHA=$SHORT_SHA" >> $GITHUB_ENV
         echo "SERVICE_NAME=$SERVICE_NAME" >> $GITHUB_ENV
@@ -52,6 +60,10 @@ jobs:
         echo "BUILD_IMAGE=$BUILD_IMAGE" >> $GITHUB_ENV
         echo "HOSTNAME=$HOSTNAME" >> $GITHUB_ENV
         echo "STAGING_DOMAIN=$STAGING_DOMAIN" >> $GITHUB_ENV
+        echo "MAIL_HOST=$MAIL_HOST" >> $GITHUB_ENV
+        echo "MAIL_PORT=$MAIL_PORT" >> $GITHUB_ENV
+        echo "MAIL_USER=$MAIL_USER" >> $GITHUB_ENV
+        echo "MAIL_PASSWORD=$MAIL_PASSWORD" >> $GITHUB_ENV
 
     - name: Checkout
       uses: actions/checkout@v2
