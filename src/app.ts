@@ -60,6 +60,10 @@ app.use('/', (req, res) => {
 	res.json({});
 });
 
+app.use('/ping', (req, res) => {
+	res.send('pong');
+})
+
 // swagger
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swagger));
 
