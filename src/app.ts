@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import mongodbUri from 'mongodb-uri';
 import express from 'express';
 import swaggerUi from 'swagger-ui-express';
 import swagger from './swagger.json';
@@ -105,7 +106,7 @@ const run = async () => {
 	await mailService.startWorkers();
 
 	const mongoURI = process.env.MONGO_URI || 'mongodb://localhost/notification-service';
-	await mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });
+	await mongoose.connect(mongodbUri.formatMongoose(mongoURI), { useNewUrlParser: true, useUnifiedTopology: true });
 
 	// TODO make producer configurable optional
 	server = app.listen(NOTIFICATION_PORT, NOTIFICATION_HOST, () => {
