@@ -106,7 +106,7 @@ const run = async () => {
 	await mailService.startWorkers();
 
 	const mongoURI = process.env.MONGO_URI || 'mongodb://localhost/notification-service';
-	await mongoose.connect(mongodbUri.formatMongoose(mongoURI)), { useNewUrlParser: true, useUnifiedTopology: true });
+	await mongoose.connect(mongodbUri.format(mongodbUri.parse(mongoURI)), { useNewUrlParser: true, useUnifiedTopology: true });
 
 	// TODO make producer configurable optional
 	server = app.listen(NOTIFICATION_PORT, NOTIFICATION_HOST, () => {
