@@ -104,7 +104,7 @@ const run = async () => {
 	// TODO make workers configurable optional
 	await mailService.startWorkers();
 
-	const mongoURI = `mongodb://${process.env.MONGO_HOST || 'localhost'}/notification-service`;
+	const mongoURI = process.env.MONGO_URI || 'mongodb://localhost/notification-service';
 	await mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });
 
 	// TODO make producer configurable optional
