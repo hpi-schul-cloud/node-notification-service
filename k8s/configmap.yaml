@@ -5,7 +5,7 @@ metadata:
 data:
   THIS_SERVICE: $SERVICE_NAME
   BRANCH: $NAMESPACE
-  MONGO_HOST: "mongodb://10.141.10.112,10.141.10.150,10.141.10.125/notify_$NAMESPACE?replicaSet=myReplicaSet&readPreference=secondary"
+  MONGO_HOST: "10.141.10.112,10.141.10.150,10.141.10.125/notify_$NAMESPACE?replicaSet=myReplicaSet&readPreference=secondary"
   NODE_ENV: production
   NOTIFICATION_HOST: "0.0.0.0"
   NOTIFICATION_PORT: "3031"
