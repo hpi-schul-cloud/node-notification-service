@@ -5,12 +5,12 @@ metadata:
 data:
   THIS_SERVICE: $SERVICE_NAME
   BRANCH: $NAMESPACE
-  API_KEY: '123' #secret
-  BACKEND_URL: http://schulcloud-server
-  HOST: http://$HOSTNAME # must change to https
-  SC_NAV_TITLE: HPI Schul-Cloud
-  SC_THEME: default
-  NODE_VERSION: 10.17.0
-  TZ: Europe/Berlin
-  #PORT do not exist at the moment but should
+  MONGO_HOST: "mongodb://10.141.10.112,10.141.10.150,10.141.10.125/notify_$NAMESPACE?replicaSet=myReplicaSet&readPreference=secondary"
+  NODE_ENV: production
+  NOTIFICATION_HOST: "0.0.0.0"
+  NOTIFICATION_PORT: "3031"
+  REDIS_HOST: notification-redis
+  REDIS_PORT: "6379"
+  NODE_VERSION: "10.21.0"
+
 
