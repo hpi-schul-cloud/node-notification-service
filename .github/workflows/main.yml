@@ -38,8 +38,8 @@ jobs:
         export HOSTNAME=$HOSTNAME_PREFIX-$NAMESPACE.$STAGING_DOMAIN
         export MAIL_HOST=${{ secrets.MAIL_HOST }}
         export MAIL_PORT=25
-        export MAIL_USER=${{ secrets.MAIL_USER }}
-        export MAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }}
+        export MAIL_USER=${{ secrets.EMAIL_USER }}
+        export MAIL_PASSWORD="${{ secrets.EMAIL_PASSWORD }}"
 
         export BUILD_IMAGE=$REGISTRY_HOSTNAME/${{ secrets.GCP_PROJECT_ID }}/$SERVICE_NAME:$SHORT_SHA
         
