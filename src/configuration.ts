@@ -44,14 +44,14 @@ function loadCfgEnv(): ConfigData {
 }
 
 function applyMailEnv(cfg: ConfigData): ConfigData {
-	const { MAIL_HOST, MAIL_PORT, EMAIL_SECURE, EMAIL_USER, EMAIL_PASSWORD } = process.env;
+	const { MAIL_HOST, MAIL_PORT, MAIL_SECURE, MAIL_USER, MAIL_PASSWORD } = process.env;
 	const cfgEnv = {
 		host: MAIL_HOST,
-		port: parseInt(MAIL_PORT || '') || undefined,
-		secure: EMAIL_SECURE || false,
+		port: parseInt(MAIL_PORT || '', 10) || undefined,
+		secure: MAIL_SECURE || false,
 		auth: {
-			user: EMAIL_USER,
-			pass: EMAIL_PASSWORD,
+			user: MAIL_USER,
+			pass: MAIL_PASSWORD,
 		},
 	};
 
