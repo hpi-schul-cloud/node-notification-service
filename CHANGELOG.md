@@ -1,3 +1,7 @@
+# Release 1.2.3
+
+- SC-8772 - update extend of mongodb connection
+
 # Release 1.2.2
 
 ## Features
