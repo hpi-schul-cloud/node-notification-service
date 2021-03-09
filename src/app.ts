@@ -66,7 +66,7 @@ app.use((err: HttpException, req: Request, res: Response, next: NextFunction) =>
 const db = mongoose.connection;
 // tslint:disable-next-line: no-console
 db.on('error', console.error.bind(logger, 'connection error:'));
-const mongoHost = `mongodb://${process.env.MONGO_HOST || 'localhost'}/notification-service`;
+const mongoHost = `mongodb://${process.env.MONGO_HOST || 'localhost/notification-service'}`;
 logger.info('mongo host', { mongoHost });
 mongoose.connect(mongoHost);
 
