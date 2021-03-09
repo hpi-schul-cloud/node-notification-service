@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import Template from '@/interfaces/Template';
 import logger from './helper/logger';
-import defaults from 'defaults-deep';
+import { defaultsDeep } from 'lodash';
 import Cache from '@/helper/cache';
 import { QueueSettings } from 'bee-queue';
 import { isNullOrUndefined } from 'util';
@@ -14,7 +14,7 @@ class Utils {
 			// eslint-disable-next-line @typescript-eslint/no-var-requires
 			const config: any = platformId ? require(`../platforms/${platformId}/config.json`) : {};
 			// eslint-disable-next-line @typescript-eslint/no-var-requires
-			const result = defaults(config, require(`../platforms/config.default.json`));
+			const result = defaultsDeep(config, require(`../platforms/config.default.json`));
 			logger.info('platform config loaded', { platformId, result });
 			return result;
 		} catch (err) {

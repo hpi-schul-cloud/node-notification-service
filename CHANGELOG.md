@@ -1,3 +1,30 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+Allowed Types of change: `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `Security`
+
+## Unreleased
+
+### Added
+
+- Added E-mail error handling
+- Added status routes for queues and transports
+- OPS-1297 - Added Changelog github action
+
+### Fixed
+
+- ARC-138 fix changelog action
+- added missing package lock file
+- fixed debug start scripts
+
+### Changed
+
+- SC-6832, SC-7568 - New implementation of mail service
+
 # Release 1.2.4
 
 ## Bugfix

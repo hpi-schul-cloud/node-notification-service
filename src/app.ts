@@ -1,83 +1,133 @@
 import mongoose from 'mongoose';
-import express, { NextFunction, Request, Response } from 'express';
-import bodyParser from 'body-parser';
+import express from 'express';
 import swaggerUi from 'swagger-ui-express';
-import swagger from '../swagger.json';
+import swagger from './swagger.json';
 import morgan from 'morgan';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const mjson = require('morgan-json');
 import logger, { LoggerStream } from '@/helper/logger';
-import path from 'path';
-
 import mailRouter from '@/routes/mail';
-import pushRouter from '@/routes/push';
-import messageRouter from '@/routes/message';
-import deviceRouter from '@/routes/device';
-import statisticRouter from '@/routes/statistic';
+import statusRouter from '@/routes/status';
 import failedJobsRouter from '@/routes/failedJobs';
-import HttpException from './exceptions/httpException';
-import Shutdown from '@/helper/shutdown';
+import errorHandler from '@/error-handler';
+import configuration from '@/configuration';
+import QueueManager from '@/services/QueueManager';
+import MailService from '@/services/MailService';
+import { Server } from 'http';
+import promBundle from 'express-prom-bundle';
+import * as bullProm from 'bull-prom';
+import { PageNotFoundError } from './errors';
 
 const app: express.Application = express();
 
-const NOTIFICATION_PORT: string = process.env.NOTIFICATION_PORT || '3031';
+const NOTIFICATION_HOST = process.env.NOTIFICATION_HOST || '0.0.0.0';
+const NOTIFICATION_PORT = parseInt(process.env.NOTIFICATION_PORT || '3031');
 
-const format = mjson(':status :method :url :res[content-length] bytes :response-time ms');
-app.use(morgan(format, { stream: new LoggerStream('request', 'debug') }));
+// middlewares
+app.use(express.json({ limit: 10 * 1024 * 1024 })); // 10MB limit
+app.use(express.urlencoded({ extended: true }));
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(
-	bodyParser.json({
-		limit: 10 * 1024 * 1024, // 10MB
+const logFormat = ':status :method :url :res[content-length] bytes - :response-time ms';
+app.use(morgan(logFormat, { stream: new LoggerStream('request', 'debug') }));
+
+// http metrics
+const promMetrics = promBundle({ includePath: true });
+app.use(promMetrics);
+
+// services
+const queueManager = new QueueManager();
+const mailService = new MailService(
+	queueManager,
+	// use test platform only if needed
+	configuration.filter((config) => {
+		if (process.env.TESTPLATFORM !== '1' && config.platformId === 'testplatform') {
+			return false;
+		}
+		return true;
 	})
 );
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'pug');
+// queue metrics
+const bullMetric = bullProm.init({
+	interval: 1000, // optional, in ms, default to 60000
+});
+queueManager.queues.forEach((queue) => bullMetric.start(queue));
 
-app.use('/mails', mailRouter);
-app.use('/push', pushRouter);
-app.use('/messages', messageRouter);
-app.use('/devices', deviceRouter);
-app.use('/statistic', statisticRouter);
+// routes
+app.use('/mails', mailRouter(mailService));
+app.use('/statistic', statusRouter(queueManager, mailService));
 app.use('/failedJobs', failedJobsRouter);
 
-app.head('/', (req, res) => {
-	res.send(200);
+app.use('/', (req, res) => {
+	res.json({});
 });
 
+// swagger
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swagger));
 
-app.use((err: HttpException, req: Request, res: Response, next: NextFunction) => {
-	// set locals, only providing error in development
-	res.locals.message = err.message || 'unknown error';
-	res.locals.error = req.app.get('NODE_ENV') !== 'production' ? err : {};
-	const status = err.status || 500;
-
-	// tslint:disable-next-line no-console
-	console.error(err);
-
-	// render the error page
-	res.status(status);
-	res.render('error');
+// 404
+app.use((req, res, next) => {
+	next(new PageNotFoundError());
 });
 
+// error handler (has to be the last middleware)
+app.use(errorHandler);
+
+// the mongodb connection
 const db = mongoose.connection;
-// tslint:disable-next-line: no-console
-db.on('error', console.error.bind(logger, 'connection error:'));
-const mongoHost = `mongodb://${process.env.MONGO_HOST || 'localhost/notification-service'}`;
-logger.info('mongo host', { mongoHost });
-mongoose.connect(mongoHost);
-
-logger.info('listen on port ' + NOTIFICATION_PORT + '. Set NOTIFICATION_PORT for change');
-const instance = app.listen(NOTIFICATION_PORT);
-
-process.on('SIGINT', () => {
-	logger.info('[shutdown] SIGINT received: gracefully shutting down...)');
-
-	Promise.all([Shutdown.httpShutdown(instance), Shutdown.queueShutdown()]).then(() => {
-		logger.info('[shutdown] gracefully closed all connections...');
-		process.exit();
+// https://mongoosejs.com/docs/connections.html#connection-events
+db.on('error', (error) => {
+	logger.error('[mongodb] error:', error);
+});
+db.on('disconnected', (error) => {
+	logger.error('[mongodb] disconnected:', error);
+});
+db.on('reconnectFailed', (error) => {
+	logger.error('[mongodb] reconnectFailed:', error);
+});
+const mongoEvents = ['connecting', 'connected', 'disconnecting', 'close', 'reconnected', 'fullsetup', 'all'];
+mongoEvents.forEach((event) => {
+	db.on(event, () => {
+		logger.debug(`[mongodb] ${event}`);
 	});
+});
+
+// the server instance
+let server: Server;
+
+const run = async () => {
+	// IMPORTANT: We require successful connection to Redis and MongoDB
+	// before starting the HTTP listener
+
+	// TODO make workers configurable optional
+	await mailService.startWorkers();
+
+	const mongoURI = `mongodb://${process.env.MONGO_HOST || 'localhost/notification-service'}`;
+	await mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });
+
+	// TODO make producer configurable optional
+	server = app.listen(NOTIFICATION_PORT, NOTIFICATION_HOST, () => {
+		logger.info(`Listening on ${NOTIFICATION_HOST}:${NOTIFICATION_PORT}`);
+	});
+};
+
+const shutDown = async () => {
+	logger.info('[shutdown] Shutting down gracefully...');
+
+	const httpClose = () => server.close();
+	const queueClose = () => queueManager.closeAll();
+	const mongoClose = () => db.close();
+
+	await Promise.all([httpClose, queueClose, mongoClose]);
+	logger.info('[shutdown] All connections closed');
+	process.exit();
+};
+
+process.on('SIGINT', async () => {
+	logger.info('[shutdown] SIGINT received)');
+	await shutDown();
+});
+
+// start server
+run().catch((error) => {
+	logger.error(`[fatal] Aborting.`, error);
+	shutDown();
 });
