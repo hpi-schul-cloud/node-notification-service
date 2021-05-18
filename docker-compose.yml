@@ -26,11 +26,11 @@ services:
     command: npm run debug
 
   mongo:
-    image: mongo:3
+    image: mongo:4.2.9
     restart: always
 
   redis:
-    image: redis:5.0.3
+    image: redis:6.0.8
     restart: always
 
   redis-commander:
