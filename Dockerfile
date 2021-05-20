@@ -2,11 +2,7 @@ FROM node:10.21.0-alpine3.11
 
 ENV NODE_ENV "production"
 
-WORKDIR /app
-
-COPY ./package.json .
-COPY ./package-lock.json .
-RUN npm ci
+WORKDIR /usr/src/app
 
 COPY . .
 RUN npm install
