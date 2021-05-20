@@ -42,11 +42,13 @@ spec:
             name: notification-configmap
         - secretRef:
             name: notification-secret
+{% if NOTIFICATION_PLATFORM is defined and NOTIFICATION_PLATFORM != "testplatform" %}
         volumeMounts:
         - name: configjson
           mountPath: /usr/src/app/platforms/{{ NOTIFICATION_PLATFORM|default("testplatform", true) }}/config.json
           subPath: config.json
           readOnly: true
+{% endif %}
         resources:
           limits:
             cpu: "1000m"
