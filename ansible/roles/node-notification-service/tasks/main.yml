@@ -1,9 +1,3 @@
-  - name: Ingress
-    community.kubernetes.k8s:
-      kubeconfig: ~/.kube/config 
-      namespace: "{{ NAMESPACE }}"
-      template: ingress.yml.j2
-  
   - name: Service
     community.kubernetes.k8s:
       kubeconfig: ~/.kube/config 
@@ -15,6 +9,19 @@
       kubeconfig: ~/.kube/config 
       namespace: "{{ NAMESPACE }}"
       template: configmap.yml.j2
+      
+  - name: Configmap File
+    community.kubernetes.k8s:
+      kubeconfig: ~/.kube/config 
+      namespace: "{{ NAMESPACE }}"
+      template: configmap_configmapfiles.yml.j2
+    when: NOTIFICATION_PLATFORM is defined and NOTIFICATION_PLATFORM != "testplatform"
+      
+  - name: Secred
+    community.kubernetes.k8s:
+      kubeconfig: ~/.kube/config 
+      namespace: "{{ NAMESPACE }}"
+      template: secret.yml.j2
       
   - name: Deployment
     community.kubernetes.k8s:
