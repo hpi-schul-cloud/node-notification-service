@@ -1,4 +1,4 @@
-FROM node:lts-alpine
+FROM node:10.21.0-alpine3.11
 
 USER node
 
