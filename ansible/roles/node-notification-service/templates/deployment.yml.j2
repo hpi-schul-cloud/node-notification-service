@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-deployment
+  namespace: {{ NAMESPACE }}
+  labels:
+    app: notification
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notification
+  template:
+    metadata:
+      labels:
+        app: notification
+      annotations:
+      # The field we'll use to couple our ConfigMap and Deployment
+      # cat notification-configmap.yml | sha256sum
+        configmapHash: ""
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+    spec:
+      securityContext:
+        #readOnlyRootFilesystem: true
+        # run as user node (uid 1000)
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        runAsNonRoot: true
+      containers:
+      - name: notification
+        image: {{ NOTIFICATION_IMAGE_NAME }}:{{ APP_IMAGE_TAG }}
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: notification
+          containerPort: 3031
+          protocol: TCP
+        # from configmap
+        envFrom:
+        - configMapRef:
+            name: notification-configmap
+        - secretRef:
+            name: notification-secret
+        volumeMounts:
+        - name: configjson
+          mountPath: /usr/src/app/platforms/{{ NOTIFICATION_PLATFORM|default("testplatform", true) }}/config.json
+          subPath: config.json
+          readOnly: true
+        resources:
+          limits:
+            cpu: "1000m"
+            memory: "1Gi"
+          requests:
+            cpu: "100m"
+            memory: "1Gi"
+{% if NOTIFICATION_PLATFORM is defined and NOTIFICATION_PLATFORM != "testplatform" %}
+      volumes:
+      - name: configjson
+        configMap:
+          name: notification-configmap-configfiles
+          items:
+          - key: config.json
+            path: config.json
+{% endif %}
