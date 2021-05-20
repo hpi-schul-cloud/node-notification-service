@@ -11,7 +11,7 @@ COPY ./package-lock.json .
 RUN npm ci
 
 COPY . .
-npm install
+RUN npm install
 RUN npm run build
 
 EXPOSE 3100
