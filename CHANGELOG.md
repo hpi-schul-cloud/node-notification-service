@@ -25,6 +25,14 @@ Allowed Types of change: `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `
 
 - SC-6832, SC-7568 - New implementation of mail service
 
+# Release 1.2.4
+
+## Bugfix
+
+- SC-8772 - update extend of mongodb connection
+
+# Release 1.2.3
+
 # Release 1.2.2
 
 ## Features
