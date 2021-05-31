@@ -29,7 +29,7 @@
       kubeconfig: ~/.kube/config 
       namespace: "{{ NAMESPACE }}"
       template: onepassword.yml.j2
-    when: OONEPASSWORD is defined and ONEPASSWORD|bool
+    when: ONEPASSWORD is defined and ONEPASSWORD|bool
       
   - name: Deployment
     community.kubernetes.k8s:
