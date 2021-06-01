@@ -10,4 +10,6 @@ data:
   NODE_ENV: "production"
   TZ: "Europe/Berlin"
   # MONGO_HOST: "in notification secret"
+{% if ONEPASSWORD is undefined or ONEPASSWORD is defined and not ONEPASSWORD %}
   REDIS_HOST: "{{ NOTIFICATION_REDIS_HOST }}"
+{% endif %}
