@@ -134,6 +134,8 @@ export default class QueueManager {
 		// never retry failed requests
 		// NOTE: This is per request!
 		options.maxRetriesPerRequest = 0;
+		// https://github.com/OptimalBits/bull/issues/890
+		options.enableReadyCheck = false;
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		options.retryStrategy = (times: number) => {
 			return 5000; // reconnect after 5 seconds
