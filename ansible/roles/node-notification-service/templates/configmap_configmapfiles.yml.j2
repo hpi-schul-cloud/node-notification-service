@@ -1,0 +1,68 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: notification-configmap-configfiles
+  namespace: {{ NAMESPACE }}
+  labels:
+    app: notification
+data:
+  config.json: |
+    {
+      "mail": {
+        "options": [{
+          "host": "{{ SMTP_HOST }}",
+          "port": {{ SMTP_PORT }},
+          "secure": {{ SMTP_SECURE | default("false", true) }},
+          "auth": {
+            "user": "{{ SMTP_USER }}",
+            "pass": "{{ SMTP_PASS }}"
+          }
+        }],
+        "defaults": {
+          "from": "{{ SMTP_SENDER }}",
+          "envelope": {
+            "from": "{{ SMTP_BOUNCE }}"
+          },
+          "delay": 0
+        }
+      },
+      "push": {
+        "service_account_object": {
+          "type": "",
+          "project_id": "",
+          "private_key_id": "",
+          "private_key": "",
+          "client_email": "",
+          "client_id": "",
+          "auth_uri": "",
+          "token_uri": "",
+          "auth_provider_x509_cert_url": "",
+          "client_x509_cert_url": ""
+        },
+        "database_url": ""
+      },
+      "callback": {
+        "url": "http://localhost:3100/notification/callback/{MESSAGE_ID}/seenBy/{RECEIVER_ID}/?redirect={REDIRECT_URL}"
+      },
+      "queue": {
+        "timeout": 10000,
+        "retries": 6,
+        "backoffTime": 120000,
+        "backoffStrategy": "fixed",
+        "defaults": {
+          "prefix": "notification",
+          "stallInterval": 5000,
+          "nearTermWindow": 1200000,
+          "delayedDebounce": 1000,
+          "isWorker": true,
+          "getEvents": true,
+          "sendEvents": true,
+          "storeJobs": true,
+          "ensureScripts": true,
+          "activateDelayedJobs": true,
+          "removeOnSuccess": true,
+          "removeOnFailure": false,
+          "redisScanCount": 200
+        }
+      }
+    }
