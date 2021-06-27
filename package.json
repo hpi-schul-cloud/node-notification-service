@@ -37,7 +37,7 @@
 		"express": "^4.17.1",
 		"express-prom-bundle": "^6.2.0",
 		"firebase-admin": "^8.13.0",
-		"js-yaml": "^3.14.0",
+		"js-yaml": "^4.1.0",
 		"lodash": "^4.17.20",
 		"mongoose": "^5.10.5",
 		"morgan": "^1.10.0",
