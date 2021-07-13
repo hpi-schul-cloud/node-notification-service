@@ -8,6 +8,10 @@ Allowed Types of change: `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `
 
 ## Unreleased
 
+### Added
+
+- OPS-2574 - Removeing autodeployed branches for developers if branch deleted
+
 ## [1.2.5] - 2021-06-24
 
 ### Changed
